@@ -2,7 +2,6 @@
 The Braket Algorithm Library provides Amazon Braket customers with 20 pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
 
 ---  
-## <a name="advanced">Advanced circuits and algorithms</a>
 
   * [**Grover's search algorithm**](samples/Grover-search-algorithm/Grover.ipynb)
   
