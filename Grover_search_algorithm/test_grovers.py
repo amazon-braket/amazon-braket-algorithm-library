@@ -1,11 +1,6 @@
-import numpy as np
-import pytest
-
-from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
 from grovers import grover, oracles
-
 
 
 def test_grover():

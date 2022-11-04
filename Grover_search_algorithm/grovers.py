@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from braket.circuits import Circuit, circuit
-from braket.tasks import GateModelQuantumTaskResult
 
 
 def grover(item, oracles, n_qubits=3, n_reps=1):
@@ -10,7 +9,8 @@ def grover(item, oracles, n_qubits=3, n_reps=1):
 
     Args:
         item (str): target solution (e.g., '010')
-        oracle (Dict[str, Circuit]): oracle implementations for each solution as quantum circuits
+        oracle (Dict[str, Circuit]): oracle implementations for each solution
+            as quantum circuits
         n_qubits (int): number of qubits
         n_reps (int): number of repetitions for amplification
     """
@@ -24,11 +24,12 @@ def grover(item, oracles, n_qubits=3, n_reps=1):
 
 
 def amplify(oracles, n_qubits=3):
-    """ Amplitude amplification. amplify is a function that does a single iteration of 
-    amplitude amplification shown in Figure 1 of Ref[1].
+    """ Amplitude amplification. amplify is a function that does a single
+    iteration of amplitude amplification shown in Figure 1 of Ref[1].
 
     Args:
-        oracle (Dict[str, Circuit]): oracle implementations for each solution as quantum circuits
+        oracle (Dict[str, Circuit]): oracle implementations for each solution
+            as quantum circuits.
         n_qubits (int): number of qubits
     """
     circ = Circuit()
@@ -54,12 +55,15 @@ def oracles():
 def plot_bitstrings(result):
     """ Plot the measure results
 
-    Args: 
-        result (GateModelQuantumTaskResult): Execution result from a Braket device
+    Args:
+        result (GateModelQuantumTaskResult): Execution result from a Braket
+            device
     """
     num_qubits = len(result.measured_qubits)
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
-    bitstring_keys = [format_bitstring.format(ii) for ii in range(2 ** num_qubits)]
+    bitstring_keys = [
+        format_bitstring.format(ii) for ii in range(2 ** num_qubits)
+        ]
 
     # plot probabalities
     probs_values = result.values[0]
@@ -91,17 +95,19 @@ def ccz(targets=[0, 1, 2]):
         ],
         dtype=complex,
     )
-    return Circuit().unitary(matrix=matrix, targets=targets, display_name="CCZ")
+    return Circuit().unitary(
+        matrix=matrix, targets=targets, display_name="CCZ"
+        )
 
 
 @circuit.subroutine(register=True)
 def CCNot(controls=[0, 1], target=2):
     """
     build CCNOT (Toffoli gate) from H, CNOT, T, Ti
-    
+
     Args:
         controls (List[int]): control qubits of CCNot gates
-        target (int): target qubit of CCNot gates 
+        target (int): target qubit of CCNot gates
     """
     qubit_0, qubit_1 = controls
     circ = Circuit()
@@ -130,6 +136,6 @@ def ccz_ionq(controls=[0, 1], target=2):
 
     Args:
         controls (List[int]): control qubits of CCNot gates
-        target (int): target qubit of CCNot gates 
+        target (int): target qubit of CCNot gates
     """
     return Circuit().h(target).CCNot(controls, target).h(target)
