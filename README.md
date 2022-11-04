@@ -1,20 +1,20 @@
 # Amazon Braket Algorithm Library
-The Braket Algorithm Library provides Amazon Braket customers with 20 pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
+The Braket Algorithm Library provides Amazon Braket customers with 12 pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
 
 ---  
 
   * [**Grover's search algorithm**](samples/Grover-search-algorithm/Grover.ipynb)
   
-    Grover's algorithm is arguably one of the canonical quantum algorithms that kick-started the field of quantum computing. In the future, it could possibly serve as a hallmark application of quantum computing. Grover's algorithm allows us to find a particular register in an unordered database with $N$ entries in just $O(\\sqrt{N})$.
+    Grover's algorithm is arguably one of the canonical quantum algorithms that kick-started the field of quantum computing. In the future, it could possibly serve as a hallmark application of quantum computing. Grover's algorithm allows us to find a particular register in an unordered database with $N$ entries with computational complexity $O(\\sqrt{N})$.
   
   * [**Violation of Bell's Inequality**](samples/Grover-search-algorithm/Grover.ipynb)
 
-    Bell's experiment considers what would happen when Alice and Bob each measures a part of entangled photon pair. The violation of Bell's Inequality rules out the hidden variable theory for quantum phenomena.
+    Bell's experiment considers what would happen when Alice and Bob each measures a part of entangled photon pair. The violation of Bell's Inequality rules out the hidden variable theory for quantum entanglement.
 
   * [**Bernstein–Vazirani algorithm**](samples/Grover-search-algorithm/Grover.ipynb)
   
-    The Bernstein-Vazirani algorithm finds the hidden string with just a single application
-    of the oracle. The algorithm was one of the first examples of a quasi-polynomial speed-up over a probabilistic classical computer. 
+    The Bernstein-Vazirani algorithm finds the hidden string in an oracle with just a single application
+    of the oracle. The algorithm was one of the first examples to demonstrate quasi-polynomial speed-up over a probabilistic classical computer. 
   
 ---
 ## <a name="conda">Creating a conda environment</a>
