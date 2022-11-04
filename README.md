@@ -9,7 +9,7 @@ The Braket Algorithm Library provides Amazon Braket customers with 20 pre-built 
   
   * [**Violation of Bell's Inequality**](samples/Grover-search-algorithm/Grover.ipynb)
 
-    Bell's experiment considers that would happen if Alice and Bob each measure in two different directions.Alice will measure in $\mathbf{\hat a}$ and $\mathbf{\hat b}$, while Bob will measure in $\mathbf{\hat a}$ and $\mathbf{\hat c}$. The violation of Bell's Inequality rule out the hidden variable theory for quantum phenomena.
+    Bell's experiment considers what would happen when Alice and Bob each measures a part of entangled photon pair. The violation of Bell's Inequality rules out the hidden variable theory for quantum phenomena.
 
   * [**Bernstein–Vazirani algorithm**](samples/Grover-search-algorithm/Grover.ipynb)
   
