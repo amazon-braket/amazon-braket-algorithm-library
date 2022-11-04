@@ -1,5 +1,5 @@
 # Amazon Braket Algorithm Library
-The Braket Algorithm Library provides Amazon Braket customers with 12 pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
+The Braket Algorithm Library provides Amazon Braket customers with 20 pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
 
 ---  
 
@@ -9,7 +9,7 @@ The Braket Algorithm Library provides Amazon Braket customers with 12 pre-built 
   
   * [**Violation of Bell's Inequality**](samples/Grover-search-algorithm/Grover.ipynb)
 
-    Bell's experiment considers what would happen when Alice and Bob each measures a part of entangled photon pair. The violation of Bell's Inequality rules out the hidden variable theory for quantum entanglement.
+    Bell’s Inequality shows that certain predictions of quantum mechanics cannot be explained by local interactions and inherent physical properties. Instead, we must give up the assumption of either (1) some pre-existing physical property that the measurement “uncovers” or (2) that the measurements are not causally related.
 
   * [**Bernstein–Vazirani algorithm**](samples/Grover-search-algorithm/Grover.ipynb)
   
