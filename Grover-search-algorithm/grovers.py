@@ -1,11 +1,18 @@
 import numpy as np
-from braket.circuits import Circuit, circuit
 import matplotlib.pyplot as plt
+
+from braket.circuits import Circuit, circuit
+from braket.tasks import GateModelQuantumTaskResult
 
 
 def grover(item, oracles, n_qubits=3, n_reps=1):
-    """
-    function to put together individual modules of Grover algorithm
+    """ Put together individual modules of Grover algorithm
+
+    Args:
+        item (str): target solution (e.g., '010')
+        oracle (Dict[str, Circuit]): oracle implementations for each solution as quantum circuits
+        n_qubits (int): number of qubits
+        n_reps (int): number of repetitions for amplification
     """
     grover_circ = Circuit().h(np.arange(n_qubits))
     for _ in range(n_reps):
@@ -16,15 +23,17 @@ def grover(item, oracles, n_qubits=3, n_reps=1):
     return grover_circ
 
 
-def amplify(oracles, n_qubits=3, bitstring="000"):
-    """
-    function for amplitude amplification
+def amplify(oracles, n_qubits=3):
+    """ Amplitude amplification. amplify is a function that does a single iteration of 
+    amplitude amplification shown in Figure 1 of Ref[1].
 
-    `amplify` is a function that does a single iteration of amplitude amplification shown in Figure 1 of Ref[1].
+    Args:
+        oracle (Dict[str, Circuit]): oracle implementations for each solution as quantum circuits
+        n_qubits (int): number of qubits
     """
     circ = Circuit()
     circ.h(np.arange(n_qubits))
-    circ.add_circuit(oracles[bitstring])
+    circ.add_circuit(oracles['000'])
     circ.h(np.arange(n_qubits))
     return circ
 
@@ -43,6 +52,11 @@ def oracles():
 
 
 def plot_bitstrings(result):
+    """ Plot the measure results
+
+    Args: 
+        result (GateModelQuantumTaskResult): Execution result from a Braket device
+    """
     num_qubits = len(result.measured_qubits)
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
     bitstring_keys = [format_bitstring.format(ii) for ii in range(2 ** num_qubits)]
@@ -59,8 +73,10 @@ def plot_bitstrings(result):
 def ccz(targets=[0, 1, 2]):
     """
     implementation of three-qubit gate CCZ
-
     The quantum circuit for each marked state is based on Table 1 of Ref [1].
+
+    Args:
+        targets (List[int]): target qubits of ccz gates
     """
     matrix = np.array(
         [
@@ -82,6 +98,10 @@ def ccz(targets=[0, 1, 2]):
 def CCNot(controls=[0, 1], target=2):
     """
     build CCNOT (Toffoli gate) from H, CNOT, T, Ti
+    
+    Args:
+        controls (List[int]): control qubits of CCNot gates
+        target (int): target qubit of CCNot gates 
     """
     qubit_0, qubit_1 = controls
     circ = Circuit()
@@ -107,5 +127,9 @@ def CCNot(controls=[0, 1], target=2):
 def ccz_ionq(controls=[0, 1], target=2):
     """
     build CCZ from H and CCNOT
+
+    Args:
+        controls (List[int]): control qubits of CCNot gates
+        target (int): target qubit of CCNot gates 
     """
     return Circuit().h(target).CCNot(controls, target).h(target)
