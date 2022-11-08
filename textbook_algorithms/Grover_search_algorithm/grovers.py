@@ -1,11 +1,10 @@
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 from braket.circuits import Circuit, circuit
 
 
 def grover(item, oracles, n_qubits=3, n_reps=1):
-    """ Put together individual modules of Grover algorithm
+    """Put together individual modules of Grover algorithm
 
     Args:
         item (str): target solution (e.g., '010')
@@ -24,7 +23,7 @@ def grover(item, oracles, n_qubits=3, n_reps=1):
 
 
 def amplify(oracles, n_qubits=3):
-    """ Amplitude amplification. amplify is a function that does a single
+    """Amplitude amplification. amplify is a function that does a single
     iteration of amplitude amplification shown in Figure 1 of Ref[1].
 
     Args:
@@ -34,7 +33,7 @@ def amplify(oracles, n_qubits=3):
     """
     circ = Circuit()
     circ.h(np.arange(n_qubits))
-    circ.add_circuit(oracles['000'])
+    circ.add_circuit(oracles["000"])
     circ.h(np.arange(n_qubits))
     return circ
 
@@ -53,7 +52,7 @@ def oracles():
 
 
 def plot_bitstrings(result):
-    """ Plot the measure results
+    """Plot the measure results
 
     Args:
         result (GateModelQuantumTaskResult): Execution result from a Braket
@@ -61,9 +60,7 @@ def plot_bitstrings(result):
     """
     num_qubits = len(result.measured_qubits)
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
-    bitstring_keys = [
-        format_bitstring.format(ii) for ii in range(2 ** num_qubits)
-        ]
+    bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
 
     # plot probabalities
     probs_values = result.values[0]
@@ -95,9 +92,7 @@ def ccz(targets=[0, 1, 2]):
         ],
         dtype=complex,
     )
-    return Circuit().unitary(
-        matrix=matrix, targets=targets, display_name="CCZ"
-        )
+    return Circuit().unitary(matrix=matrix, targets=targets, display_name="CCZ")
 
 
 @circuit.subroutine(register=True)

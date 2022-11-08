@@ -1,5 +1,4 @@
 from braket.devices import LocalSimulator
-
 from grovers import grover, oracles
 
 
