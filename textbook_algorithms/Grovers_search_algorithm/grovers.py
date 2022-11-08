@@ -1,44 +1,52 @@
+from typing import Dict
+
+import braket.circuits.circuit as cir
 import matplotlib.pyplot as plt
 import numpy as np
-from braket.circuits import Circuit, circuit
+from braket.circuits import Circuit
+from braket.tasks import GateModelQuantumTaskResult
 
 
-def grover(item, oracles, n_qubits=3, n_reps=1):
-    """Put together individual modules of Grover algorithm
+def grover(target_bitstring: str, oracles: Dict[str, Circuit], n_qubits=3, n_reps=1) -> Circuit:
+    """Generate Grover's circuit for a target solution and oracle.
 
     Args:
-        item (str): target solution (e.g., '010')
-        oracle (Dict[str, Circuit]): oracle implementations for each solution
+        target_bitstring (str): Target solution (e.g., '010')
+        oracles (Dict[str, Circuit]): Oracle implementations for each solution
             as quantum circuits
-        n_qubits (int): number of qubits
-        n_reps (int): number of repetitions for amplification
+        n_qubits (int, optional): Number of qubits. Defaults to 3.
+        n_reps (int, optional): Number of repititions for amplification. Defaults to 1.
+
+    Returns:
+        Circuit: Grover's circuit
     """
+
     grover_circ = Circuit().h(np.arange(n_qubits))
     for _ in range(n_reps):
-        grover_circ.add(oracles[item])
+        grover_circ.add(oracles[target_bitstring])
         amplification = amplify(oracles)
         grover_circ.add(amplification)
     grover_circ.probability()
     return grover_circ
 
 
-def amplify(oracles, n_qubits=3):
-    """Amplitude amplification. amplify is a function that does a single
-    iteration of amplitude amplification shown in Figure 1 of Ref[1].
+def amplify(oracles: Dict[str, Circuit], n_qubits=3):
+    """Amplitude amplification. amplify is a function that does a single iteration of amplitude
+        amplification shown in Figure 1 of Ref[1].
 
     Args:
         oracle (Dict[str, Circuit]): oracle implementations for each solution
             as quantum circuits.
-        n_qubits (int): number of qubits
+        n_qubits (int): Number of qubits. Defaults to 3.
     """
     circ = Circuit()
     circ.h(np.arange(n_qubits))
-    circ.add_circuit(oracles["000"])
+    circ.add_circuit(oracles[n_qubits * "0"])
     circ.h(np.arange(n_qubits))
     return circ
 
 
-def oracles():
+def oracles() -> Dict[str, Circuit]:
     return {
         "000": Circuit().x([0, 1, 2]).ccz(targets=[0, 1, 2]).x([0, 1, 2]),
         "001": Circuit().x([0, 1]).ccz(targets=[0, 1, 2]).x([0, 1]),
@@ -51,12 +59,11 @@ def oracles():
     }
 
 
-def plot_bitstrings(result):
+def plot_bitstrings(result: GateModelQuantumTaskResult):
     """Plot the measure results
 
     Args:
-        result (GateModelQuantumTaskResult): Execution result from a Braket
-            device
+        result (GateModelQuantumTaskResult): Execution result from a Braket device
     """
     num_qubits = len(result.measured_qubits)
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
@@ -70,7 +77,7 @@ def plot_bitstrings(result):
     plt.xticks(rotation=90)
 
 
-@circuit.subroutine(register=True)
+@cir.circuit.subroutine(register=True)
 def ccz(targets=[0, 1, 2]):
     """
     implementation of three-qubit gate CCZ
@@ -95,7 +102,7 @@ def ccz(targets=[0, 1, 2]):
     return Circuit().unitary(matrix=matrix, targets=targets, display_name="CCZ")
 
 
-@circuit.subroutine(register=True)
+@cir.circuit.subroutine(register=True)
 def CCNot(controls=[0, 1], target=2):
     """
     build CCNOT (Toffoli gate) from H, CNOT, T, Ti
@@ -124,7 +131,7 @@ def CCNot(controls=[0, 1], target=2):
     return circ
 
 
-@circuit.subroutine(register=True)
+@cir.circuit.subroutine(register=True)
 def ccz_ionq(controls=[0, 1], target=2):
     """
     build CCZ from H and CCNOT
