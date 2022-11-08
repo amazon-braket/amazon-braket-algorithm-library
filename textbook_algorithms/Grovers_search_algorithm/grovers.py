@@ -1,9 +1,8 @@
 from typing import Dict
 
-import braket.circuits.circuit as cir
 import matplotlib.pyplot as plt
 import numpy as np
-from braket.circuits import Circuit
+from braket.circuits import Circuit, circuit
 from braket.tasks import GateModelQuantumTaskResult
 
 
@@ -77,32 +76,32 @@ def plot_bitstrings(result: GateModelQuantumTaskResult):
     plt.xticks(rotation=90)
 
 
-@cir.circuit.subroutine(register=True)
-def ccz(targets=[0, 1, 2]):
-    """
-    implementation of three-qubit gate CCZ
-    The quantum circuit for each marked state is based on Table 1 of Ref [1].
+# @circuit.subroutine(register=True)
+# def ccz(targets=[0, 1, 2]):
+#     """
+#     implementation of three-qubit gate CCZ
+#     The quantum circuit for each marked state is based on Table 1 of Ref [1].
 
-    Args:
-        targets (List[int]): target qubits of ccz gates
-    """
-    matrix = np.array(
-        [
-            [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0],
-        ],
-        dtype=complex,
-    )
-    return Circuit().unitary(matrix=matrix, targets=targets, display_name="CCZ")
+#     Args:
+#         targets (List[int]): target qubits of ccz gates
+#     """
+#     matrix = np.array(
+#         [
+#             [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+#             [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+#             [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+#             [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+#             [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+#             [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+#             [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+#             [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0],
+#         ],
+#         dtype=complex,
+#     )
+#     return Circuit().unitary(matrix=matrix, targets=targets, display_name="CCZ")
 
 
-@cir.circuit.subroutine(register=True)
+@circuit.subroutine(register=True)
 def CCNot(controls=[0, 1], target=2):
     """
     build CCNOT (Toffoli gate) from H, CNOT, T, Ti
@@ -131,8 +130,8 @@ def CCNot(controls=[0, 1], target=2):
     return circ
 
 
-@cir.circuit.subroutine(register=True)
-def ccz_ionq(controls=[0, 1], target=2):
+@circuit.subroutine(register=True)
+def ccz(targets=[0, 1, 2]):  # controls=[0, 1], target=2):
     """
     build CCZ from H and CCNOT
 
@@ -140,4 +139,4 @@ def ccz_ionq(controls=[0, 1], target=2):
         controls (List[int]): control qubits of CCNot gates
         target (int): target qubit of CCNot gates
     """
-    return Circuit().h(target).CCNot(controls, target).h(target)
+    return Circuit().h(targets[2]).CCNot([targets[0], targets[1]], targets[2]).h(targets[2])
