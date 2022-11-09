@@ -8,8 +8,7 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
     """Bernstein–Vazirani circuit on a hidden string.
 
     Args:
-        num_qubits (int, optional): _description_. Defaults to 3.
-        hidden_string (str, optional): _description_. Defaults to "011".
+        hidden_string (str): Hidden bitstring. Defaults to "011".
 
     Returns:
         Circuit: Bernstein–Vazirani circuit
@@ -29,9 +28,6 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
             bv_circuit.cnot(q, num_qubits)
 
     bv_circuit.h(range(num_qubits))
-
-    for i in range(num_qubits):
-        bv_circuit.probability(i)
     return bv_circuit
 
 
