@@ -7,19 +7,23 @@ from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-def submit_bell_tasks(device: Device, shots: int = 1_000) -> List[QuantumTask]:
+def submit_bell_tasks(
+    device: Device, shots: int = 1_000, qubit0: Qubit = 0, qubit1: Qubit = 1
+) -> List[QuantumTask]:
     """Submits three Bell circuits to a device.
 
     Args:
         device (Device): Quantum device or simulator.
         shots (int, optional): Number of shots. Defaults to 1_000.
+        qubit0 (Qubit): First qubit.
+        qubit1 (Qubit): Second qubit.
 
     Returns:
         List[AwsQuantumTask]: List of quantum tasks.
     """
-    circAB = bell_singlet_rotated(0, 1, 0, np.pi / 3.0)
-    circAC = bell_singlet_rotated(0, 1, 0, 2 * np.pi / 3.0)
-    circBC = bell_singlet_rotated(0, 1, np.pi / 3.0, 2 * np.pi / 3.0)
+    circAB = bell_singlet_rotated(qubit0, qubit1, 0, np.pi / 3.0)
+    circAC = bell_singlet_rotated(qubit0, qubit1, 0, 2 * np.pi / 3.0)
+    circBC = bell_singlet_rotated(qubit0, qubit1, np.pi / 3.0, 2 * np.pi / 3.0)
     tasks = [device.run(circ, shots=shots) for circ in [circAB, circAC, circBC]]
     return tasks
 
