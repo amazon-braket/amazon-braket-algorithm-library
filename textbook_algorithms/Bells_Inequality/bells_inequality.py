@@ -38,11 +38,12 @@ def get_bell_results(
         verbose (bool, optional): Controls printing of the inequality result. Defaults to True.
 
     Returns:
-        _type_:  results, pAB, pAC, pBC
+        Tuple[List[Counter[float]], float, float, float]: results, pAB, pAC, pBC
     """
     results = [task.result().measurement_probabilities for task in tasks]
     prob_same = [d["00"] + d["11"] for d in results]
     prob_different = [d["01"] + d["10"] for d in results]
+    # Bell probabilities
     pAB, pAC, pBC = np.array(prob_same) - np.array(prob_different)
     bell_ineqality_lhs = np.abs(pAB - pAC) - pBC
     if verbose:
