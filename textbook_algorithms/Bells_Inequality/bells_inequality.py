@@ -10,16 +10,16 @@ from braket.tasks import QuantumTask
 def submit_bell_tasks(
     device: Device, shots: int = 1_000, qubit0: Qubit = 0, qubit1: Qubit = 1
 ) -> List[QuantumTask]:
-    """Submits three Bell circuits to a device.
+    """Submit three Bell circuits to a device.
 
     Args:
         device (Device): Quantum device or simulator.
-        shots (int, optional): Number of shots. Defaults to 1_000.
+        shots (int): Number of shots. Defaults to 1_000.
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
 
     Returns:
-        List[AwsQuantumTask]: List of quantum tasks.
+        List[QuantumTask]: List of quantum tasks.
     """
     circAB = bell_singlet_rotated(qubit0, qubit1, 0, np.pi / 3.0)
     circAC = bell_singlet_rotated(qubit0, qubit1, 0, 2 * np.pi / 3.0)
@@ -35,7 +35,7 @@ def get_bell_results(
 
     Args:
         tasks (List[QuantumTask]): List of quantum tasks.
-        verbose (bool, optional): Controls printing of the inequality result. Defaults to True.
+        verbose (bool): Controls printing of the inequality result. Defaults to True.
 
     Returns:
         Tuple[List[Counter[float]], float, float, float]: results, pAB, pAC, pBC
@@ -53,7 +53,8 @@ def get_bell_results(
         if bell_ineqality_lhs > 1:
             print("Bell's inequality is violated!")
             print(
-                "Notice that the quantity is not exactly 1.5 as predicted by theory. This is may be due to less number shots or the effects of noise on the QPU."
+                "Notice that the quantity is not exactly 1.5 as predicted by theory."
+                "This is may be due to less number shots or the effects of noise on the QPU."
             )
         else:
             print("Bell's inequality is not violated due to noise.")
@@ -63,7 +64,7 @@ def get_bell_results(
 def bell_singlet_rotated(
     qubit0: Qubit, qubit1: Qubit, rotation0: float, rotation1: float
 ) -> Circuit:
-    """Prepare a Bell singlet state in a Rx-rotated meaurement basis
+    """Prepare a Bell singlet state in a Rx-rotated meaurement basis.
 
     Args:
         qubit0 (Qubit): First qubit.
@@ -83,7 +84,7 @@ def bell_singlet_rotated(
     return circ
 
 
-def bell_singlet(qubit0, qubit1) -> Circuit:
+def bell_singlet(qubit0: Qubit, qubit1: Qubit) -> Circuit:
     """Prepare a Bell singlet state.
 
     Args:
