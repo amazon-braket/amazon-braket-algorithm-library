@@ -34,7 +34,6 @@ setup(
     ],
     extras_require={
         "test": [
-            "amazon-braket-sdk",
             "black>=22.3.0",
             "flake8",
             "isort",
