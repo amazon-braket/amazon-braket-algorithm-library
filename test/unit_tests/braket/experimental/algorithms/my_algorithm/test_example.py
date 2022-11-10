@@ -10,7 +10,7 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-from braket.algorithm.example import example_function
+from braket.experimental.algorithms.my_algorithm.example import example_function
 
 
 def test_creation():
