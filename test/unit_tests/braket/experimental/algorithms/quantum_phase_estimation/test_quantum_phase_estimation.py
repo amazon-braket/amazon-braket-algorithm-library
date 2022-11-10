@@ -14,7 +14,7 @@
 from braket.circuits import Circuit, circuit
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms import quantum_phase_estimation as qpe
+from braket.experimental.algorithms.quantum_phase_estimation import quantum_phase_estimation as qpe
 
 
 # controlled unitary gate definition
@@ -53,7 +53,7 @@ def test_cnot_qpe_run_2_precision_qubits():
 
     print(
         f"test_cnot_qpe_run_2_precision_qubits Results: \
-        {qpe.get_quantum_phase_estimation_results(result)}"
+      {qpe.get_quantum_phase_estimation_results(result)}"
     )
 
     # validate excepted QPE output
@@ -88,7 +88,7 @@ def test_0_shots():
 
     print(
         f"test_0_shots Results: \
-        {qpe.get_quantum_phase_estimation_results(result)}"
+       {qpe.get_quantum_phase_estimation_results(result)}"
     )
 
     # validate excepted QPE output
@@ -117,7 +117,7 @@ def test_cnot_qpe_run_3_precision_qubits():
 
     print(
         f"test_cnot_qpe_run_3_precision_qubits Results: \
-        {qpe.get_quantum_phase_estimation_results(result)}"
+       {qpe.get_quantum_phase_estimation_results(result)}"
     )
 
     # validate excepted QPE output
@@ -148,7 +148,7 @@ def test_cnot_qpe_run_HX_eigenstate():
 
     print(
         f"test_cnot_qpe_run_HX_eigenstate Results: \
-        {qpe.get_quantum_phase_estimation_results(result)}"
+       {qpe.get_quantum_phase_estimation_results(result)}"
     )
 
     # validate excepted QPE output
@@ -179,7 +179,7 @@ def test_cnot_qpe_run_X_eigenstate():
 
     print(
         f"test_cnot_qpe_run_HX_eigenstate Results: \
-        {qpe.get_quantum_phase_estimation_results(result)}"
+       {qpe.get_quantum_phase_estimation_results(result)}"
     )
 
     # validate excepted QPE output

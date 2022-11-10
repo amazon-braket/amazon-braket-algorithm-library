@@ -13,7 +13,7 @@
 
 import math
 from collections import Counter
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Callable
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,8 +23,8 @@ from braket.devices import Device
 
 @circuit.subroutine(register=True)
 def quantum_phase_estimation(
-    precision_qubits: List[int],
-    query_qubits: List[int],
+    precision_qubits: list,
+    query_qubits: list,
     unitary_apply_func: Callable,
 ) -> Circuit:
     """
@@ -40,8 +40,8 @@ def quantum_phase_estimation(
     Args:
         precision_qubits (list): Qubits defining the precision register
         query_qubits (list) : Qubits defining the query register
-        unitary_apply_func (Callable): Function that applies the desired controlled unitary to
-        a provided circuit using provided control and target qubits
+        unitary_apply_func (Callable): Function that applies the desired controlled unitary to a
+            provided circuit using provided control and target qubits
 
     Returns:
         Circuit: Circuit object that implements the Quantum Phase Estimation algorithm
@@ -66,24 +66,24 @@ def quantum_phase_estimation(
 
 def run_quantum_phase_estimation(
     circuit: Circuit,
-    precision_qubits: List[int],
-    query_qubits: List[int],
+    precision_qubits: list,
+    query_qubits: list,
     device: Device,
     items_to_keep: int = None,
     shots: int = 1000,
-) -> Dict[str, Any]:
+) -> dict:
     """
     Function to run Quantum Phase Estimation algorithm and return measurement counts.
 
     Args:
         circuit (Circuit): Quantum Phase Estimation circuit
-        precision_qubits (List): Qubits defining the precision register
-        query_qubits (List) : Qubits defining the query register
+        precision_qubits (list): Qubits defining the precision register
+        query_qubits (list) : Qubits defining the query register
         device (Device): Braket device backend
-        items_to_keep (int) : Number of items to return, topmost measurement counts for
-                              precision register (default to None which means all)
+        items_to_keep (int) : Number of items to return, topmost measurement counts for precision
+            register (default to None which means all)
         shots (int) : Number of measurement shots (default is 1000).
-                      0 shots results in no measurement.
+            0 shots results in no measurement.
 
     Returns:
         dict: measurements and results from running Quantum Phase Estimation
@@ -174,17 +174,18 @@ def _binary_to_decimal(binary: str) -> float:
 
 # helper function for postprocessing based on measurement shots
 def _get_quantum_phase_estimation_phases(
-    measurement_counts: Counter, precision_qubits: List[int], items_to_keep: int = 1
-) -> Tuple[List[float], Dict[str, int]]:
+    measurement_counts: Counter, precision_qubits: list, items_to_keep: int = 1
+) -> list:
     """
     Get Quantum Phase Estimates phase estimate from measurement_counts for given number
     of precision qubits
 
     Args:
-        measurement_counts: measurement results from a device run
-        precision_qubits: List of qubits corresponding to precision_qubits. Currently assumed to be
-                          a list of integers corresponding to the indices of the qubits.
-        items_to_keep: number of items to return (topmost measurement counts for precision register)
+        measurement_counts (Counter) : measurement results from a device run
+        precision_qubits (list) : List of qubits corresponding to precision_qubits. Currently
+            assumed to be a list of integers corresponding to the indices of the qubits.
+        items_to_keep (int) : number of items to return (topmost measurement counts for
+            precision register)
 
     Returns:
         list: decimal phase estimates
@@ -225,14 +226,14 @@ def _get_quantum_phase_estimation_phases(
     return phases_decimal, precision_results_dict
 
 
-def get_quantum_phase_estimation_results(out: Dict[str, Any]):
+def get_quantum_phase_estimation_results(out: dict) -> None:
     """
     Function to postprocess dictionary returned by run_quantum_phase_estimation
-    and pretty print results
+        and pretty print results
 
     Args:
         out (dict): Results associated with quantum phase estimation run as produced by
-        run_quantum_phase_estimation
+            run_quantum_phase_estimation
     """
 
     # unpack results
@@ -270,7 +271,7 @@ def get_quantum_phase_estimation_results(out: Dict[str, Any]):
 # TODO: Add to qft module once available
 # inverse QFT
 @circuit.subroutine(register=True)
-def inverse_qft(qubits: List[int]) -> Circuit:
+def inverse_qft(qubits: list) -> Circuit:
     """
     Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the circuit.
