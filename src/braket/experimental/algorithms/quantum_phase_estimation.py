@@ -56,9 +56,7 @@ def quantum_phase_estimation(
         # If the control qubit is zero, the identity gate is used and there is no need to call apply
         if qubit:
             for _ in range(2**ii):
-                unitary_apply_func(
-                    quantum_phase_estimation_circuit, qubit, query_qubits
-                )
+                unitary_apply_func(quantum_phase_estimation_circuit, qubit, query_qubits)
 
     # Apply inverse qft to the precision_qubits
     quantum_phase_estimation_circuit.inverse_qft(precision_qubits)
