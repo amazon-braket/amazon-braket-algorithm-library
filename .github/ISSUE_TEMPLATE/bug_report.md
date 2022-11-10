@@ -21,6 +21,7 @@ If applicable, add screenshots or logs to help explain your problem.
 
 **System information**
 A description of your system. Please provide:
+- **Amazon Braket Python Algorithm Library version**:
 - **Amazon Braket Python SDK version**:
 - **Amazon Braket Python Schemas version**:
 - **Amazon Braket Python Default Simulator version**:
