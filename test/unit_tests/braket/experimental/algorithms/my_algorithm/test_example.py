@@ -16,4 +16,3 @@ from braket.experimental.algorithms.my_algorithm.example import example_function
 def test_creation():
     result = example_function(2)
     assert result == 1
-    

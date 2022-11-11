@@ -23,4 +23,3 @@ def example_function(my_param: int) -> int:
     """
     print(f"This is a test {my_param}")
     return 1
-    
