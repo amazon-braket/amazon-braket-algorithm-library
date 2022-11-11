@@ -63,7 +63,6 @@ def quantum_phase_estimation(
     for ii, qubit in enumerate(reversed(precision_qubits)):
         if qubit:
             for _ in range(2**ii):
-                print("MDATEST: ", ii)
                 unitary_apply_func(quantum_phase_estimation_circuit, qubit, query_qubits)
 
     quantum_phase_estimation_circuit.inverse_qft(precision_qubits)
