@@ -48,9 +48,7 @@ def simons_oracle(secret_s: str) -> Circuit:
         for index, bit_value in enumerate(secret_s):
 
             if bit_value not in ["0", "1"]:
-                raise Exception(
-                    "Incorrect char '" + bit_value + "' in secret string s:" + secret_s
-                )
+                raise Exception("Incorrect char '" + bit_value + "' in secret string s:" + secret_s)
 
             # XOR with s whenever the flag bit is 1.
             # In terms of gates, XOR means we apply an X gate only whenever the corresponding bit in s is 1.
@@ -97,6 +95,7 @@ def run_simons_algorithm(
 
     return out
 
+
 def get_simons_algorithm_results(results: Dict[str, Any]) -> Dict[str, Any]:
 
     result_s, traced_measurement_counts = _get_secret_string(results["measurement_counts"])
@@ -109,6 +108,7 @@ def get_simons_algorithm_results(results: Dict[str, Any]) -> Dict[str, Any]:
     print("Result string:", result_s)
 
     return out
+
 
 def _get_secret_string(measurement_counts: Counter):
     n = int(len(list(measurement_counts.keys())[0]) / 2)
