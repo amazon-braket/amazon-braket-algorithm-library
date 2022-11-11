@@ -13,9 +13,8 @@
 
 import math
 from collections import Counter
-from typing import Callable
+from typing import Any, Callable, Dict, List, Tuple
 
-import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit, circuit
 from braket.devices import Device
@@ -23,8 +22,8 @@ from braket.devices import Device
 
 @circuit.subroutine(register=True)
 def quantum_phase_estimation(
-    precision_qubits: list,
-    query_qubits: list,
+    precision_qubits: List[int],
+    query_qubits: List[int],
     unitary_apply_func: Callable,
 ) -> Circuit:
     """
@@ -38,8 +37,8 @@ def quantum_phase_estimation(
          controlled unitary needs to be defined in terms of available gates for a given QPU.
 
     Args:
-        precision_qubits (list): Qubits defining the precision register
-        query_qubits (list) : Qubits defining the query register
+        precision_qubits (List[int]): Qubits defining the precision register
+        query_qubits (List[int]) : Qubits defining the query register
         unitary_apply_func (Callable): Function that applies the desired controlled unitary to a
             provided circuit using provided control and target qubits
 
@@ -48,17 +47,14 @@ def quantum_phase_estimation(
     """
     quantum_phase_estimation_circuit = Circuit()
 
-    # Apply Hadamard across precision register
     quantum_phase_estimation_circuit.h(precision_qubits)
 
     # Apply controlled unitaries C-U(2^k). Start with the last precision_qubit, end with the first
     for ii, qubit in enumerate(reversed(precision_qubits)):
-        # If the control qubit is zero, the identity gate is used and there is no need to call apply
         if qubit:
             for _ in range(2**ii):
                 unitary_apply_func(quantum_phase_estimation_circuit, qubit, query_qubits)
 
-    # Apply inverse qft to the precision_qubits
     quantum_phase_estimation_circuit.inverse_qft(precision_qubits)
 
     return quantum_phase_estimation_circuit
@@ -66,19 +62,19 @@ def quantum_phase_estimation(
 
 def run_quantum_phase_estimation(
     circuit: Circuit,
-    precision_qubits: list,
-    query_qubits: list,
+    precision_qubits: List[int],
+    query_qubits: List[int],
     device: Device,
     items_to_keep: int = None,
     shots: int = 1000,
-) -> dict:
+) -> Dict[str, Any]:
     """
     Function to run Quantum Phase Estimation algorithm and return measurement counts.
 
     Args:
         circuit (Circuit): Quantum Phase Estimation circuit
-        precision_qubits (list): Qubits defining the precision register
-        query_qubits (list) : Qubits defining the query register
+        precision_qubits (List[int]): Qubits defining the precision register
+        query_qubits (List[int]) : Qubits defining the query register
         device (Device): Braket device backend
         items_to_keep (int) : Number of items to return, topmost measurement counts for precision
             register (default to None which means all)
@@ -86,23 +82,18 @@ def run_quantum_phase_estimation(
             0 shots results in no measurement.
 
     Returns:
-        dict: measurements and results from running Quantum Phase Estimation
+        Dict[str, Any]: measurements and results from running Quantum Phase Estimation
     """
 
     # Add desired results_types
     circuit.probability()
 
-    # get total number of qubits
     num_qubits = len(precision_qubits) + len(query_qubits)
 
-    # Run the circuit with all zeros input.
-    # The query_circuit subcircuit generates the desired input from all zeros.
     task = device.run(circuit, shots=shots)
 
-    # get result for this task
     result = task.result()
 
-    # get metadata
     metadata = result.task_metadata
 
     # get output probabilities (see result_types above)
@@ -114,7 +105,6 @@ def run_quantum_phase_estimation(
     measurement_counts = result.measurement_counts
     measurement_probabilities = result.measurement_probabilities
 
-    # bitstrings
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
     bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
 
@@ -146,8 +136,6 @@ def run_quantum_phase_estimation(
     return out
 
 
-# helper function to convert binary fractional to decimal
-# reference: https://www.geeksforgeeks.org/convert-binary-fraction-decimal/
 def _binary_to_decimal(binary: str) -> float:
     """
     Helper function to convert binary string (example: '01001') to decimal
@@ -172,24 +160,22 @@ def _binary_to_decimal(binary: str) -> float:
     return fracDecimal
 
 
-# helper function for postprocessing based on measurement shots
 def _get_quantum_phase_estimation_phases(
-    measurement_counts: Counter, precision_qubits: list, items_to_keep: int = 1
-) -> list:
+    measurement_counts: Counter, precision_qubits: List[int], items_to_keep: int = 1
+) -> Tuple[List[float], Dict[str, int]]:
     """
     Get Quantum Phase Estimates phase estimate from measurement_counts for given number
     of precision qubits
 
     Args:
         measurement_counts (Counter) : measurement results from a device run
-        precision_qubits (list) : List of qubits corresponding to precision_qubits. Currently
+        precision_qubits (List[int]) : List of qubits corresponding to precision_qubits. Currently
             assumed to be a list of integers corresponding to the indices of the qubits.
         items_to_keep (int) : number of items to return (topmost measurement counts for
             precision register)
 
     Returns:
-        list: decimal phase estimates
-        dict: precision results
+        Tuple[List[float], Dict[str, int]]: decimal phase estimates, precision results
     """
     # Aggregate the results (i.e., ignore/trace out the query register qubits):
     if not measurement_counts:
@@ -226,36 +212,28 @@ def _get_quantum_phase_estimation_phases(
     return phases_decimal, precision_results_dict
 
 
-def get_quantum_phase_estimation_results(out: dict) -> None:
+def get_quantum_phase_estimation_results(results: Dict[str, Any]) -> None:
     """
     Function to postprocess dictionary returned by run_quantum_phase_estimation
         and pretty print results
 
     Args:
-        out (dict): Results associated with quantum phase estimation run as produced by
-            run_quantum_phase_estimation
+        results (Dict[str, Any]): Results associated with quantum phase estimation run as produced
+            by run_quantum_phase_estimation
     """
 
     # unpack results
-    circuit = out["circuit"]
-    measurement_counts = out["measurement_counts"]
-    bitstring_keys = out["bitstring_keys"]
-    probs_values = out["probs_values"]
-    precision_results_dict = out["precision_results_dict"]
-    phases_decimal = out["phases_decimal"]
-    eigenvalues = out["eigenvalues"]
+    circuit = results["circuit"]
+    measurement_counts = results["measurement_counts"]
+    precision_results_dict = results["precision_results_dict"]
+    phases_decimal = results["phases_decimal"]
+    eigenvalues = results["eigenvalues"]
 
     # print the circuit
     print(f"Printing circuit: {circuit}")
 
     # print measurement results
     print(f"Measurement counts: {measurement_counts}")
-
-    # plot probabalities
-    plt.bar(bitstring_keys, probs_values)
-    plt.xlabel("bitstrings")
-    plt.ylabel("probability")
-    plt.xticks(rotation=90)
 
     if not eigenvalues:
         eigenvalue_estimates = None
@@ -271,13 +249,13 @@ def get_quantum_phase_estimation_results(out: dict) -> None:
 # TODO: Add to qft module once available
 # inverse QFT
 @circuit.subroutine(register=True)
-def inverse_qft(qubits: list) -> Circuit:
+def inverse_qft(qubits: List[int]) -> Circuit:
     """
     Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the circuit.
 
     Args:
-        qubits (list): Qubits on which to apply the inverse Quantum Fourier Transform
+        qubits (List[int]): Qubits on which to apply the inverse Quantum Fourier Transform
 
     Returns:
         Circuit: Circuit object that implements the inverse Quantum Fourier Transform algorithm

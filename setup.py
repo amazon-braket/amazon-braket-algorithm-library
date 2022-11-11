@@ -29,7 +29,6 @@ setup(
     install_requires=[
         "amazon-braket-sdk",
         "boto3>=1.22.3",
-        "matplotlib",
         "numpy>=1.19.2",
     ],
     extras_require={
