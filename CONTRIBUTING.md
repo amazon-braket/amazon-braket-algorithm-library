@@ -40,8 +40,31 @@ GitHub provides additional document on [forking a repository](https://help.githu
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
 
+### Making your changes
+
+When you make a contribution please ensure that you
+
+1.  Follow the existing flow of an example algorithm. This should include providing a circuit definition function a run_your_algorithm() function, and a get_your_algorithm_results() function
+2.  Provide the following files:
+    1.  *src/braket/experimental/algorithms/name_of_algo/name_of_algo.py* - implements your example algorithm
+    2.  *src/braket/experimental/algorithms/name_of_algo/\_\_init__\.py* - used for testing/packaging
+    3.  *examples/Algorithm_Name_Algorithm.ipynb* - provides a notebook the runs an example using your implementation
+    4.  (optional)*test/unit_tests/braket/experimental/algorithms/name_of_algo/test_name_of_algo.py* - unit tests for your python file
+4.  Run your algorithm on a simulator and on a QPU in your notebook.
+5.  Only have Open Source licensed dependencies in your example.
+6.  Ensure that your example runs without issues on both a recent Braket Notebook Instance (create a new Braket Notebook Instance or restart one from Amazon Braket [in the console](https://docs.aws.amazon.com/braket/latest/developerguide/braket-get-started-create-notebook.html)) and locally, using our most [recently released Amazon Braket SDK version](https://github.com/aws/amazon-braket-sdk-python/blob/main/README.md#installing-the-amazon-braket-python-sdk). Run the entire notebook by clicking `Cells > Run All`, either in the console or locally, and confirm that every cell completes without error.
+7.  Ensure that you are using HTML elements to source images in the notebooks, and that sourced images are saved in the appropriate example folder.
+
+In addition we encourage re-use of existing examples but it is not required. If you see an opportunity to make use of existing modules,
+feel free to do so. For instance if your example implementation requires Quantum Fourier Transform and you can use the existing
+Quantum Fourier Transform module instead of re-implementing it, please do so.
+
+
 ## Finding contributions to work on
-Looking at the existing issues is a great way to find something to contribute on. As our projects, by default, use the default GitHub issue labels (enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any 'help wanted' issues is a great place to start.
+The goal of the algorithm library is to offer example implementations of quantum algorithms on Amazon Braket, from textbook algorithms
+to advanced implementations of recently published research. If you just read a research paper on an algorithm it may be a good candidate.
+Also looking at the existing issues is a great way to find something to contribute on. As our projects, by default, use the default GitHub
+issue labels (enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any 'help wanted' issues is a great place to start.
 
 
 ## Code of Conduct
