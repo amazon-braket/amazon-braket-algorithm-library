@@ -101,6 +101,7 @@ def quantum_walk(n_nodes: int, num_steps: int = 1) -> Circuit:
     for _ in range(num_steps):
         qc.h(0)
         qc.add_circuit(qft_conditional_add_1(n))
+        qc.x(0) # flip the coin after the shift
     
     return qc
 
@@ -156,7 +157,11 @@ def run_quantum_walk(
     # 
     quantum_walk_measurement_counts = {}
     for key, val in measurement_counts.items():
-        quantum_walk_measurement_counts[int(key[1:], 2)] = val/shots
+        node = int(key[1:][::-1], 2)
+        if node in quantum_walk_measurement_counts:
+            quantum_walk_measurement_counts[node] += val/shots
+        else:
+            quantum_walk_measurement_counts[node] = val/shots 
     # aggregate results
     out = {
         "circuit": circ,
@@ -182,6 +187,6 @@ def plot_bitstrings(counts: Counter, title: str = None):
     """
     plt.bar(counts.keys(), counts.values())
     plt.xticks(list(counts.keys()))
-    plt.xlabel("bitstrings")
-    plt.ylabel("counts")
+    plt.xlabel("index of the nodes")
+    plt.ylabel("probability")
     plt.title(title)
