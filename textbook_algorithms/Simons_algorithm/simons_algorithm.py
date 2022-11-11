@@ -86,12 +86,8 @@ def run_simons_algorithm(
 
     result = task.result()
 
-    result_s, traced_measurement_counts = _get_secret_string(result.measurement_counts)
-
     out = {
         "circuit": circuit,
-        "secret_string": result_s,
-        "traced_measurement_counts": traced_measurement_counts,
         "task_metadata": result.task_metadata,
         "measurements": result.measurements,
         "measured_qubits": result.measured_qubits,
@@ -101,6 +97,18 @@ def run_simons_algorithm(
 
     return out
 
+def get_simons_algorithm_results(results: Dict[str, Any]) -> Dict[str, Any]:
+
+    result_s, traced_measurement_counts = _get_secret_string(results["measurement_counts"])
+
+    out = {
+        "secret_string": result_s,
+        "traced_measurement_counts": traced_measurement_counts,
+    }
+
+    print("Result string:", result_s)
+
+    return out
 
 def _get_secret_string(measurement_counts: Counter):
     n = int(len(list(measurement_counts.keys())[0]) / 2)
