@@ -60,15 +60,12 @@ def get_bell_results(
     pAB, pAC, pBC = np.array(prob_same) - np.array(prob_different)
     bell_ineqality_lhs = np.abs(pAB - pAC) - pBC
     if verbose:
-        print(
-            f"P(a,b) = {pAB},P(a,c) = {pAC},P(b,c) = {pBC}\nBell's' inequality: {bell_ineqality_lhs} ≤ 1"
-        )
+        print(f"P(a,b) = {pAB},P(a,c) = {pAC},P(b,c) = {pBC}")
+        print(f"Bell's' inequality: {bell_ineqality_lhs} ≤ 1")
         if bell_ineqality_lhs > 1:
             print("Bell's inequality is violated!")
-            print(
-                "Notice that the quantity is not exactly 1.5 as predicted by theory."
-                "This is may be due to less number shots or the effects of noise on the QPU."
-            )
+            print("Notice that the quantity is not exactly 1.5 as predicted by theory.")
+            print("This is may be due to less number shots or the effects of noise on the QPU.")
         else:
             print("Bell's inequality is not violated due to noise.")
     return results, pAB, pAC, pBC
