@@ -54,7 +54,7 @@ def test_cnot_qpe_run_2_precision_qubits():
     assert agg_result["measurement_counts"]["000"] > 300
     assert len(agg_result["measurement_counts"]) == 2
     assert agg_result["phases_decimal"] == [0.0]
-    assert set(agg_result["eigenvalue_estimates"]) == {1.+0.j}
+    assert set(agg_result["eigenvalue_estimates"]) == {1.0 + 0.0j}
 
 
 # 0 shots should result in no measurement
@@ -119,7 +119,7 @@ def test_cnot_qpe_run_3_precision_qubits():
     assert agg_result["measurement_counts"]["0000"] > 300
     assert len(agg_result["measurement_counts"]) == 2
     assert agg_result["phases_decimal"] == [0.0]
-    assert set(agg_result["eigenvalue_estimates"]) == {1.+0.j}
+    assert set(agg_result["eigenvalue_estimates"]) == {1.0 + 0.0j}
 
 
 # CNOT controlled unitary with 2 precision qubits, and HX gate query prep
@@ -151,7 +151,7 @@ def test_cnot_qpe_run_HX_eigenstate():
     assert agg_result["measurement_counts"]["100"] > 300
     assert len(agg_result["measurement_counts"]) == 2
     assert agg_result["phases_decimal"] == [0.5]
-    assert set(agg_result["eigenvalue_estimates"]) == {-1.+0.j}
+    assert set(agg_result["eigenvalue_estimates"]) == {-1.0 + 0.0j}
 
 
 # CNOT controlled unitary with 2 precision qubits, and X gate query prep
@@ -185,7 +185,7 @@ def test_cnot_qpe_run_X_eigenstate():
     assert agg_result["measurement_counts"]["001"] > 100
     assert len(agg_result["measurement_counts"]) == 4
     assert set(agg_result["phases_decimal"]) == {0.0, 0.5}
-    assert set(agg_result["eigenvalue_estimates"]) == {1.+0.j, -1.+0.j}
+    assert set(agg_result["eigenvalue_estimates"]) == {1.0 + 0.0j, -1.0 + 0.0j}
 
 
 # inverse QFT circuit validation with 2 input qubits
