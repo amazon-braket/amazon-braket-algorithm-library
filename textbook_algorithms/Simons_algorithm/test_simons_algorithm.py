@@ -1,6 +1,8 @@
 import pytest
 from braket.devices import LocalSimulator
-from .simons_algorithm import simons_oracle, submit_simons_task, process_simons_results
+
+from .simons_algorithm import (process_simons_results, simons_oracle,
+                               submit_simons_task)
 
 local_simulator = LocalSimulator()
 

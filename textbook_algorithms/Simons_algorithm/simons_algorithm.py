@@ -1,8 +1,9 @@
-from braket.circuits import Circuit
-from braket.aws import AwsDevice, AwsQuantumTask
 from typing import Optional
-from sympy import Matrix
+
 import numpy as np
+from braket.aws import AwsDevice, AwsQuantumTask
+from braket.circuits import Circuit
+from sympy import Matrix
 
 
 def simons_oracle(secret_s: str) -> Circuit:
