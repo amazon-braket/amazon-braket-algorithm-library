@@ -14,10 +14,13 @@
 
 def example_function(my_param: int) -> int:
     """This is an example function.
+
     Args:
         my_param (int): This is a parameter.
+
     Returns:
         int: The result, which is 1.
     """
     print(f"This is a test {my_param}")
     return 1
+    
