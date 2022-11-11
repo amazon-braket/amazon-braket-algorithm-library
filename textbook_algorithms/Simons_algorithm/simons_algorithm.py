@@ -75,13 +75,14 @@ def process_simons_results(task: AwsQuantumTask) -> str:
             + str(len(new_results.keys()))
             + " returned. Please rerun Simon's algorithm."
         )
-    string_list = []
+    # string_list = []
 
-    for key in new_results.keys():
-        #     if key!= "0"*n:
-        string_list.append([int(c) for c in key])
+    # for key in new_results.keys():
+    #     #     if key!= "0"*n:
+    #     string_list.append([int(c) for c in key])
 
-    M = Matrix(string_list).T
+    # M = Matrix(string_list).T
+    M=np.vstack([np.array([*key], dtype=int) for key in new_results]).T
 
     # Construct the agumented matrix
     M_I = Matrix(np.hstack([M, np.eye(M.shape[0], dtype=int)]))
