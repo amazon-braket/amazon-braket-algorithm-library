@@ -14,21 +14,33 @@
 import pytest
 from braket.devices import LocalSimulator
 
-from .simons_algorithm import run_simons_algorithm, simons_oracle
+from braket.experimental.algorithms.simons_algorithm.simons_algorithm import (
+    get_simons_algorithm_results,
+    run_simons_algorithm,
+    simons_oracle,
+)
 
 local_simulator = LocalSimulator()
 
 
-@pytest.mark.parametrize("secret", "10110")
+@pytest.mark.parametrize("secret", ["00000", "10110"])
 def test_simons_algorithm(secret):
     oracle = simons_oracle(secret)
-    result = run_simons_algorithm(oracle=oracle, device=local_simulator)
-    revelead_secret = result["secret_string"]
+    results = run_simons_algorithm(oracle=oracle, device=local_simulator)
+    processed_results = get_simons_algorithm_results(results)
+    revelead_secret = processed_results["secret_string"]
     assert secret == revelead_secret
 
 
-def test_simons_algorithm():
-    secret = "10110"
-    oracle = simons_oracle(secret)
+def test_low_shot_number():
+    secret_5_qubit = "10110"
+    oracle = simons_oracle(secret_5_qubit)
+    results = run_simons_algorithm(oracle=oracle, device=local_simulator, shots=4)
     with pytest.raises(RuntimeError):
-        run_simons_algorithm(oracle=oracle, device=local_simulator, shots=4)
+        get_simons_algorithm_results(results)
+
+
+def test_bad_string():
+    bad_string = "a0110"
+    with pytest.raises(ValueError):
+        simons_oracle(bad_string)
