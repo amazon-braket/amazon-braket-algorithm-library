@@ -26,7 +26,11 @@ setup(
     python_requires=">= 3.7.2",
     packages=find_namespace_packages(where="src", exclude=("test",)),
     package_dir={"": "src"},
-    install_requires=["boto3>=1.22.3"],
+    install_requires=[
+        "amazon-braket-sdk",
+        "boto3>=1.22.3",
+        "numpy>=1.19.2",
+    ],
     extras_require={
         "test": [
             "black>=22.3.0",
