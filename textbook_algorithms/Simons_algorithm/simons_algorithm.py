@@ -1,11 +1,26 @@
-from typing import Optional
+# Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+#     http://aws.amazon.com/apache2.0/
+#
+# or in the "license" file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+
+from collections import Counter
+from typing import Any, Dict, Optional
 
 import numpy as np
-from braket.aws import AwsDevice, AwsQuantumTask
-from braket.circuits import Circuit
+from braket.circuits import Circuit, circuit
+from braket.devices import Device
 from sympy import Matrix
 
 
+@circuit.subroutine(register=True)
 def simons_oracle(secret_s: str) -> Circuit:
     """
     Quantum circuit implementing a particular oracle for Simon's problem. Details of this implementation are
@@ -13,6 +28,9 @@ def simons_oracle(secret_s: str) -> Circuit:
     https://github.com/aws/amazon-braket-examples/blob/main/examples/advanced_circuits_algorithms/Simons_Algorithm/Simons_Algorithm.ipynb
     Args:
         secret_s (str): the secret string
+
+    Returns:
+        Circuit: Circuit object that implements the oracle
     """
     # Find the index of the first 1 in s, to be used as the flag bit
     flag_bit = secret_s.find("1")
@@ -42,49 +60,66 @@ def simons_oracle(secret_s: str) -> Circuit:
     return circ
 
 
-def simons_circuit(oracle: Circuit) -> Circuit:
+def simons_algorithm(oracle: Circuit) -> Circuit:
     n = int(oracle.qubit_count / 2)
     return Circuit().h(range(n)).add(oracle).h(range(n))
 
 
-def submit_simons_task(
-    oracle: Circuit, device: AwsDevice, shots: Optional[int] = None
-) -> AwsQuantumTask:
-    return device.run(
-        simons_circuit(oracle), shots=2 * oracle.qubit_count if shots is None else shots
-    )
+def run_simons_algorithm(
+    oracle: Circuit, device: Device, shots: Optional[int] = None
+) -> Dict[str, Any]:
+    """
+    Function to run Simon's algorithm and return the secret string.
+    Args:
+        oracle (Circuit): The oracle encoding the secret string
+        device (Device): Braket device backend
+        shots (int) : Number of measurement shots (default is None).
+            The default number of shots is set to twice the arity of the oracle.
+            0 shots results in no measurement.
+    Returns:
+        Dict[str, Any]: measurements and results from running Simon's algorithm
+    """
+    circuit = simons_algorithm(oracle)
+    circuit.probability()
 
+    task = device.run(circuit, shots=2 * oracle.qubit_count if shots is None else shots)
 
-def process_simons_results(task: AwsQuantumTask) -> str:
     result = task.result()
 
-    n = int(len(result.measured_qubits) / 2)
+    result_s, traced_measurement_counts = _get_secret_string(result.measurement_counts)
 
-    new_results = {}
-    for bitstring, count in result.measurement_counts.items():
-        # Only keep the outcomes on first n qubits
-        trunc_bitstring = bitstring[:n]
-        # Add the count to that of the of truncated bit string
-        new_results[trunc_bitstring] = new_results.get(trunc_bitstring, 0) + count
+    out = {
+        "circuit": circuit,
+        "secret_string": result_s,
+        "traced_measurement_counts": traced_measurement_counts,
+        "task_metadata": result.task_metadata,
+        "measurements": result.measurements,
+        "measured_qubits": result.measured_qubits,
+        "measurement_counts": result.measurement_counts,
+        "measurement_probabilities": result.measurement_probabilities,
+    }
 
-    if len(new_results.keys()) < n:
-        raise Exception(
+    return out
+
+
+def _get_secret_string(measurement_counts: Counter):
+    n = int(len(list(measurement_counts.keys())[0]) / 2)
+
+    traced_results = Counter()
+    for bitstring, count in measurement_counts.items():
+        traced_results.update({bitstring[:n]: count})
+
+    if len(traced_results.keys()) < n:
+        raise RuntimeError(
             "System will be underdetermined. Minimum "
             + str(n)
             + " bistrings needed, but only "
-            + str(len(new_results.keys()))
+            + str(len(traced_results.keys()))
             + " returned. Please rerun Simon's algorithm."
         )
-    # string_list = []
+    M = np.vstack([np.array([*key], dtype=int) for key in traced_results]).T
 
-    # for key in new_results.keys():
-    #     #     if key!= "0"*n:
-    #     string_list.append([int(c) for c in key])
-
-    # M = Matrix(string_list).T
-    M=np.vstack([np.array([*key], dtype=int) for key in new_results]).T
-
-    # Construct the agumented matrix
+    # Construct the augmented matrix
     M_I = Matrix(np.hstack([M, np.eye(M.shape[0], dtype=int)]))
 
     # Perform row reduction, working modulo 2. We use the iszerofunc property of rref
@@ -110,4 +145,4 @@ def process_simons_results(task: AwsQuantumTask) -> str:
     else:
         result_s = "0" * M.shape[0]
 
-    return result_s
+    return result_s, traced_results
