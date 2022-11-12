@@ -15,12 +15,12 @@ from collections import Counter
 from typing import List, Tuple
 
 import numpy as np
-from braket.circuits import Circuit, Observable, Qubit
+from braket.circuits import Circuit, Qubit
 from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-def submit_bell_tasks(
+def run_bell_tasks(
     device: Device, shots: int = 1_000, qubit0: Qubit = 0, qubit1: Qubit = 1
 ) -> List[QuantumTask]:
     """Submit three Bell circuits to a device.
@@ -90,7 +90,6 @@ def bell_singlet_rotated(
         circ.rx(qubit0, rotation0)
     if rotation1 != 0:
         circ.rx(qubit1, rotation1)
-    circ.sample(Observable.Z())
     return circ
 
 

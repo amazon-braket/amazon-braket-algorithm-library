@@ -10,23 +10,3 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-
-
-import math
-
-from braket.devices import LocalSimulator
-
-from braket.experimental.algorithms.bells_inequality.bells_inequality import (
-    get_bell_results,
-    run_bell_tasks,
-)
-
-
-def test_bell():
-    local_simulator = LocalSimulator()
-    local_tasks = run_bell_tasks(local_simulator, shots=100_000)
-    results, pAB, pAC, pBC = get_bell_results(local_tasks)
-    assert math.isclose(pAB, -0.5, rel_tol=0.1)
-    assert math.isclose(pBC, -0.5, rel_tol=0.1)
-    assert math.isclose(pAC, 0.5, rel_tol=0.1)
-    assert len(results) == 3
