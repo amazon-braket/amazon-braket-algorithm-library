@@ -43,7 +43,7 @@ def run_bell_tasks(
 
 def get_bell_results(
     tasks: List[QuantumTask], verbose: bool = True
-) -> Tuple[List[Counter[float]], float, float, float]:
+) -> Tuple[List[Counter], float, float, float]:
     """Return Bell task results after post-processing.
 
     Args:
