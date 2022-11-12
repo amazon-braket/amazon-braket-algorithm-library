@@ -150,7 +150,7 @@ def random_oracle(n_qubits: int) -> Circuit:
     return circuit
 
 
-def dj_algorithm(
+def deutsch_jozsa_algorithm(
     oracle: Circuit, n_qubits: int, device: Device = None, shots: int = 10_000
 ) -> Tuple[Circuit, GateModelQuantumTaskResult]:
     """General Deutsch-Jozsa algorithm.
