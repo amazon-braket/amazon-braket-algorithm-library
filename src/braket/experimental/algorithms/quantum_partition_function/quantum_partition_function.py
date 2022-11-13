@@ -18,13 +18,13 @@ from typing import Any, Callable, Dict, List, Tuple
 import numpy as np
 from braket.circuits import Circuit, circuit
 from braket.devices import Device
-
+import networkx as nx
 
 @circuit.subroutine(register=True)
-def quantum_phase_estimation(
-    precision_qubits: List[int],
-    query_qubits: List[int],
-    unitary_apply_func: Callable,
+def quantum_partition_function(
+    potts_model: nx,
+    step: String,
+    qft_qubits: List[int],
 ) -> Circuit:
     """
     Creates the Quantum Phase Estimation circuit using:
@@ -43,24 +43,61 @@ def quantum_phase_estimation(
             provided circuit using provided control and target qubits
 
     Returns:
-        Circuit: Circuit object that implements the Quantum Phase Estimation algorithm
+        Circuit: Circuit object that implements the Quantum Parition Estimation algorithm
     """
-    quantum_phase_estimation_circuit = Circuit()
+    
+    quantum_partition_function_circuit = Circuit()
 
-    quantum_phase_estimation_circuit.h(precision_qubits)
+    quantum_partition_function_circuit.h(precision_qubits)
 
     # Apply controlled unitaries C-U(2^k). Start with the last precision_qubit, end with the first
     for ii, qubit in enumerate(reversed(precision_qubits)):
         if qubit:
             for _ in range(2**ii):
-                unitary_apply_func(quantum_phase_estimation_circuit, qubit, query_qubits)
+                unitary_apply_func(quantum_partition_function_circuit, qubit, query_qubits)
 
-    quantum_phase_estimation_circuit.inverse_qft(precision_qubits)
+    quantum_partition_function_circuit.inverse_qft(precision_qubits)
 
-    return quantum_phase_estimation_circuit
+    return quantum_partition_function_circuit
 
+@circuit.subroutine(register=True)
+def quantum_fourier_transform(
+    qft_qubits: List[int],
+) -> Circuit:
+    """
+    Construct a circuit object corresponding to the Quantum Fourier Transform (QFT)
+    algorithm, applied to the argument qubits. 
+    
+    Args:
+        qft_qubits (List[int]): Qubits on which to apply the QFT
 
-def run_quantum_phase_estimation(
+    Returns:
+        Circuit: Circuit object that implements the Quantum Fourier Transform (QFT)
+    """
+    qftcirc = Circuit()
+    
+    # get number of qubits
+    num_qubits = len(qubits)
+    
+    for k in range(num_qubits):
+        # First add a Hadamard gate
+        qftcirc.h(qubits[k])
+    
+        # Then apply the controlled rotations, with weights (angles) defined by the distance to the control qubit.
+        # Start on the qubit after qubit k, and iterate until the end.  When num_qubits==1, this loop does not run.
+        for j in range(1,num_qubits - k):
+            angle = 2*math.pi/(2**(j+1))
+            qftcirc.cphaseshift(qubits[k+j],qubits[k], angle)
+            
+    # Then add SWAP gates to reverse the order of the qubits:
+    for i in range(math.floor(num_qubits/2)):
+        qftcirc.swap(qubits[i], qubits[-i-1])
+        
+    return qftcirc
+
+def run_quantum_partition_function(
+    potts_model: dict,
+    step: str,
     circuit: Circuit,
     precision_qubits: List[int],
     query_qubits: List[int],
@@ -84,54 +121,90 @@ def run_quantum_phase_estimation(
     Returns:
         Dict[str, Any]: measurements and results from running Quantum Phase Estimation
     """
+    
+    out = {}
 
-    # Add desired results_types
-    circuit.probability()
+    if step == 'pre':
+        print(f"Classical Preprocessing to [n,k] Code")
+        Ga = potts_model['graph-model']
+        q = potts_model['q-state']
+        # nodes of graph
+        N = len(Ga.nodes)
+        # edges of graph
+        E = len(Ga.edges)
+        # the number of connected components in the graph
+        C = len([Ga.subgraph(c).copy() for c in nx.connected_components(Ga)])
+        # [n,k] code
+        n = N
+        k = E-C
+        out['nk-code'] = (n,k)
+        out['connected-component'] = C
+    elif step == 'ICCC-check':
+        print(f"Irreducible Cyclic Cocycle Code Check")
+        if 'nk-code' not in potts_model.keys():
+            raise Exception ('no nk-code found in potts_model, please run pre-process step!')
+        Ga = potts_model['graph-model']
+        # TODO: Add shor algorithm to check ICCC
+        N = len(Ga.nodes)
+        E = len(Ga.edges)
+        n, k = potts_model['nk-code']
+        C = potts_model['connected-component']
+        print(f"The cycle matroid matrix of Graph Gamma is {n-C}x{n}")
+        check_result = False
+        if N == 3 and E == 3:
+            print("the ICCC is [1,-1], which passes ICCC check!")
+            check_result = True
+        out['iccc-check'] = check_result
+    elif step == 'qft':
+        print(f"State Preparation and Quantum Fourier Transform")
+        if 'iccc-check' not in potts_model.keys():
+            raise Exception ('no iccc-check found in potts_model, please run ICCC-check step!')
+        check_result = potts_model['iccc-check']
+        assert check_result == True, "ICCC check didn't pass, no efficient quantum alogrithm!"
 
-    num_qubits = len(precision_qubits) + len(query_qubits)
+        if 'qft-circuit' not in potts_model.keys():
+            raise Exception ('no qft-circuit found in potts_model, please generate circuit!')
 
-    task = device.run(circuit, shots=shots)
+        qft_circuit = potts_model['qft-circuit']
+        # Add desired results_types
+        qft_circuit.probability()
+        
+        qft_param = potss_model['qft-circuit']['param']
+        qft_device = qft_param['device']
+        qft_shots = qft_param['shots']
 
-    result = task.result()
+        task = qft_device.run(qft_circuit, shots=qft_shots)
 
-    metadata = result.task_metadata
+        result = task.result()
 
-    # get output probabilities (see result_types above)
-    probs_values = result.values[0]
+        metadata = result.task_metadata
 
-    # get measurement results
-    measurements = result.measurements
-    measured_qubits = result.measured_qubits
-    measurement_counts = result.measurement_counts
-    measurement_probabilities = result.measurement_probabilities
+        # get output probabilities (see result_types above)
+        probs_values = result.values[0]
 
-    format_bitstring = "{0:0" + str(num_qubits) + "b}"
-    bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
+        # get measurement results
+        measurements = result.measurements
+        measured_qubits = result.measured_qubits
+        measurement_counts = result.measurement_counts
+        measurement_probabilities = result.measurement_probabilities
 
-    # quantum phase estimation postprocessing
-    phases_decimal, precision_results_dict = _get_quantum_phase_estimation_phases(
-        measurement_counts, precision_qubits, items_to_keep
-    )
-
-    if not phases_decimal and not precision_results_dict:
-        eigenvalues = None
-    else:
-        eigenvalues = [np.exp(2 * np.pi * 1j * phase) for phase in phases_decimal]
-
-    # aggregate results
-    out = {
-        "circuit": circuit,
+        circ_result = {
         "task_metadata": metadata,
         "measurements": measurements,
         "measured_qubits": measured_qubits,
         "measurement_counts": measurement_counts,
         "measurement_probabilities": measurement_probabilities,
-        "probs_values": probs_values,
-        "bitstring_keys": bitstring_keys,
-        "precision_results_dict": precision_results_dict,
-        "phases_decimal": phases_decimal,
-        "eigenvalues": eigenvalues,
-    }
+        }
+
+        out.update(circ_result)
+    elif step == 'post':
+        print(f"Classical Post-Processing")
+        # TODO Classical pots process logic
+    else:
+        raise ValueError(
+                        f"Wrong step value {step}, can only be one 
+                        of pre,ICCC-check,qft and post"
+                        )
 
     return out
 
@@ -160,7 +233,7 @@ def _binary_to_decimal(binary: str) -> float:
     return fracDecimal
 
 
-def _get_quantum_phase_estimation_phases(
+def _get_quantum_partition_function_phases(
     measurement_counts: Counter, precision_qubits: List[int], items_to_keep: int = 1
 ) -> Tuple[List[float], Dict[str, int]]:
     """
@@ -212,14 +285,14 @@ def _get_quantum_phase_estimation_phases(
     return phases_decimal, precision_results_dict
 
 
-def get_quantum_phase_estimation_results(results: Dict[str, Any]) -> None:
+def get_quantum_partition_function_results(results: Dict[str, Any]) -> None:
     """
-    Function to postprocess dictionary returned by run_quantum_phase_estimation
+    Function to postprocess dictionary returned by run_quantum_partition_function
         and pretty print results
 
     Args:
         results (Dict[str, Any]): Results associated with quantum phase estimation run as produced
-            by run_quantum_phase_estimation
+            by run_quantum_partition_function
     """
 
     # unpack results
