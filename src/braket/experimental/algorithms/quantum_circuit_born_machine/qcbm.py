@@ -84,7 +84,7 @@ class QCBM:
                 length = 3 * n_qubits * n_layers
 
         Returns:
-            circ (braket.circuit): Circuit with parameters fixed to `params`.
+            Circuit: Circuit with parameters fixed to `params`.
         """
         try:
             params = params.reshape(self.n_layers, self.n_qubits, 3)
@@ -103,24 +103,31 @@ class QCBM:
         return circ
 
     def probabilities(self, params: np.ndarray) -> np.ndarray:
+        """Get probabilities from a run.
+
+        Args:
+            params (np.ndarray): Parameters for QCBM.
+
+        Returns:
+            np.ndarray: Probabilities.
+        """
         circ = self.create_circuit(params)
         probs = self.device.run(circ, shots=self.shots).result().values[0]
         return probs
 
     def gradient(self, params: np.ndarray) -> np.ndarray:
         """Gradient for QCBM via:
+
         Liu, Jin-Guo, and Lei Wang.
         “Differentiable Learning of Quantum Circuit Born Machine.”
         Physical Review A 98, no. 6 (December 19, 2018): 062324.
         https://doi.org/10.1103/PhysRevA.98.062324.
 
         Args:
-            qcbm (QCBM): QCBM class
-            data (ndarray): Probability vector for the data
             params (ndarray): Parameters for the rotation gates in the QCBM
 
         Returns:
-            grad (ndarray): Gradient vector
+           ndarray: Gradient vector
         """
         qcbm_probs = self.probabilities(params)
         shift = np.ones_like(params) * np.pi / 2
@@ -145,7 +152,7 @@ class QCBM:
         return grad
 
 
-def compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]):
+def compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]) -> float:
     r"""Gaussian radial basis function (RBF) kernel.
 
     K(x, y) = sum_\sigma exp(-|x-y|^2/(2\sigma^2 ))
@@ -153,10 +160,10 @@ def compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.
     Args:
         px (ndarray): Probability distribution
         py (ndarray): Target probability distribution
-        sigma_list (list): [description]. Defaults to [0.1, 1].
+        sigma_list (List[float]): Standard deviations of distribution. Defaults to [0.1, 1].
 
     Returns:
-        kernel (float): Value of the Gaussian RBF function for kernel(px, py).
+        float: Value of the Gaussian RBF function for kernel(px, py).
     """
     x = np.arange(len(px))
     y = np.arange(len(py))
@@ -165,7 +172,7 @@ def compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.
     return kernel
 
 
-def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list=[0.1, 1]):
+def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]) -> float:
     r"""Maximum Mean Discrepancy loss (MMD).
 
     MMD determines if two distributions are equal by looking at the difference between
@@ -184,10 +191,10 @@ def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list=[0.1, 1]):
     Args:
         px (ndarray): Probability distribution
         py (ndarray): Target probability distribution
-        sigma_list (list, optional): [description]. Defaults to [0.1, 1].
+        sigma_list (List[float]):  Standard deviations of distribution. Defaults to [0.1, 1].
 
     Returns:
-        mmd (float): Value of the MMD loss
+        float: Value of the MMD loss
     """
 
     mmd_xx = compute_kernel(px, px, sigma_list)

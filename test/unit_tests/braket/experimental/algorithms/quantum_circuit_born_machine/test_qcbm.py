@@ -23,14 +23,20 @@ def test_qcbm():
     n_qubits = 2
     n_layers = 1
 
-    init_params = np.ones(3 * n_layers * n_qubits)
+    data = np.ones(3 * n_layers * n_qubits)
 
     device = LocalSimulator()
-    qcbm = QCBM(device, n_qubits, n_layers, init_params)
+    qcbm = QCBM(device, n_qubits, n_layers, data)
 
-    expected = Circuit().rx(0, 1.0).rz(0, 1.0).rx(0, 1.0)
+    expected = Circuit()
+    expected.rx(0, 1.0).rz(0, 1.0).rx(0, 1.0)
     expected.rx(1, 1.0).rz(1, 1.0).rx(1, 1.0)
     expected.cnot(0, 1)
     expected.cnot(1, 0)
+    expected.probability()
 
-    assert qcbm == expected
+    init_params = np.ones(3 * n_layers * n_qubits)
+
+    circ = qcbm.create_circuit(init_params)
+
+    assert circ == expected
