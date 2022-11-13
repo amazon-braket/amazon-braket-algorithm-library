@@ -109,20 +109,16 @@ def random_oracle(n_qubits: int) -> Circuit:
     # create a list combining single and multiple qubit gates to randomly choose from
     choice_gate_set = ["single_gate_set", "multiple_gate_set"]
 
-    # random oracle circuit generator
-
     # implement all the gate options
     for qubit in range(len(random_array)):
         # randomly choose to apply a single qubit or multiple qubit gate
         random_gate_set = np.random.choice(choice_gate_set, p=[0.30, 0.70])
-
         # if single qubit gate then implement x gate accordingly
         if random_gate_set == "single_gate_set":
             if random_array[qubit] == 1:
                 circuit.x(qubit)
-
         # if multiple qubit gate then implement cnot and ccnot gates
-        if random_gate_set == "multiple_gate_set":
+        elif random_gate_set == "multiple_gate_set":
             # randomly choose to implement a cnot or ccnot gate
             random_gate_m = np.random.choice(multiple_gate_set)
             if random_gate_m == "cnot":
