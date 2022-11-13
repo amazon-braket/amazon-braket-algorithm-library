@@ -210,46 +210,16 @@ def classical_generator(
     """
     if device is None:
         device = LocalSimulator()
+
     output_qubit = n_qubits
     n = n_qubits
-    matrix = []
-
-    for i in range(2**n):
-        # convert integer to bitstring and into an integer
-        bit_str = [int(x) for x in str(format(i, "b"))]
-        # if len of bitstring less than n then pad with zeros
-        if len(bit_str) < n:
-            num_zero = n - len(bit_str)
-            bit_str = np.pad(bit_str, (num_zero, 0), "constant")
-        # append bit_str to matrix
-        matrix.append(bit_str)
-
-    # turn matix into an numpy array
-    matrix_bitout = np.array(matrix)
+    matrix_bitout = construct_matrix(n)
     measurement_results_classical = []
 
     for row in matrix_bitout:
-        circuit = Circuit()
-        # retrieve the bit string that initializes the qubits for this iteration
-        qubit_info = row.tolist()
-        print(qubit_info)
-        # creating initial states of our classical circuit
-        for qubit in range(len(qubit_info)):
-            if qubit_info[qubit] == 1:
-                circuit.x(qubit)
-            else:
-                circuit.i(qubit)
-        # adding random circuit to our initial states
-        circuit.add_circuit(random_oracle, range(n_qubits))
-        circuit.sample(observable=Observable.Z(), target=output_qubit)
-        print(circuit)
-
+        circuit = build_dj_circuit(random_oracle, output_qubit, n, row)
         task = device.run(circuit, shots=shots)
-
-        # Retrieve the result
         result = task.result()
-        # print the measurement probabilities
-        print("Measurement results:\n", result.measurement_probabilities)
 
         # store results in a measurement variable
         measurement_classical = result.measurement_probabilities
@@ -285,9 +255,59 @@ def classical_generator(
     return random_oracle
 
 
+def construct_matrix(n: int) -> np.ndarray:
+    """Construct a matrix.
+
+    Args:
+        n (int): log2(size of matrix.
+
+    Returns:
+        ndarray: Matrix
+    """
+    matrix = []
+    for i in range(2**n):
+        # convert integer to bitstring and into an integer
+        bit_str = [int(x) for x in str(format(i, "b"))]
+        # if len of bitstring less than n then pad with zeros
+        if len(bit_str) < n:
+            num_zero = n - len(bit_str)
+            bit_str = np.pad(bit_str, (num_zero, 0), "constant")
+        matrix.append(bit_str)
+
+    return np.array(matrix)
+
+
+def build_dj_circuit(random_oracle: Circuit, output_qubit: int, row: np.ndarray) -> Circuit:
+    """Construct full Deustch-Jozsa circuit.
+
+    Args:
+        random_oracle (Circuit): Random oracle circuit.
+        output_qubit (int): Output qubit.
+        row (np.ndarray): Row vector.
+
+    Returns:
+        Circuit: Deustch-Jozsa circuit.
+    """
+    circuit = Circuit()
+    # retrieve the bit string that initializes the qubits for this iteration
+    qubit_info = row.tolist()
+    # creating initial states of our classical circuit
+    for qubit in range(len(qubit_info)):
+        if qubit_info[qubit] == 1:
+            circuit.x(qubit)
+        else:
+            circuit.i(qubit)
+    circuit.add_circuit(random_oracle, range(output_qubit))
+    circuit.sample(observable=Observable.Z(), target=output_qubit)
+    return circuit
+
+
 def quantum_generator(
-    n_qubits: int, random_oracle: Circuit, device: Device = None, shots: int = 100
-) -> None:
+    n_qubits: int,
+    random_oracle: Circuit,
+    device: Device = None,
+    shots: int = 100,
+) -> Circuit:
     """Run initialized states through circuit and add random_oracle
 
 
@@ -305,25 +325,12 @@ def quantum_generator(
     output_qubit = n_qubits
 
     # create circuit and initialize states
-    circuit = Circuit().h(range(n_qubits)).x(output_qubit).h(output_qubit)
-    # add the random oracle to this circuit
-    circuit.add_circuit(random_oracle, range(n_qubits))
-    # place the h-gates again
-    circuit.h(range(n_qubits))
+    circuit = build_quantum_dj_circuit(n_qubits, random_oracle, output_qubit)
 
-    # measure the results
-    for qubit in range(n_qubits):
-        circuit.sample(observable=Observable.Z(), target=qubit)
-
-    # Designate the device being used as the local simulator
-    # Feel free to use another device
     device = LocalSimulator()
-    # Submit the task
     task = device.run(circuit, shots=shots)
-    # Retrieve the result
     result = task.result()
     measurement_quantum = result.measurement_probabilities
-    # print the measurement probabilities
     print("Measurement results:\n", result.measurement_probabilities)
 
     measurement_keys = list(measurement_quantum.keys())
@@ -335,13 +342,44 @@ def quantum_generator(
         all_measurements.append(func)
 
     num_outputs = len(all_measurements)
-
     type_func = sum(0 if sum(row) == 0 else 1 for row in all_measurements)
+    print_results(num_outputs, type_func)
+    return circuit
 
+
+def print_results(num_outputs: int, type_func: int):
+    """Print the predictions.
+
+    Args:
+        num_outputs (int): Number of outputs.
+        type_func (int): Type of function.
+    """
     if type_func == 0:
         print("This is a constant function")
     elif type_func == num_outputs:
         print("This is a balanced function")
     else:
         print("This is neither a balanced or constant function")
+
+
+def build_quantum_dj_circuit(n_qubits: int, random_oracle: Circuit, output_qubit: int) -> Circuit:
+    """Build the full circuit.
+
+    Args:
+        n_qubits (int): Number of qubits
+        random_oracle (Circuit): Random oracle circuit.
+        output_qubit (int): Output qubit.
+
+    Returns:
+        Circuit: Full circuit with measurements.
+    """
+    circuit = Circuit().h(range(n_qubits)).x(output_qubit).h(output_qubit)
+    # add the random oracle to this circuit
+    circuit.add_circuit(random_oracle, range(n_qubits))
+    # place the h-gates again
+    circuit.h(range(n_qubits))
+
+    # measure the results
+    for qubit in range(n_qubits):
+        circuit.sample(observable=Observable.Z(), target=qubit)
     return circuit
