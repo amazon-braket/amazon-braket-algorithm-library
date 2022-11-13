@@ -127,7 +127,7 @@ class QCBM:
             params (ndarray): Parameters for the rotation gates in the QCBM
 
         Returns:
-           ndarray: Gradient vector
+            ndarray: Gradient vector
         """
         qcbm_probs = self.probabilities(params)
         shift = np.ones_like(params) * np.pi / 2
