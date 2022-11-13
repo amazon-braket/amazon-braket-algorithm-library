@@ -109,7 +109,7 @@ class QCBM:
             params (np.ndarray): Parameters for QCBM.
 
         Returns:
-            np.ndarray: Probabilities.
+            ndarray: Probabilities.
         """
         circ = self.create_circuit(params)
         probs = self.device.run(circ, shots=self.shots).result().values[0]
