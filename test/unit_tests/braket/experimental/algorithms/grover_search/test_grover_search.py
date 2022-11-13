@@ -1,7 +1,7 @@
 from braket.devices import LocalSimulator
 from braket.experimental.algorithms.grover_search.grover_search import (
     grover_search,
-    get_oracles,
+    get_oracle,
 )
 
 
