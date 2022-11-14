@@ -38,13 +38,19 @@ def quantum_phase_estimation(
          repeatedly apply this function for the target qubits. This is a necessary input because the
          controlled unitary needs to be defined in terms of available gates for a given QPU.
 
-    For example:
-    With two precision qubits, one query qubit, the unitary is cnot, and your
-    initial query qubit state is Hadamard, you would do the following:
-    def cnot_apply_func(circ, control_qubit, query_qubits):
-        circ.qpe_cnot_unitary(control_qubit, query_qubits)
-    circ = Circuit().h([2])
-    circ.quantum_phase_estimation([0, 1], [2], cnot_apply_func)
+    Example:
+        >>> def cnot_apply_func(circ, control_qubit, query_qubits):
+        ...    circ.qpe_cnot_unitary(control_qubit, query_qubits)
+        >>> circ = Circuit().h([2])
+        >>> circ.quantum_phase_estimation([0, 1], [2], cnot_apply_func)
+        >>> print(circ)
+        T  : |0|1| 2  |3|     4      |5|
+        q0 : -H---SWAP---PHASE(-1.57)-H-
+                  |      |
+        q1 : -H-C-SWAP-H-C--------------
+                |
+        q2 : -H-X-----------------------
+        T  : |0|1| 2  |3|     4      |5|
 
     Args:
         precision_qubits (QubitSetInput): Qubits defining the precision register
