@@ -1,16 +1,12 @@
-from typing import Dict
+from typing import Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit, QubitSetInput, circuit
-from braket.tasks import GateModelQuantumTaskResult
 
 
 def grover_search(
-    oracle: Circuit, 
-    n_qubits: int, 
-    n_reps: int = 1,
-    decompose_ccnot: bool = False
+    oracle: Circuit, n_qubits: int, n_reps: int = 1, decompose_ccnot: bool = False
 ) -> Circuit:
     """Generate Grover's circuit for a target solution and oracle.
 
@@ -32,18 +28,18 @@ def grover_search(
     return grover_circ
 
 
-def get_oracle(solution: str, decompose_ccnot: bool = False):
-    """ Oraclc circuit of a given solution.
+def get_oracle(solution: str, decompose_ccnot: bool = False) -> Circuit:
+    """Oraclc circuit of a given solution.
 
     Args:
-        solution (str): Target solution (e.g., '010') 
+        solution (str): Target solution (e.g., '010')
         decompose_ccnot (bool): Whether to decompose CCNOT (Toffoli) gate in the circuit.
 
     Returns:
         Circuit: Oracle circuit
     """
-    x_idx = [i for i,s in enumerate(solution) if s=='0']
-    
+    x_idx = [i for i, s in enumerate(solution) if s == "0"]
+
     circ = Circuit()
     n_qubit = len(solution)
     mcz = multi_control_z(n_qubit, decompose_ccnot)
@@ -119,11 +115,11 @@ def CCNot(controls: QubitSetInput = [0, 1], target: int = 2) -> Circuit:
 
 
 def multi_control_not_constructor(
-        n_qubit: int, 
-        decompose_ccnot: bool, 
-        is_outermost_call: bool = True,
-    ):
-    """ Recusive constructor of a multi-contol Not circuit (generalized Toffoli gate).
+    n_qubit: int,
+    decompose_ccnot: bool,
+    is_outermost_call: bool = True,
+) -> Tuple[Circuit, int]:
+    """Recusive constructor of a multi-contol Not circuit (generalized Toffoli gate).
     Ref: https://arxiv.org/abs/1904.01671
 
     Args:
@@ -135,53 +131,53 @@ def multi_control_not_constructor(
         Circuit:  multi-contol Not circuit
         int: number of ancilla in the circuit
     """
-    if n_qubit==1:
+    if n_qubit == 1:
         n_ancilla = 1
         circ = Circuit().cnot(0, 1)
         return circ, n_ancilla
-    elif n_qubit==2:
+    elif n_qubit == 2:
         n_ancilla = 1
         if decompose_ccnot:
-            circ = Circuit().CCNot([0,1],2)
+            circ = Circuit().CCNot([0, 1], 2)
         else:
-            circ = Circuit().ccnot(0,1,2)
+            circ = Circuit().ccnot(0, 1, 2)
         return circ, n_ancilla
     else:
         n_ancilla = 0
         nq1 = n_qubit // 2
-        nq2 = n_qubit - nq1 
-        
+        nq2 = n_qubit - nq1
+
         circ1, na1 = multi_control_not_constructor(nq1, decompose_ccnot, is_outermost_call=False)
         circ2, na2 = multi_control_not_constructor(nq2, decompose_ccnot, is_outermost_call=False)
-        
+
         circ = Circuit()
 
-        qd1 = list(range(0,nq1))
-        qa1 = list(range(n_qubit+n_ancilla, n_qubit+n_ancilla+na1))  
-        circ.add_circuit(circ1, target=qd1+qa1) 
+        qd1 = list(range(0, nq1))
+        qa1 = list(range(n_qubit + n_ancilla, n_qubit + n_ancilla + na1))
+        circ.add_circuit(circ1, target=qd1 + qa1)
         n_ancilla += na1
-        
-        qd2 = list(range(nq1,nq1+nq2))
-        qa2 = list(range(n_qubit+n_ancilla, n_qubit+n_ancilla+na2))
-        circ.add_circuit(circ2, target=qd2+qa2) 
+
+        qd2 = list(range(nq1, nq1 + nq2))
+        qa2 = list(range(n_qubit + n_ancilla, n_qubit + n_ancilla + na2))
+        circ.add_circuit(circ2, target=qd2 + qa2)
         n_ancilla += na2
 
-        q0, q1, q2 = qa1[-1], qa2[-1], n_qubit+n_ancilla
+        q0, q1, q2 = qa1[-1], qa2[-1], n_qubit + n_ancilla
         if decompose_ccnot:
-            circ.CCNot([q0,q1],q2)
+            circ.CCNot([q0, q1], q2)
         else:
             circ.ccnot(q0, q1, q2)
         n_ancilla += 1
 
         if is_outermost_call:
-            circ.add_circuit(circ2.adjoint(), target=qd2+qa2)
-            circ.add_circuit(circ1.adjoint(), target=qd1+qa1) 
- 
+            circ.add_circuit(circ2.adjoint(), target=qd2 + qa2)
+            circ.add_circuit(circ1.adjoint(), target=qd1 + qa1)
+
         return circ, n_ancilla
 
-    
-def multi_control_not(n_qubit: int, decompose_ccnot: bool):
-    """ Multi-control Not circuit
+
+def multi_control_not(n_qubit: int, decompose_ccnot: bool) -> Circuit:
+    """Multi-control Not circuit
 
     Args:
         n_qubits (int): Number of qubits.
@@ -193,9 +189,9 @@ def multi_control_not(n_qubit: int, decompose_ccnot: bool):
     mcx_circ, _ = multi_control_not_constructor(n_qubit, decompose_ccnot, is_outermost_call=True)
     return mcx_circ
 
-    
-def multi_control_z(n_qubit: int, decompose_ccnot: bool): 
-    """ Multi-control Z circuit
+
+def multi_control_z(n_qubit: int, decompose_ccnot: bool) -> Circuit:
+    """Multi-control Z circuit
 
     Args:
         n_qubits (int): Number of qubits.
@@ -203,17 +199,11 @@ def multi_control_z(n_qubit: int, decompose_ccnot: bool):
 
     Returns:
         Circuit:  multi-contol Z circuit
-    """      
+    """
     mcz_circ = multi_control_not(n_qubit, decompose_ccnot)
     z_target = mcz_circ.qubit_count - 1
 
     circ = Circuit()
     circ.x(z_target).h(z_target).add_circuit(mcz_circ).h(z_target).x(z_target)
-    
+
     return circ
-
-
-
-
-
-
