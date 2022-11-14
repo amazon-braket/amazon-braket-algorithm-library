@@ -13,7 +13,6 @@
 
 import math
 from typing import Any, Dict, List
-import matplotlib.pyplot as plt
 
 from braket.circuits import Circuit, circuit
 import networkx as nx
@@ -211,7 +210,7 @@ def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
 
     print(counts)
 
-    # plot using Counter
-    plt.bar(counts.keys(), counts.values())
-    plt.xlabel("bitstrings")
-    plt.ylabel("counts")
+    # # plot using Counter
+    # plt.bar(counts.keys(), counts.values())
+    # plt.xlabel("bitstrings")
+    # plt.ylabel("counts")
