@@ -7,7 +7,7 @@ from braket.tasks import GateModelQuantumTaskResult
 
 
 def grover_search(
-    target_bitstring: str, 
+    oracle: Circuit, 
     n_qubits: int = 3, 
     n_reps: int = 1,
     decompose_ccnot: bool = False
@@ -24,9 +24,6 @@ def grover_search(
     Returns:
         Circuit: Grover's circuit
     """
-    oracle = get_oracle(target_bitstring, decompose_ccnot)
-    n_qubits = len(target_bitstring)
-
     grover_circ = Circuit().h(np.arange(n_qubits))
     for _ in range(n_reps):
         grover_circ.add(oracle)
@@ -34,6 +31,16 @@ def grover_search(
         grover_circ.add(amplification)
     grover_circ.probability(range(n_qubits))
     return grover_circ
+
+
+def get_oracle(solution: str, decompose_ccnot: bool = False):
+    x_idx = [i for i,s in enumerate(solution) if s=='0']
+    
+    circ = Circuit()
+    n_qubit = len(solution)
+    mcz = multi_control_z(n_qubit, decompose_ccnot)
+    circ.x(x_idx).add_circuit(mcz).x(x_idx)
+    return circ
 
 
 def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
@@ -175,14 +182,7 @@ def multi_control_z(n_qubit: int, decompose_ccnot: bool):
     return circ
 
 
-def get_oracle(solution: str, decompose_ccnot: bool):
-    x_idx = [i for i,s in enumerate(solution) if s=='0']
-    
-    circ = Circuit()
-    n_qubit = len(solution)
-    mcz = multi_control_z(n_qubit, decompose_ccnot)
-    circ.x(x_idx).add_circuit(mcz).x(x_idx)
-    return circ
+
 
 
 
