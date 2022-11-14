@@ -29,7 +29,7 @@ def test_constant_oracle_circuit():
     assert circ.qubit_count == 4
 
 
-@pytest.xfail(raises=ValueError)
+@pytest.mark.xfail(raises=ValueError)
 def test_fail_constant_oracle_circuit():
     constant_oracle(0)
 
@@ -39,7 +39,7 @@ def test_balanced_oracle_circuit():
     assert circ.qubit_count == 4
 
 
-@pytest.xfail(raises=ValueError)
+@pytest.mark.xfail(raises=ValueError)
 def test_fail_balanced_oracle_circuit():
     balanced_oracle(0)
 
@@ -61,7 +61,7 @@ def test_get_deutsch_jozsa_results_constant():
 
 def test_get_deutsch_jozsa_results_balanced():
     device = LocalSimulator()
-    bal_oracle = balanced_oracle()(3)
+    bal_oracle = balanced_oracle(3)
     dj_circuit = deutsch_jozsa_circuit(bal_oracle, 3)
     task = device.run(dj_circuit, shots=0)
     dj_probabilities = get_deutsch_jozsa_results(task)
