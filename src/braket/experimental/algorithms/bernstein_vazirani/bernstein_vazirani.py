@@ -56,7 +56,7 @@ def get_bernstein_vazirani_results(task: QuantumTask) -> Dict[str, float]:
         Dict[str, float]: Results as a dictionary of bitstrings
     """
 
-    probabilities = task.result().result_types[-1].value
+    probabilities = task.result().result_types[0].value
     probabilities = np.round(probabilities, 10)  # round off floating-point errors
     num_qubits = int(np.log2(len(probabilities)))
     binary_strings = [format(i, "b").zfill(num_qubits) for i in range(2**num_qubits)]
