@@ -180,8 +180,8 @@ def _objective_function(
 
     # store optimal (classical) result/bitstring
     if energy_min < tracker["optimal_energy"]:
-        tracker.update({"optimal_energy": energy_min})
-        tracker.update({"optimal_bitstring": optimal_string})
+        tracker["optimal_energy"] = energy_min
+        tracker["optimal_bitstring"] = optimal_string
 
     # store global minimum
     tracker["global_energies"].append(tracker["optimal_energy"])
