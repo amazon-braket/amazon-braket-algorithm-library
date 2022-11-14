@@ -20,7 +20,7 @@ from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-def run_bell_tasks(
+def run_bell_inequality_tasks(
     device: Device, shots: int = 1_000, qubit0: Qubit = 0, qubit1: Qubit = 1
 ) -> List[QuantumTask]:
     """Submit three Bell circuits to a device.
@@ -41,7 +41,7 @@ def run_bell_tasks(
     return tasks
 
 
-def get_bell_results(
+def get_bell_inequality_results(
     tasks: List[QuantumTask], verbose: bool = True
 ) -> Tuple[List[Counter], float, float, float]:
     """Return Bell task results after post-processing.
@@ -51,13 +51,13 @@ def get_bell_results(
         verbose (bool): Controls printing of the inequality result. Defaults to True.
 
     Returns:
-        Tuple[List[Counter[float]], float, float, float]: results, pAB, pAC, pBC
+        Tuple[List[Counter], float, float, float]: results, pAB, pAC, pBC
     """
-    results = [task.result().measurement_probabilities for task in tasks]
-    prob_same = [d["00"] + d["11"] for d in results]
-    prob_different = [d["01"] + d["10"] for d in results]
-    # Bell probabilities
-    pAB, pAC, pBC = np.array(prob_same) - np.array(prob_different)
+    results = [task.result().result_types[0].value for task in tasks]  # probability result type
+    prob_same = np.array([d[0] + d[3] for d in results])  # 00 and 11 states
+    prob_different = np.array([d[1] + d[2] for d in results])  # 01 and 10 states
+
+    pAB, pAC, pBC = prob_same - prob_different  # Bell probabilities
     bell_ineqality_lhs = np.abs(pAB - pAC) - pBC
     if verbose:
         print(f"P(a,b) = {pAB},P(a,c) = {pAC},P(b,c) = {pBC}")
@@ -90,6 +90,7 @@ def bell_singlet_rotated(
         circ.rx(qubit0, rotation0)
     if rotation1 != 0:
         circ.rx(qubit1, rotation1)
+    circ.probability()
     return circ
 
 

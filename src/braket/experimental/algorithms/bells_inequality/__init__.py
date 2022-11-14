@@ -10,3 +10,10 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
+
+from braket.experimental.algorithms.bells_inequality.bells_inequality import (
+    bell_singlet,
+    bell_singlet_rotated,
+    get_bell_inequality_results,
+    run_bell_inequality_tasks,
+)
