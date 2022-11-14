@@ -10,3 +10,11 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
+
+from braket.experimental.algorithms.deutsch_jozsa.deutsch_jozsa import (  # noqa: F401
+    balanced_oracle,
+    constant_oracle,
+    deutsch_jozsa_circuit,
+    get_deutsch_jozsa_results,
+    plot_bitstrings,
+)
