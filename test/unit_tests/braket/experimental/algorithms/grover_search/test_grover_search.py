@@ -1,11 +1,10 @@
 import numpy as np
 import pytest
-
 from braket.devices import LocalSimulator
 
 from braket.experimental.algorithms.grover_search import (
-    grover_search,
     build_oracle,
+    grover_search,
     plot_bitstrings,
 )
 
@@ -38,8 +37,8 @@ def test_grover_search_solution_decompose_ccnot(decompose_ccnot):
     result = task.result()
     probabilities = result.values[0]
 
-    assert np.argmax(probabilities) == 0    
+    assert np.argmax(probabilities) == 0
 
 
 def test_plot_bitstrings():
-    plot_bitstrings([0.1,0.2])
+    plot_bitstrings([0.1, 0.2])
