@@ -111,10 +111,8 @@ def qaoa(
 
     # initialize qaoa circuit with first Hadamard layer: for minimization start in |->
     circ = Circuit()
-    X_on_all = Circuit().x(range(0, n_qubits))
-    circ.add(X_on_all)
-    H_on_all = Circuit().h(range(0, n_qubits))
-    circ.add(H_on_all)
+    circ.x(range(0, n_qubits))
+    circ.h(range(0, n_qubits))
 
     # setup two parameter families
     circuit_length = int(len(params) / 2)
