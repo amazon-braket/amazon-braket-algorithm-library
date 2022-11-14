@@ -56,13 +56,12 @@ def _driver(beta: float, n_qubits: int) -> Circuit:
 
 
 def _cost_circuit(
-    gamma: float,  ising: np.ndarray, device: Union[AwsDevice, LocalSimulator]
+    gamma: float, ising: np.ndarray, device: Union[AwsDevice, LocalSimulator]
 ) -> Circuit:
     """Returns circuit for evolution with cost Hamiltonian
 
     Args:
         gamma (float): Rotation angle to apply parameterized rotation around z
-        n_qubits (int): number of qubits
         ising (np.ndarray): Ising matrix
         device (Union[AwsDevice, LocalSimulator]): AwsDevice or LocalSimulator to run the circuit on
 
@@ -121,7 +120,7 @@ def qaoa(
 
     # add QAOA circuit layer blocks
     for gamma, beta in zip(gammas, betas):
-        circ.add(_cost_circuit(gamma, n_qubits, ising, device))
+        circ.add(_cost_circuit(gamma, ising, device))
         circ.add(_driver(beta, n_qubits))
 
     return circ
