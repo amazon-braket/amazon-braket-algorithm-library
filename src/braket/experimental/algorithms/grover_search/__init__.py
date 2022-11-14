@@ -13,6 +13,6 @@
 
 from braket.experimental.algorithms.grover_search.grover_search import (  # noqa: F401
     grover_search,
-    get_oracle,
+    build_oracle,
     plot_bitstrings,
 )

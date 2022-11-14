@@ -28,7 +28,7 @@ def grover_search(
     return grover_circ
 
 
-def get_oracle(solution: str, decompose_ccnot: bool = False) -> Circuit:
+def build_oracle(solution: str, decompose_ccnot: bool = False) -> Circuit:
     """Oraclc circuit of a given solution.
 
     Args:
@@ -58,7 +58,7 @@ def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
     Returns:
         Circuit: Amplification circuit.
     """
-    oracle = get_oracle(n_qubits * "0", decompose_ccnot)
+    oracle = build_oracle(n_qubits * "0", decompose_ccnot)
     circ = Circuit()
     circ.h(np.arange(n_qubits))
     circ.add_circuit(oracle)
