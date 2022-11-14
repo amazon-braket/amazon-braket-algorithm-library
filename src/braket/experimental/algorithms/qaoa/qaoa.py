@@ -52,13 +52,7 @@ def _driver(beta: float, n_qubits: int) -> Circuit:
     Returns:
         Circuit: Circuit object that implements evolution with driver Hamiltonian
     """
-    circ = Circuit()
-
-    for qubit in range(n_qubits):
-        gate = Circuit().rx(qubit, 2 * beta)
-        circ.add(gate)
-
-    return circ
+    return Circuit().rx(range(n_qubits), 2 * beta)
 
 
 def _cost_circuit(
