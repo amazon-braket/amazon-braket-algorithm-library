@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 import numpy as np
 import pennylane as qml
-from afqmc.classical_afqmc import (
+from braket.experimental.algorithms.afqmc.classical_afqmc import (
     ChemicalProperties,
     greens_pq,
     hartree_fock_energy,
