@@ -120,9 +120,9 @@ def qaoa(
     betas = params[circuit_length:]
 
     # add QAOA circuit layer blocks
-    for mm in range(circuit_length):
-        circ.add(_cost_circuit(gammas[mm], n_qubits, ising, device))
-        circ.add(_driver(betas[mm], n_qubits))
+    for gamma, beta in zip(gammas, betas):
+        circ.add(_cost_circuit(gamma, n_qubits, ising, device))
+        circ.add(_driver(beta, n_qubits))
 
     return circ
 
