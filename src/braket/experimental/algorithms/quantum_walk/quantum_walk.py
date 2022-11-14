@@ -1,7 +1,5 @@
-from collections import Counter
 from typing import Any, Dict
 
-import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit
 from braket.devices import Device
@@ -175,16 +173,3 @@ def run_quantum_walk(
     }
 
     return out
-
-
-def plot_bitstrings(counts: Counter, title: str = None) -> None:
-    """Plot the measure results
-    Args:
-        counts (Counter): Measurement counts.
-        title (str): Title for the plot.
-    """
-    plt.bar(counts.keys(), counts.values())
-    plt.xticks(list(counts.keys()))
-    plt.xlabel("index of the nodes")
-    plt.ylabel("probability")
-    plt.title(title)
