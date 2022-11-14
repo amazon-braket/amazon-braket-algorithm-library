@@ -10,11 +10,12 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-
-from collections import Counter
+from typing import Dict
 
 import matplotlib.pyplot as plt
-from braket.circuits import Circuit, Observable
+import numpy as np
+from braket.circuits import Circuit
+from braket.tasks import QuantumTask
 
 
 def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
@@ -26,7 +27,6 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
     Returns:
         Circuit: Bernstein–Vazirani circuit
     """
-
     num_qubits = len(hidden_string)
 
     bv_circuit = Circuit()
@@ -42,38 +42,36 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
 
     bv_circuit.h(range(num_qubits))
 
-    for q in range(num_qubits):
-        bv_circuit.sample(Observable.Z(), q)
+    bv_circuit.probability(range(num_qubits))
     return bv_circuit
 
 
-def marginalize_measurements(measurement_counts: Counter) -> Counter:
-    """Remove the last qubit measurement counts.
+def get_bernstein_vazirani_results(task: QuantumTask) -> Dict[str, float]:
+    """Return the probabilities and corresponding bitstrings.
 
     Args:
-        measurement_counts (Counter): Measurement counts from circuit.
+        task (QuantumTask): Quantum task to process.
 
     Returns:
-        Counter: Measurement counts from without the last qubit.
+        Dict[str, float]: Results as a dictionary of bitstrings
     """
-    new_dict = {}
-    for k, v in measurement_counts.items():
-        if k[:-1] not in new_dict:
-            new_dict[k[:-1]] = v
-        else:
-            new_dict[k[:-1]] += v
-    return Counter(new_dict)
+
+    probabilities = task.result().result_types[-1].value
+    probabilities = np.round(probabilities, 10)  # round off floating-point errors
+    num_qubits = int(np.log2(len(probabilities)))
+    binary_strings = [format(i, "b").zfill(num_qubits) for i in range(2**num_qubits)]
+    return dict(zip(binary_strings, probabilities))
 
 
-def plot_bitstrings(counts: Counter, title: str = None) -> None:
+def plot_bitstrings(probabilities: Dict[str, float], title: str = None) -> None:
     """Plot the measure results
 
     Args:
-        counts (Counter): Measurement counts.
+        probabilities (Dict[str, float]): Measurement probabilities.
         title (str): Title for the plot.
     """
-    plt.bar(counts.keys(), counts.values())
+    plt.bar(probabilities.keys(), probabilities.values())
     plt.xlabel("bitstrings")
-    plt.ylabel("counts")
+    plt.ylabel("probabilities")
     plt.title(title)
     plt.xticks(rotation=90)
