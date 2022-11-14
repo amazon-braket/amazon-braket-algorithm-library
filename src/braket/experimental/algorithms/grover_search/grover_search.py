@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +11,7 @@ def grover_search(
     """Generate Grover's circuit for a target solution and oracle.
 
     Args:
-        oracles (Circuit): Oracle circuit for a solution.
+        oracle (Circuit): Oracle circuit for a solution.
         n_qubits (int): Number of qubits.
         n_reps (int): Number of repititions for amplification. Defaults to 1.
         decompose_ccnot (bool): To decompose CCNOT (Toffoli) gate in the circuit.
@@ -52,8 +52,8 @@ def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
     Perform a single iteration of amplitude amplification.
 
     Args:
-        oracles (Dict[str, Circuit]): oracle implementations for each solution as quantum circuits.
         n_qubits (int): Number of qubits.
+        decompose_ccnot (bool): Whether to decompose CCNOT (Toffoli) gate in the circuit.
 
     Returns:
         Circuit: Amplification circuit.
@@ -66,11 +66,11 @@ def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
     return circ
 
 
-def plot_bitstrings(probabilities) -> None:
+def plot_bitstrings(probabilities: List[float]) -> None:
     """Plot the measure results.
 
     Args:
-        result (GateModelQuantumTaskResult): Result from a Braket device.
+        probabilities (List[float]): Probabilities of measuring each bitstring.
     """
     num_qubits = int(np.log2(len(probabilities)))
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
@@ -123,13 +123,12 @@ def multi_control_not_constructor(
     Ref: https://arxiv.org/abs/1904.01671
 
     Args:
-        n_qubits (int): Number of qubits.
+        n_qubit (int): Number of qubits.
         decompose_ccnot (bool): To decompose CCNOT (Toffoli) gate in the circuit.
-        is_outermost_call (bool:  Whether the call is the outermost call from external functions.
+        is_outermost_call (bool):  Whether the call is the outermost call from external functions.
 
     Returns:
-        Circuit:  multi-contol Not circuit
-        int: number of ancilla in the circuit
+        Tuple[Circuit, int]:  the multi-contol Not circuit and the number of ancilla in the circuit
     """
     if n_qubit == 1:
         n_ancilla = 1
@@ -180,7 +179,7 @@ def multi_control_not(n_qubit: int, decompose_ccnot: bool) -> Circuit:
     """Multi-control Not circuit
 
     Args:
-        n_qubits (int): Number of qubits.
+        n_qubit (int): Number of qubits.
         decompose_ccnot (bool): To decompose CCNOT (Toffoli) gate in the circuit.
 
     Returns:
@@ -194,7 +193,7 @@ def multi_control_z(n_qubit: int, decompose_ccnot: bool) -> Circuit:
     """Multi-control Z circuit
 
     Args:
-        n_qubits (int): Number of qubits.
+        n_qubit (int): Number of qubits.
         decompose_ccnot (bool): To decompose CCNOT (Toffoli) gate in the circuit.
 
     Returns:

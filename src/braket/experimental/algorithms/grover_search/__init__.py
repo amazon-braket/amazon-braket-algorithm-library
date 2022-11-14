@@ -12,7 +12,7 @@
 # language governing permissions and limitations under the License.
 
 from braket.experimental.algorithms.grover_search.grover_search import (  # noqa: F401
-    grover_search,
     build_oracle,
+    grover_search,
     plot_bitstrings,
 )
