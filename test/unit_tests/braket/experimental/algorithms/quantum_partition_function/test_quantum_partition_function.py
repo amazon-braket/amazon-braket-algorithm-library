@@ -11,10 +11,12 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from braket.circuits import Circuit, circuit
+from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.quantum_partition_function import quantum_partition_function as qpf
+from braket.experimental.algorithms.quantum_partition_function import (
+    quantum_partition_function as qpf,
+)
 
 
 # CNOT controlled unitary with 2 precision qubits, and H gate query prep
@@ -26,15 +28,13 @@ def test_qpf_qft_run_2_qubits():
     q1 = qubits[1]
 
     # Prepare state for quantum fourier circuit
-    qpf_circ = Circuit().h(range(2)).rz(q0,-pi).rz(q1,pi)
+    qpf_circ = Circuit().h(range(2)).rz(q0, -pi).rz(q1, pi)
 
     # apply qpf
     # qpf_qft.quantum_partition_function(
     #     'qft', qubits
     # )
-    qpf_circ.add(qpf.quantum_partition_function(
-        'qft', qubits
-    ))
+    qpf_circ.add(qpf.quantum_partition_function("qft", qubits))
 
     assert len(qpf_circ.instructions) == 8
     assert qpf_circ.depth == 6
@@ -42,18 +42,16 @@ def test_qpf_qft_run_2_qubits():
 
     # run qpf
     potts_model = {}
-    potts_model['iccc-check'] = True
-    potts_model['qft-func'] = {}
-    potts_model['qft-func']['circuit'] = qpf_circ
-    potts_model['qft-func']['param'] = {}
-    potts_model['qft-func']['param']['shots'] = 1000
-    potts_model['qft-func']['param']['device'] = LocalSimulator()
+    potts_model["iccc-check"] = True
+    potts_model["qft-func"] = {}
+    potts_model["qft-func"]["circuit"] = qpf_circ
+    potts_model["qft-func"]["param"] = {}
+    potts_model["qft-func"]["param"]["shots"] = 1000
+    potts_model["qft-func"]["param"]["device"] = LocalSimulator()
 
-    step = 'qft'
-    
-    result_dict = qpf.run_quantum_partition_function(
-        potts_model, step
-    )
+    step = "qft"
+
+    result_dict = qpf.run_quantum_partition_function(potts_model, step)
 
     # print(
     #     f"test_cnot_qpf_run_2_precision_qubits Results: \
@@ -61,7 +59,7 @@ def test_qpf_qft_run_2_qubits():
     # )
 
     # validate excepted qpf output
-    counts_result = result_dict['qft-func']['task'].result().measurement_counts
+    counts_result = result_dict["qft-func"]["task"].result().measurement_counts
 
     assert counts_result["11"] > 300
     assert counts_result["01"] > 300

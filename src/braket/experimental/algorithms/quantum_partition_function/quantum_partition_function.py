@@ -21,6 +21,7 @@ from braket.circuits import Circuit, circuit
 from braket.devices import Device
 import networkx as nx
 
+
 @circuit.subroutine(register=True)
 def quantum_partition_function(
     function: str,
@@ -43,18 +44,19 @@ def quantum_partition_function(
 
     circuit = None
 
-    if function == 'shor':
+    if function == "shor":
         print(f"shor's algorithm for iccc-check hasn't implemented!")
-    elif function == 'qft':
+    elif function == "qft":
         print(f"qft circuit for checking gamma values")
         circuit = _quantum_fourier_transform(qubits)
     else:
         raise ValueError(
-                        f"Wrong function value {function}, can only be one \
+            f"Wrong function value {function}, can only be one \
                         of shor and qft"
-                        )
+        )
 
     return circuit
+
 
 @circuit.subroutine(register=True)
 def _quantum_fourier_transform(
@@ -62,8 +64,8 @@ def _quantum_fourier_transform(
 ) -> Circuit:
     """
     Construct a circuit object corresponding to the Quantum Fourier Transform (QFT)
-    algorithm, applied to the argument qubits. 
-    
+    algorithm, applied to the argument qubits.
+
     Args:
         qft_qubits (List[int]): Qubits on which to apply the QFT
 
@@ -71,25 +73,26 @@ def _quantum_fourier_transform(
         Circuit: Circuit object that implements the Quantum Fourier Transform (QFT)
     """
     qftcirc = Circuit()
-    
+
     # get number of qubits
     num_qubits = len(qft_qubits)
-    
+
     for k in range(num_qubits):
         # First add a Hadamard gate
         qftcirc.h(qft_qubits[k])
-    
+
         # Then apply the controlled rotations, with weights (angles) defined by the distance to the control qubit.
         # Start on the qubit after qubit k, and iterate until the end.  When num_qubits==1, this loop does not run.
-        for j in range(1,num_qubits - k):
-            angle = 2*math.pi/(2**(j+1))
-            qftcirc.cphaseshift(qft_qubits[k+j],qft_qubits[k], angle)
-            
+        for j in range(1, num_qubits - k):
+            angle = 2 * math.pi / (2 ** (j + 1))
+            qftcirc.cphaseshift(qft_qubits[k + j], qft_qubits[k], angle)
+
     # Then add SWAP gates to reverse the order of the qubits:
-    for i in range(math.floor(num_qubits/2)):
-        qftcirc.swap(qft_qubits[i], qft_qubits[-i-1])
-        
+    for i in range(math.floor(num_qubits / 2)):
+        qftcirc.swap(qft_qubits[i], qft_qubits[-i - 1])
+
     return qftcirc
+
 
 def run_quantum_partition_function(
     potts_model: dict,
@@ -111,13 +114,13 @@ def run_quantum_partition_function(
     Returns:
         Dict[str, Any]: measurements and results from running Quantum partition function
     """
-    
+
     out = {}
 
-    if step == 'pre':
+    if step == "pre":
         print(f"Classical Preprocessing to [n,k] Code")
-        Ga = potts_model['graph-model']
-        q = potts_model['q-state']
+        Ga = potts_model["graph-model"]
+        q = potts_model["q-state"]
         # nodes of graph
         N = len(Ga.nodes)
         # edges of graph
@@ -126,62 +129,63 @@ def run_quantum_partition_function(
         C = len([Ga.subgraph(c).copy() for c in nx.connected_components(Ga)])
         # [n,k] code
         n = N
-        k = E-C
-        out['nk-code'] = (n,k)
-        out['connected-component'] = C
-    elif step == 'iccc-check':
+        k = E - C
+        out["nk-code"] = (n, k)
+        out["connected-component"] = C
+    elif step == "iccc-check":
         print(f"Irreducible Cyclic Cocycle Code Check")
-        if 'nk-code' not in potts_model.keys():
-            raise Exception ('no nk-code found in potts_model, please run pre-process step!')
-        Ga = potts_model['graph-model']
+        if "nk-code" not in potts_model.keys():
+            raise Exception("no nk-code found in potts_model, please run pre-process step!")
+        Ga = potts_model["graph-model"]
         # TODO: Add shor algorithm to check ICCC
         N = len(Ga.nodes)
         E = len(Ga.edges)
-        n, k = potts_model['nk-code']
-        C = potts_model['connected-component']
+        n, k = potts_model["nk-code"]
+        C = potts_model["connected-component"]
         print(f"The cycle matroid matrix of Graph Gamma is {n-C} x {n}")
         check_result = False
         if N == 3 and E == 3:
             print("the ICCC is [1,-1], which passes ICCC check!")
             check_result = True
-        out['iccc-check'] = check_result
-    elif step == 'qft':
+        out["iccc-check"] = check_result
+    elif step == "qft":
         print(f"State Preparation and Quantum Fourier Transform")
-        if 'iccc-check' not in potts_model.keys():
-            raise Exception ('no iccc-check found in potts_model, please run ICCC-check step!')
-        check_result = potts_model['iccc-check']
+        if "iccc-check" not in potts_model.keys():
+            raise Exception("no iccc-check found in potts_model, please run ICCC-check step!")
+        check_result = potts_model["iccc-check"]
         assert check_result == True, "ICCC check didn't pass, no efficient quantum alogrithm!"
 
-        if 'qft-func' not in potts_model.keys():
-            raise Exception ('no qft-func found in potts_model, please generate circuit!')
+        if "qft-func" not in potts_model.keys():
+            raise Exception("no qft-func found in potts_model, please generate circuit!")
 
-        qft_circuit = potts_model['qft-func']['circuit']
+        qft_circuit = potts_model["qft-func"]["circuit"]
         # Add desired results_types
         qft_circuit.probability()
-        
-        qft_param = potts_model['qft-func']['param']
-        qft_device = qft_param['device']
-        qft_shots = qft_param['shots']
+
+        qft_param = potts_model["qft-func"]["param"]
+        qft_device = qft_param["device"]
+        qft_shots = qft_param["shots"]
 
         task = qft_device.run(qft_circuit, shots=qft_shots)
 
         circ_result = {
             "qft-func": {
-                'task': task,
+                "task": task,
             }
         }
 
         out.update(circ_result)
-    elif step == 'post':
+    elif step == "post":
         print(f"Classical Post-Processing")
         # TODO Classical pots process logic
     else:
         raise ValueError(
-                        f"Wrong step value {step}, can only be one \
+            f"Wrong step value {step}, can only be one \
                         of pre,ICCC-check,qft and post"
-                        )
+        )
 
     return out
+
 
 def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
     """
@@ -192,18 +196,18 @@ def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
         results (Dict[str, Any]): Results associated with quantum partition function run as produced
             by run_quantum_partition_function
     """
-    task = potts_model['qft-func']['task']
+    task = potts_model["qft-func"]["task"]
 
     # get id and status of submitted task
     task_id = task.id
     status = task.state()
     # print('ID of task:', task_id)
-    print('Status of task:', status)
+    print("Status of task:", status)
 
     # wait for job to complete
-    while status != 'COMPLETED':
+    while status != "COMPLETED":
         status = task.state()
-        print('Status:', status)
+        print("Status:", status)
 
     # get results of task
     result = task.result()
@@ -215,5 +219,5 @@ def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
 
     # plot using Counter
     plt.bar(counts.keys(), counts.values())
-    plt.xlabel('bitstrings')
-    plt.ylabel('counts')
+    plt.xlabel("bitstrings")
+    plt.ylabel("counts")
