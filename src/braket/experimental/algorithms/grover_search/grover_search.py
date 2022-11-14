@@ -173,7 +173,7 @@ def multi_control_not_constructor(
             circ.ccnot(q0, q1, q2)
         n_ancilla += 1
 
-        if outermost_call:
+        if is_outermost_call:
             circ.add_circuit(circ2.adjoint(), target=qd2+qa2)
             circ.add_circuit(circ1.adjoint(), target=qd1+qa1) 
  

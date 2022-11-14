@@ -1,3 +1,5 @@
+import numpy as np
+
 from braket.devices import LocalSimulator
 from braket.experimental.algorithms.grover_search.grover_search import (
     grover_search,
@@ -6,11 +8,15 @@ from braket.experimental.algorithms.grover_search.grover_search import (
 
 
 def test_grover_search():
-    oracles_circuits = oracles()
-    circuit = grover("000", oracles_circuits)
+    solution = '000'
+    n_qubits = len(solution)
+
+    oracle = get_oracle(solution)
+    circuit = grover_search(oracle, n_qubits=n_qubits, n_reps=1)
 
     local_simulator = LocalSimulator()
     task = local_simulator.run(circuit, shots=1000)
-    probs = task.result().measurement_probabilities
+    result = task.result()
+    probabilities = result.values[0] 
 
-    assert max(probs, key=probs.get) == "000"
+    assert np.argmax(probabilities) == 0
