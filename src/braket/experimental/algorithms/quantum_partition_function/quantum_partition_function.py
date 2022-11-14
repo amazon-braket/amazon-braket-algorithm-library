@@ -42,9 +42,9 @@ def quantum_partition_function(
     circuit = None
 
     if function == "shor":
-        print(f"shor's algorithm for iccc-check hasn't implemented!")
+        print("shor's algorithm for iccc-check hasn't implemented!")
     elif function == "qft":
-        print(f"qft circuit for checking gamma values")
+        print("qft circuit for checking gamma values")
         circuit = _quantum_fourier_transform(qubits)
     else:
         raise ValueError(
@@ -113,7 +113,7 @@ def run_quantum_partition_function(
     out = {}
 
     if step == "pre":
-        print(f"Classical Preprocessing to [n,k] Code")
+        print("Classical Preprocessing to [n,k] Code")
         Ga = potts_model["graph-model"]
         # q = potts_model["q-state"]
         # nodes of graph
@@ -128,7 +128,7 @@ def run_quantum_partition_function(
         out["nk-code"] = (n, k)
         out["connected-component"] = C
     elif step == "iccc-check":
-        print(f"Irreducible Cyclic Cocycle Code Check")
+        print("Irreducible Cyclic Cocycle Code Check")
         if "nk-code" not in potts_model.keys():
             raise Exception("no nk-code found in potts_model, please run pre-process step!")
         Ga = potts_model["graph-model"]
@@ -144,7 +144,7 @@ def run_quantum_partition_function(
             check_result = True
         out["iccc-check"] = check_result
     elif step == "qft":
-        print(f"State Preparation and Quantum Fourier Transform")
+        print("State Preparation and Quantum Fourier Transform")
         if "iccc-check" not in potts_model.keys():
             raise Exception("no iccc-check found in potts_model, please run ICCC-check step!")
         check_result = potts_model["iccc-check"]
@@ -171,7 +171,7 @@ def run_quantum_partition_function(
 
         out.update(circ_result)
     elif step == "post":
-        print(f"Classical Post-Processing")
+        print("Classical Post-Processing")
         # TODO Classical pots process logic
     else:
         raise ValueError(
@@ -194,7 +194,6 @@ def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
     task = potts_model["qft-func"]["task"]
 
     # get id and status of submitted task
-    task_id = task.id
     status = task.state()
     # print('ID of task:', task_id)
     print("Status of task:", status)
