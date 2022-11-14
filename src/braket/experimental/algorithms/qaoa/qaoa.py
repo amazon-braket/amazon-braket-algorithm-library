@@ -56,7 +56,7 @@ def _driver(beta: float, n_qubits: int) -> Circuit:
 
 
 def _cost_circuit(
-    gamma: float, n_qubits: int, ising: np.ndarray, device: Union[AwsDevice, LocalSimulator]
+    gamma: float,  ising: np.ndarray, device: Union[AwsDevice, LocalSimulator]
 ) -> Circuit:
     """Returns circuit for evolution with cost Hamiltonian
 
