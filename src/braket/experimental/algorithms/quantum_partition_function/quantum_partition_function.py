@@ -130,9 +130,7 @@ def run_quantum_partition_function(
     elif step == "iccc-check":
         print(f"Irreducible Cyclic Cocycle Code Check")
         if "nk-code" not in potts_model.keys():
-            raise Exception(
-                "no nk-code found in potts_model, please run pre-process step!"
-            )
+            raise Exception("no nk-code found in potts_model, please run pre-process step!")
         Ga = potts_model["graph-model"]
         # TODO: Add shor algorithm to check ICCC
         N = len(Ga.nodes)
@@ -148,18 +146,12 @@ def run_quantum_partition_function(
     elif step == "qft":
         print(f"State Preparation and Quantum Fourier Transform")
         if "iccc-check" not in potts_model.keys():
-            raise Exception(
-                "no iccc-check found in potts_model, please run ICCC-check step!"
-            )
+            raise Exception("no iccc-check found in potts_model, please run ICCC-check step!")
         check_result = potts_model["iccc-check"]
-        assert (
-            check_result is True
-        ), "ICCC check didn't pass, no efficient quantum alogrithm!"
+        assert check_result is True, "ICCC check didn't pass, no efficient quantum alogrithm!"
 
         if "qft-func" not in potts_model.keys():
-            raise Exception(
-                "no qft-func found in potts_model, please generate circuit!"
-            )
+            raise Exception("no qft-func found in potts_model, please generate circuit!")
 
         qft_circuit = potts_model["qft-func"]["circuit"]
         # Add desired results_types
@@ -196,7 +188,7 @@ def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
         and pretty print results
 
     Args:
-        results (Dict[str, Any]): Results associated with quantum partition function 
+        results (Dict[str, Any]): Results associated with quantum partition function
         run as produced by run_quantum_partition_function
     """
     task = potts_model["qft-func"]["task"]
