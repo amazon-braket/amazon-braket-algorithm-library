@@ -12,31 +12,23 @@
 # language governing permissions and limitations under the License.
 
 import numpy as np
-from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.quantum_circuit_born_machine.qcbm import QCBM
+from braket.experimental.algorithms.quantum_circuit_born_machine import QCBM, mmd_loss
+
+
+def test_mmd_loss():
+    loss = mmd_loss(np.zeros(4), np.zeros(4))
+    assert np.isclose(loss, 0, rtol=1e-5)
 
 
 def test_qcbm():
-
     n_qubits = 2
     n_layers = 1
-
     data = np.ones(3 * n_layers * n_qubits)
-
     device = LocalSimulator()
     qcbm = QCBM(device, n_qubits, n_layers, data)
-
-    expected = Circuit()
-    expected.rx(0, 1.0).rz(0, 1.0).rx(0, 1.0)
-    expected.rx(1, 1.0).rz(1, 1.0).rx(1, 1.0)
-    expected.cnot(0, 1)
-    expected.cnot(1, 0)
-    expected.probability()
-
-    init_params = np.ones(3 * n_layers * n_qubits)
-
-    circ = qcbm.create_circuit(init_params)
-
-    assert circ == expected
+    init_params = np.zeros((n_layers, n_qubits, 3))
+    probs = qcbm.get_probabilities(init_params)
+    expected = np.array([1, 0, 0, 0])
+    assert np.isclose(probs, expected).all()

@@ -15,7 +15,7 @@
 from typing import List
 
 import numpy as np
-from braket.circuits import Circuit
+from braket.circuits import Circuit, FreeParameter
 from braket.devices import Device
 
 
@@ -30,7 +30,6 @@ class QCBM:
     q1 : -Rx(0.549)-Rz(0.878)-Rx(0.913)-X-C-Probability--
 
     T  : |    0    |    1    |    2    |3|4|Result Types|
-
     """
 
     def __init__(
@@ -48,14 +47,39 @@ class QCBM:
             data (ndarray): Target probabilities
             shots (int): Number of shots. Defaults to 10_000.
         """
+        if n_qubits <= 1:
+            raise ValueError("Number of qubits must be greater than 1.")
         self.device = device
         self.n_qubits = n_qubits
         self.n_layers = n_layers
-        self.neighbors = [(i, (i + 1) % n_qubits) for i in range(n_qubits)]
+        self.neighbors = [(i, (i + 1) % n_qubits) for i in range(n_qubits - 1)]
         self.data = data  # target probabilities
         self.shots = shots
+        self.parameters = [
+            [
+                [FreeParameter(f"theta_{layer}_{qubit}_{i}") for i in range(3)]
+                for qubit in range(n_qubits)
+            ]
+            for layer in range(n_layers)
+        ]
+        self.parametric_circuit = self._create_circuit()
 
-    def entangler(self, circ: Circuit) -> None:
+    def _create_circuit(self) -> Circuit:
+        """Creates a QCBM circuit, and returns the probabilities
+
+        Returns:
+            Circuit: Circuit with parameters fixed to `params`.
+        """
+        circ = Circuit()
+        self._rotation_layer(circ, self.parameters[0])
+        for L in range(1, self.n_layers):
+            self._entangler(circ)
+            self._rotation_layer(circ, self.parameters[L])
+        self._entangler(circ)
+        circ.probability()
+        return circ
+
+    def _entangler(self, circ: Circuit) -> None:
         """Add CNot gates to circuit.
 
         Args:
@@ -64,56 +88,47 @@ class QCBM:
         for i, j in self.neighbors:
             circ.cnot(i, j)
 
-    def rotation_layer(self, circ: Circuit, params: np.ndarray) -> None:
+    def _rotation_layer(self, circ: Circuit, parameters: List[List[FreeParameter]]) -> None:
         """Add rotation layers  to circuit.
 
         Args:
             circ (Circuit): The circuit to add CNots to.
-            params (ndarray): Parameters for rotation layers
+            parameters (List[List[FreeParameter]]): Parameters for rotation layers.
         """
         for n in range(self.n_qubits):
-            circ.rx(n, params[n, 0])
-            circ.rz(n, params[n, 1])
-            circ.rx(n, params[n, 2])
+            circ.rx(n, parameters[n][0])
+            circ.rz(n, parameters[n][1])
+            circ.rx(n, parameters[n][2])
 
-    def create_circuit(self, params: np.ndarray) -> Circuit:
-        """Creates a QCBM circuit, and returns the probabilities
+    def get_probabilities(self, values: np.ndarray) -> np.ndarray:
+        """Run and get probability results.
 
         Args:
-            params (ndarray): Parameters for the rotation gates in the circuit,
-                length = 3 * n_qubits * n_layers
+            values (np.ndarray): Values for free parameters.
 
         Returns:
-            Circuit: Circuit with parameters fixed to `params`.
+            np.ndarray: Probabilities vector.
         """
-        try:
-            params = params.reshape(self.n_layers, self.n_qubits, 3)
-        except Exception:
-            print(
-                "Length of initial parameters was not correct. Expected: "
-                + f"{self.n_layers*self.n_qubits*3} but got {len(params)}."
-            )
-        circ = Circuit()
-        self.rotation_layer(circ, params[0])
-        for L in range(1, self.n_layers):
-            self.entangler(circ)
-            self.rotation_layer(circ, params[L])
-        self.entangler(circ)
-        circ.probability()
-        return circ
+        qcbm_original_circuit = self.bound_circuit(values)
+        task = self.device.run(qcbm_original_circuit, shots=self.shots)
+        qcbm_probs = task.result().values[0]
+        return qcbm_probs
 
-    def probabilities(self, params: np.ndarray) -> np.ndarray:
-        """Get probabilities from a run.
+    def bound_circuit(self, values: np.ndarray) -> np.ndarray:
+        """Get probabilities from the current parameters.
 
         Args:
-            params (np.ndarray): Parameters for QCBM.
+            values (ndarray): Parameters for QCBM.
 
         Returns:
             ndarray: Probabilities.
         """
-        circ = self.create_circuit(params)
-        probs = self.device.run(circ, shots=self.shots).result().values[0]
-        return probs
+        # Need to flatten parameters and also parameter.
+        flat_values = values.flatten()
+        flat_parameters = np.array(self.parameters, dtype=str).flatten()
+        bound_values = dict(zip(flat_parameters, flat_values))
+        circ = self.parametric_circuit.make_bound_circuit(bound_values)
+        return circ
 
     def gradient(self, params: np.ndarray) -> np.ndarray:
         """Gradient for QCBM via:
@@ -129,30 +144,30 @@ class QCBM:
         Returns:
             ndarray: Gradient vector
         """
-        qcbm_probs = self.probabilities(params)
+
+        qcbm_probs = self.get_probabilities(params)
+
         shift = np.ones_like(params) * np.pi / 2
         shifted_params = np.stack([params + np.diag(shift), params - np.diag(shift)]).reshape(
             2 * len(params), len(params)
         )
-        circuits = [self.create_circuit(p) for p in shifted_params]
 
-        try:
-            result = self.device.run_batch(circuits, shots=self.shots).results()
-        except Exception:
-            result = [self.device.run(c, shots=self.shots).result() for c in circuits]
-
-        res = [result[i].values[0] for i in range(len(circuits))]
-        res = np.array(res).reshape(2, len(params), 2**self.n_qubits)
+        probs = [self.get_probabilities(p) for p in shifted_params]
+        probs = np.array(probs).reshape(2, len(params), 2**self.n_qubits)
 
         grad = np.zeros(len(params))
         for i in range(len(params)):
-            grad_pos = compute_kernel(qcbm_probs, res[0][i]) - compute_kernel(qcbm_probs, res[1][i])
-            grad_neg = compute_kernel(self.data, res[0][i]) - compute_kernel(self.data, res[1][i])
+            grad_pos = _compute_kernel(qcbm_probs, probs[0][i]) - _compute_kernel(
+                qcbm_probs, probs[1][i]
+            )
+            grad_neg = _compute_kernel(self.data, probs[0][i]) - _compute_kernel(
+                self.data, probs[1][i]
+            )
             grad[i] = grad_pos - grad_neg
         return grad
 
 
-def compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]) -> float:
+def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]) -> float:
     r"""Gaussian radial basis function (RBF) kernel.
 
     K(x, y) = sum_\sigma exp(-|x-y|^2/(2\sigma^2 ))
@@ -197,7 +212,7 @@ def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1])
         float: Value of the MMD loss
     """
 
-    mmd_xx = compute_kernel(px, px, sigma_list)
-    mmd_yy = compute_kernel(py, py, sigma_list)
-    mmd_xy = compute_kernel(px, py, sigma_list)
+    mmd_xx = _compute_kernel(px, px, sigma_list)
+    mmd_yy = _compute_kernel(py, py, sigma_list)
+    mmd_xy = _compute_kernel(px, py, sigma_list)
     return mmd_xx + mmd_yy - 2 * mmd_xy
