@@ -115,7 +115,7 @@ def qaoa(
     circ.h(range(0, n_qubits))
 
     # setup two parameter families
-    circuit_length = int(len(params) / 2)
+    circuit_length = len(params) // 2
     gammas = params[:circuit_length]
     betas = params[circuit_length:]
 
