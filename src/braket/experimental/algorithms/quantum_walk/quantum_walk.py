@@ -20,7 +20,7 @@ def qft(num_qubits: int, inverse: bool = False) -> Circuit:
     qc = Circuit()
     N = num_qubits - 1
 
-    if inverse is False:
+    if not inverse:
         qc.h(N)
         for n in range(1, N + 1):
             qc.cphaseshift(N - n, N, 2 * np.pi / 2 ** (n + 1))
