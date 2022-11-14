@@ -14,6 +14,7 @@
 import math
 from collections import Counter
 from typing import Any, Callable, Dict, List, Tuple
+import matplotlib.pyplot as plt
 
 import numpy as np
 from braket.circuits import Circuit, circuit
@@ -72,21 +73,21 @@ def _quantum_fourier_transform(
     qftcirc = Circuit()
     
     # get number of qubits
-    num_qubits = len(qubits)
+    num_qubits = len(qft_qubits)
     
     for k in range(num_qubits):
         # First add a Hadamard gate
-        qftcirc.h(qubits[k])
+        qftcirc.h(qft_qubits[k])
     
         # Then apply the controlled rotations, with weights (angles) defined by the distance to the control qubit.
         # Start on the qubit after qubit k, and iterate until the end.  When num_qubits==1, this loop does not run.
         for j in range(1,num_qubits - k):
             angle = 2*math.pi/(2**(j+1))
-            qftcirc.cphaseshift(qubits[k+j],qubits[k], angle)
+            qftcirc.cphaseshift(qft_qubits[k+j],qft_qubits[k], angle)
             
     # Then add SWAP gates to reverse the order of the qubits:
     for i in range(math.floor(num_qubits/2)):
-        qftcirc.swap(qubits[i], qubits[-i-1])
+        qftcirc.swap(qft_qubits[i], qft_qubits[-i-1])
         
     return qftcirc
 

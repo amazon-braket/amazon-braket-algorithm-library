@@ -26,12 +26,15 @@ def test_qpf_qft_run_2_qubits():
     q1 = qubits[1]
 
     # Prepare state for quantum fourier circuit
-    qpf_qft = Circuit().h(range(2)).rz(q0,-pi).rz(q1,pi)
+    qpf_circ = Circuit().h(range(2)).rz(q0,-pi).rz(q1,pi)
 
     # apply qpf
-    qpf_qft.quantum_partition_function(
+    # qpf_qft.quantum_partition_function(
+    #     'qft', qubits
+    # )
+    qpf_circ.add(qpf.quantum_partition_function(
         'qft', qubits
-    )
+    ))
 
     assert len(qpf_circ.instructions) == 8
     assert qpf_circ.depth == 6
@@ -51,7 +54,6 @@ def test_qpf_qft_run_2_qubits():
     result_dict = qpf.run_quantum_partition_function(
         potts_model, step
     )
-    result = potts_model['qft-func']['task'].result
 
     # print(
     #     f"test_cnot_qpf_run_2_precision_qubits Results: \
@@ -59,7 +61,7 @@ def test_qpf_qft_run_2_qubits():
     # )
 
     # validate excepted qpf output
-    counts_result = result['qft-func']['task'].result().measurement_counts
+    counts_result = result_dict['qft-func']['task'].result().measurement_counts
 
     assert counts_result["11"] > 300
     assert counts_result["01"] > 300
