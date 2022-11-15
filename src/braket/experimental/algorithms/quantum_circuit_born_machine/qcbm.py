@@ -58,7 +58,7 @@ class QCBM:
         self.n_qubits = n_qubits
         self.n_layers = n_layers
         self.neighbors = [(i, (i + 1) % n_qubits) for i in range(n_qubits - 1)]
-        self.target_probs = target_probabilities  # target probabilities
+        self.target_probs = target_probabilities
         self.shots = shots
         self.parameters = [
             [
