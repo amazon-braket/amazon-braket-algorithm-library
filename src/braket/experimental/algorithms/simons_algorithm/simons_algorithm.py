@@ -57,7 +57,7 @@ def simons_oracle(secret_string: str) -> Circuit:
 
             if bit_value not in ["0", "1"]:
                 raise ValueError(
-                    "Incorrect char '" + bit_value + "' in secret string secret_string:" + secret_string
+                    "Incorrect char '" + bit_value + "' in the secret string:" + secret_string
                 )
 
             # XOR with secret_string whenever the flag bit is 1.

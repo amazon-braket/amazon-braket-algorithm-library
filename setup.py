@@ -30,6 +30,7 @@ setup(
         "amazon-braket-sdk",
         "boto3>=1.22.3",
         "numpy>=1.19.2",
+        "sympy",
     ],
     extras_require={
         "test": [
