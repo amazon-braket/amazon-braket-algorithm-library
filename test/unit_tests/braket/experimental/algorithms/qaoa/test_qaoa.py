@@ -12,10 +12,10 @@
 # language governing permissions and limitations under the License.
 
 import numpy as np
-from braket.circuits import Circuit, FreeParameter, Observable
+from braket.circuits import Circuit, FreeParameter
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.qaoa import evaluate_circuit, evaluate_loss, qaoa
+from braket.experimental.algorithms.qaoa import cost_function, qaoa, run_qaoa_circuit
 
 
 def test_qaoa():
@@ -32,14 +32,17 @@ def test_qaoa_evaluate_circuit():
     device = LocalSimulator()
     shots = 0
     values = [0]
-    task = evaluate_circuit(device, circ, values, shots)
+    task = run_qaoa_circuit(device, circ, values, shots)
     result = task.result().values[0]
     assert np.isclose(result[0], 1)
 
 
-def test_qaoa_evaluate_loss():
-    circ = Circuit().i(0)
-    circ.expectation(observable=Observable.Z(), target=0)
-    task = LocalSimulator().run(circ, shots=0)
-    js = [1]
-    assert np.isclose(evaluate_loss(task, js), 1)
+def test_qaoa_cost_function():
+    coeffs = [1]
+    n_qubits = 2
+    n_layers = 1
+    coupling_matrix = np.diag(np.ones(n_qubits - 1), 1)
+    circ = qaoa(n_qubits, n_layers, coupling_matrix)
+    cost = cost_function(np.ones(2), LocalSimulator(), circ, coeffs, [])
+    print("loss is", cost)
+    assert np.isclose(cost, -0.636827341031835, rtol=1e-6)

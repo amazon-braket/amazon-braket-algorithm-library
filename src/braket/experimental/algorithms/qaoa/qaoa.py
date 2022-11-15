@@ -12,18 +12,47 @@
 # language governing permissions and limitations under the License.
 
 
+from typing import List
+
 import numpy as np
 from braket.circuits import Circuit, FreeParameter, Observable, circuit
 from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-def evaluate_circuit(device: Device, circ: Circuit, values: np.ndarray, shots: int) -> QuantumTask:
+def cost_function(
+    values: np.ndarray,
+    device: Device,
+    circ: Circuit,
+    coeffs: np.ndarray,
+    cost_history: List[float],
+    shots: int = 0,
+) -> float:
+    """Cost function and append to loss history list.
+
+    Args:
+        values (ndarray): Values for the parameters.
+        device (Device): Braket device to run on.
+        circ (Circuit): QAOA circuit to run.
+        coeffs (ndarray): The coefficients of the cost Hamiltonian.
+        cost_history (List[float]): History of cost evaluations.
+        shots (int): Number of shots. Defaults to 0.
+
+    Returns:
+        float: The cost function value
+    """
+    task = run_qaoa_circuit(device, circ, values, shots=shots)
+    cost = get_cost(task, coeffs)
+    cost_history.append(cost)
+    return cost
+
+
+def run_qaoa_circuit(device: Device, circ: Circuit, values: np.ndarray, shots: int) -> QuantumTask:
     """Evaluate a QAOA circuit with parameters=values.
 
     Args:
         device (Device): Braket device to run on.
-        circ (Circuit): QAAO circuit to run.
+        circ (Circuit): QAOA circuit to run.
         values (np.ndarray): Values for the parameters.
         shots (int): Number of shots.
 
@@ -37,8 +66,8 @@ def evaluate_circuit(device: Device, circ: Circuit, values: np.ndarray, shots: i
     return task
 
 
-def evaluate_loss(task: QuantumTask, coeffs: np.ndarray) -> float:
-    """Evaluate the loss function from a QAOA task.
+def get_cost(task: QuantumTask, coeffs: np.ndarray) -> float:
+    """Evaluate the cost function from a QAOA task.
 
     Args:
         task (QuantumTask): QAOA task.
@@ -48,8 +77,8 @@ def evaluate_loss(task: QuantumTask, coeffs: np.ndarray) -> float:
         float: Loss function value.
     """
     exp_vals = task.result().result_types
-    loss = sum(c * s.value for c, s in zip(coeffs, exp_vals))
-    return loss
+    cost = sum(c * s.value for c, s in zip(coeffs, exp_vals))
+    return cost
 
 
 def qaoa(n_qubits: int, n_layers: int, ising: np.ndarray) -> Circuit:

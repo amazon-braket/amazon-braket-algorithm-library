@@ -12,7 +12,7 @@
 # language governing permissions and limitations under the License.
 
 from braket.experimental.algorithms.qaoa.qaoa import (  # noqa: F401
-    evaluate_circuit,
-    evaluate_loss,
+    cost_function,
     qaoa,
+    run_qaoa_circuit,
 )
