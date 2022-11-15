@@ -3,6 +3,7 @@
 *.swp
 *.idea
 build_files.tar.gz
+.DS_Store
 
 .ycm_extra_conf.py
 .tox
