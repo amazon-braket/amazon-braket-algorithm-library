@@ -14,7 +14,7 @@ from typing import Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
-from braket.circuits import Circuit
+from braket.circuits import Circuit, circuit
 from braket.tasks import QuantumTask
 
 
@@ -80,14 +80,30 @@ def deutsch_jozsa_circuit(oracle: Circuit, n_qubits: int) -> Circuit:
         n_qubits (int): Number of qubits.
 
     Returns:
-        Circuit: The  Deutsch-Jozsa circuit.
+        Circuit: The Deutsch-Jozsa circuit and result types.
+    """
+    circuit = Circuit()
+    circuit.deutsch_jozsa(oracle, n_qubits)
+    circuit.probability(range(n_qubits))
+    return circuit
+
+
+@circuit.subroutine(register=True)
+def deutsch_jozsa(oracle: Circuit, n_qubits: int) -> Circuit:
+    """Deutsch-Jozsa subroutine.
+
+    Args:
+        oracle (Circuit): Constant or balanced oracle circuit.
+        n_qubits (int): Number of qubits.
+
+    Returns:
+        Circuit: The Deutsch-Jozsa circuit.
     """
     circuit = Circuit()
     circuit.h(range(n_qubits))
     circuit.x(n_qubits).h(n_qubits)
     circuit.add_circuit(oracle, range(n_qubits + n_qubits))
     circuit.h(range(n_qubits))
-    circuit.probability(range(n_qubits))
     return circuit
 
 
