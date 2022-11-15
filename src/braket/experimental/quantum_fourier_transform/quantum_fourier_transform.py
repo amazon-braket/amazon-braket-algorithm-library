@@ -23,7 +23,7 @@ import numpy as np
 
 # AWS imports: Import Braket SDK modules
 from braket.circuits import Circuit
-from braket.devices import LocalSimulator
+from braket.devices import Device, LocalSimulator
 from braket.tasks import GateModelQuantumTaskResult
 
 
@@ -74,7 +74,7 @@ def inverse_quantum_fourier_transform(qubits) -> Circuit:
         qubits (int/list):       Number or list of qubits on which to apply the inverse QFT
 
     Returns:
-        Circuit object for the quantum fourier transform
+        Circuit: Circuit object for the quantum fourier transform
     """
     # instantiate circuit object
     qftcirc = Circuit()
@@ -110,7 +110,7 @@ def inverse_quantum_fourier_transform(qubits) -> Circuit:
 def run_quantum_fourier_transform(
     qubits,
     nshots: int = 1000,
-    device=None,
+    device: Device = None,
     state_prep_cir: Circuit = None,
     analysis_cir: Circuit = None,
     doInverse: bool = False,
@@ -118,15 +118,15 @@ def run_quantum_fourier_transform(
     """Execute QFT algorithm and returns results.
 
     Args:
-        qubits:                (int or list)  number of qubits or a list of qubits
-        nshots (int) :          number of shot to use in the task
-        device:                The requested device (default: LocalSimulator)
-        state_perp_cir:        (circuit) to be run before qft
-        analysis_cir:          (circuit) to be run after  qft
-        doInverse:             (bool) do the inverse qft
+        qubits:                          number of qubits or a list of qubits
+        nshots (int) :                   number of shot to use in the task
+        device (Device):                 the requested device (default: LocalSimulator)
+        state_prep_cir (Circuit):        to be run before qft
+        analysis_cir (Circuit):          to be run after  qft
+        doInverse (bool):                do the inverse qft
 
     Returns:
-        results:               dictionary containing results from experiment
+        GateModelQuantumTaskResult:               dictionary containing results from experiment
     """
 
     if isinstance(qubits, int):
@@ -156,6 +156,13 @@ def run_quantum_fourier_transform(
 def postprocess_qft_results(result: GateModelQuantumTaskResult, verbose: bool = False) -> None:
     """
     Function to postprocess results returned by run_quantum_fourier_transform
+
+    Args:
+        result (GateModelQuantumTaskResult)
+        verbose (bool):                      defaults to False
+
+    Returns:
+        None
     """
 
     if verbose:
@@ -206,6 +213,10 @@ def qft_alt2(num_qubits: int, inverse: bool = False) -> Circuit:
 
     Args:
         num_qubits (int): The number of qubits on which to apply the QFT.
+        inverse(bool):  Should we do the QFT or the inverse QFT
+
+    Return:
+        Circuit
     """
     qc = Circuit()
     N = num_qubits - 1
