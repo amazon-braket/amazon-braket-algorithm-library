@@ -33,7 +33,12 @@ class QCBM:
     """
 
     def __init__(
-        self, device: Device, n_qubits: int, n_layers: int, data: np.ndarray, shots: int = 10_000
+        self,
+        device: Device,
+        n_qubits: int,
+        n_layers: int,
+        target_probabilities: np.ndarray,
+        shots: int = 10_000,
     ):
         """Quantum circuit Born machine.
 
@@ -44,7 +49,7 @@ class QCBM:
             device (Device): Amazon Braket device to use
             n_qubits (int): Number of qubits
             n_layers (int): Number of layers
-            data (ndarray): Target probabilities
+            target_probabilities (ndarray): Target probabilities.
             shots (int): Number of shots. Defaults to 10_000.
         """
         if n_qubits <= 1:
@@ -53,7 +58,7 @@ class QCBM:
         self.n_qubits = n_qubits
         self.n_layers = n_layers
         self.neighbors = [(i, (i + 1) % n_qubits) for i in range(n_qubits - 1)]
-        self.data = data  # target probabilities
+        self.target_probs = target_probabilities  # target probabilities
         self.shots = shots
         self.parameters = [
             [
@@ -73,10 +78,10 @@ class QCBM:
         circ = Circuit()
         self._rotation_layer(circ, self.parameters[0])
         for L in range(1, self.n_layers):
-            self._entangler(circ)
-            self._rotation_layer(circ, self.parameters[L])
+            circ._entangler(circ)
+            circ._rotation_layer(circ, self.parameters[L])
         self._entangler(circ)
-        circ.probability()
+
         return circ
 
     def _entangler(self, circ: Circuit) -> None:
@@ -160,8 +165,8 @@ class QCBM:
             grad_pos = _compute_kernel(qcbm_probs, probs[0][i]) - _compute_kernel(
                 qcbm_probs, probs[1][i]
             )
-            grad_neg = _compute_kernel(self.data, probs[0][i]) - _compute_kernel(
-                self.data, probs[1][i]
+            grad_neg = _compute_kernel(self.target_probs, probs[0][i]) - _compute_kernel(
+                self.target_probs, probs[1][i]
             )
             grad[i] = grad_pos - grad_neg
         return grad
