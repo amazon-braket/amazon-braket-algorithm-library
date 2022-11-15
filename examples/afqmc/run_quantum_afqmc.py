@@ -20,7 +20,16 @@ def run(
     dtau: float,
     quantum_evaluations_every_n_steps: int,
     max_pool: int,
-):
+) -> None:
+    """Run quantum assisted Auxiliary-Field Quantum Monte Carlo
+
+    Args:
+        num_walkers (int): Number of walkers.
+        num_steps (int): Number of (imaginary) time steps
+        dtau (float): Increment of each time step
+        quantum_evaluations_every_n_steps (int): How often to evaluate the energy using quantum
+        max_pool (int): Max workers. Defaults to 8.
+    """
 
     # perform HF calculations, where the geometry information and basis set are defined
     mol = gto.M(atom="H 0. 0. 0.; H 0. 0. 0.75", basis="sto-3g")
@@ -78,13 +87,16 @@ def run(
     )
 
 
-def get_pennylane_device(n_wires: int):
+def get_pennylane_device(n_wires: int) -> qml.Device:
     """Create Pennylane device from the `device` keyword argument of AwsQuantumJob.create().
     See https://docs.aws.amazon.com/braket/latest/developerguide/pennylane-embedded-simulators.html
     about the format of the `device` argument.
 
     Args:
         n_wires (int): number of qubits to initiate the local simulator.
+    
+    Returns:
+        qml.Device: PennyLane device
 
     """
     device_string = os.environ["AMZN_BRAKET_DEVICE_ARN"]

@@ -85,7 +85,7 @@ def q_full_imag_time_evolution(
     walker: np.ndarray,
     weight: float,
     dev: qml.Device,
-) -> Tuple[List[float],List[float],List[float],List[float]]:
+) -> Tuple[List[float], List[float], List[float], List[float]]:
     """Imaginary time evolution of a single walker
     Args:
         num_steps (int): number of time steps
