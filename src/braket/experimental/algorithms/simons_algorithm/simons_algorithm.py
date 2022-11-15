@@ -10,35 +10,35 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-"""
-Implementation of the Simon's Algorithm in Amazon Braket
-"""
+
 from collections import Counter
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 from braket.circuits import Circuit, circuit
 from braket.devices import Device
+from braket.tasks import QuantumTask
 from sympy import Matrix
-from sympy.core.numbers import Integer, Rational
 
 
 @circuit.subroutine(register=True)
-def simons_oracle(secret_s: str) -> Circuit:
-    """
-    Quantum circuit implementing a particular oracle for Simon's problem. Details of this
+def simons_oracle(secret_string: str) -> Circuit:
+    """Quantum circuit implementing a particular oracle for Simon's problem.
+
+    Details of this
     implementation are explained in an example notebook readable in the Amazon Braket example
     https://github.com/aws/amazon-braket-examples/blob/main/examples/advanced_circuits_algorithms/Simons_Algorithm/Simons_Algorithm.ipynb
+
     Args:
-        secret_s (str): the secret string
+        secret_string (str): the secret string
 
     Returns:
         Circuit: Circuit object that implements the oracle
     """
     # Find the index of the first 1 in s, to be used as the flag bit
-    flag_bit = secret_s.find("1")
+    flag_bit = secret_string.find("1")
 
-    length_string = len(secret_s)
+    length_string = len(secret_string)
 
     circ = Circuit()
     # First copy the first n qubits, so that |x>|0> -> |x>|x>
@@ -48,11 +48,11 @@ def simons_oracle(secret_s: str) -> Circuit:
     # If flag_bit=-1, s is the all-zeros string, and we do nothing else.
     if flag_bit != -1:
         # Now apply the XOR with s whenever the flag bit is 1.
-        for index, bit_value in enumerate(secret_s):
+        for index, bit_value in enumerate(secret_string):
 
             if bit_value not in ["0", "1"]:
                 raise ValueError(
-                    "Incorrect char '" + bit_value + "' in secret string s:" + secret_s
+                    "Incorrect char '" + bit_value + "' in secret string s:" + secret_string
                 )
 
             # XOR with s whenever the flag bit is 1.
@@ -65,10 +65,11 @@ def simons_oracle(secret_s: str) -> Circuit:
 
 
 def simons_algorithm(oracle: Circuit) -> Circuit:
-    """
-    Build the circuit associated with Simon's algorithm.
+    """Build the circuit associated with Simon's algorithm.
+
     Args:
         oracle (Circuit): The oracle encoding the secret string
+
     Returns:
         Circuit: circuit associated with Simon's algorithm
     """
@@ -78,60 +79,59 @@ def simons_algorithm(oracle: Circuit) -> Circuit:
 
 def run_simons_algorithm(
     oracle: Circuit, device: Device, shots: Optional[int] = None
-) -> Dict[str, Any]:
-    """
-    Function to run Simon's algorithm and return the secret string.
+) -> QuantumTask:
+    """Function to run Simon's algorithm and return the secret string.
+
     Args:
         oracle (Circuit): The oracle encoding the secret string
         device (Device): Braket device backend
         shots (Optional[int]) : Number of measurement shots (default is None).
             The default number of shots is set to twice the arity of the oracle.
             0 shots results in no measurement.
+
     Returns:
-        Dict[str, Any]: measurements and results from running Simon's algorithm
+        QuantumTask: Task for Simon's algorithm.
     """
     circ = simons_algorithm(oracle)
     circ.probability()
 
     task = device.run(circ, shots=2 * oracle.qubit_count if shots is None else shots)
 
-    result = task.result()
-
-    out = {
-        "circuit": circ,
-        "task_metadata": result.task_metadata,
-        "measurements": result.measurements,
-        "measured_qubits": result.measured_qubits,
-        "measurement_counts": result.measurement_counts,
-        "measurement_probabilities": result.measurement_probabilities,
-    }
-
-    return out
+    return task
 
 
-def get_simons_algorithm_results(results: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Get and print classically post-processed results from Simon's algorithm execution
+def get_simons_algorithm_results(task: QuantumTask) -> Dict[str, Any]:
+    """Get and print classically post-processed results from Simon's algorithm execution
+
     Args:
-        results (Dict[str, Any]): result Dict from run_simons_algorithm()
+        task (QuantumTask): Task for Simon's algorithm.
+
     Returns:
         Dict[str, Any]: Dict containing the secret string and marginalized output states
     """
-    result_s, traced_measurement_counts = _get_secret_string(results["measurement_counts"])
 
-    out = {
-        "secret_string": result_s,
+    task_result = task.result()
+
+    results = {
+        "measurements": task_result.measurements,
+        "measured_qubits": task_result.measured_qubits,
+        "measurement_counts": task_result.measurement_counts,
+        "measurement_probabilities": task_result.measurement_probabilities,
+    }
+    result_string, traced_measurement_counts = _get_secret_string(results["measurement_counts"])
+
+    output = {
+        "secret_string": result_string,
         "traced_measurement_counts": traced_measurement_counts,
     }
 
-    print("Result string:", result_s)
+    print("Result string:", result_string)
 
-    return out
+    return output
 
 
 def _get_secret_string(measurement_counts: Counter) -> Tuple[str, Counter]:
-    """
-    Classical post-processing to recover the secret string.
+    """Classical post-processing to recover the secret string.
 
     The measurement counter contains k bitstrings which correspond to k equations:
         z_k . s = 0 mod 2
@@ -140,10 +140,11 @@ def _get_secret_string(measurement_counts: Counter) -> Tuple[str, Counter]:
 
     Args:
         measurement_counts (Counter): Counter with all measured bistrings
+
     Returns:
         Tuple[str, Counter]: the secret string and the marginalized output states
     """
-    nb_base_qubits = int(len(list(measurement_counts.keys())[0]) / 2)
+    nb_base_qubits = len(list(measurement_counts.keys())[0]) // 2
 
     traced_results = Counter()
     for bitstring, count in measurement_counts.items():
@@ -167,19 +168,13 @@ def _get_secret_string(measurement_counts: Counter) -> Tuple[str, Counter]:
     # to perform the Gaussian elimination over the finite field.
     reduced_matrix = augmented_matrix.rref(iszerofunc=lambda x: x % 2 == 0)
 
-    # Helper function to treat fractions as modular inverse:
-    def mod2(bit: Rational) -> Integer:
-        return bit.as_numer_denom()[0] % 2
-
-    # Apply our helper function to the matrix
-    final_reduced_matrix = reduced_matrix[0].applyfunc(mod2)
+    # Apply helper function to the matrix to treat fractions as modular inverse:
+    final_reduced_matrix = reduced_matrix[0].applyfunc(lambda x: x.as_numer_denom()[0] % 2)
 
     # Extract the kernel of M from the remaining columns of the last row, when s is nonzero.
     if all(value == 0 for value in final_reduced_matrix[-1, :nb_columns]):
-        result_s = "".join(str(e) for e in final_reduced_matrix[-1, nb_columns:])
+        result_string = "".join(str(e) for e in final_reduced_matrix[-1, nb_columns:])
+    else:  # Otherwise, the sub-matrix will be full rank, so just set s=0...0
+        result_string = "0" * nb_rows
 
-    # Otherwise, the sub-matrix will be full rank, so just set s=0...0
-    else:
-        result_s = "0" * nb_rows
-
-    return result_s, traced_results
+    return result_string, traced_results
