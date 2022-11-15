@@ -14,8 +14,8 @@
 import math
 from typing import Any, Dict, List
 
-from braket.circuits import Circuit, circuit
 import networkx as nx
+from braket.circuits import Circuit, circuit
 
 
 @circuit.subroutine(register=True)
@@ -23,8 +23,7 @@ def quantum_partition_function(
     function: str,
     qubits: List[int],
 ) -> Circuit:
-    """
-    Creates two kinds of circuits for quantum partition function:
+    """Creates two kinds of circuits for quantum partition function:
       1) The shor's algorithm for ICCC-check
       2) The quantum fourier transformation circuit for checking gamma values
 
@@ -92,8 +91,7 @@ def run_quantum_partition_function(
     potts_model: dict,
     step: str,
 ) -> Dict[str, Any]:
-    """
-    Function to run Quantum partition function algorithm and return measurement counts.
+    """Function to run Quantum partition function algorithm and return measurement counts.
 
     Args:
         circuit (Circuit): Quantum partition function circuit
@@ -129,7 +127,7 @@ def run_quantum_partition_function(
     elif step == "iccc-check":
         print("Irreducible Cyclic Cocycle Code Check")
         if "nk-code" not in potts_model.keys():
-            raise Exception("no nk-code found in potts_model, please run pre-process step!")
+            raise KeyError("no nk-code found in potts_model, please run pre-process step!")
         Ga = potts_model["graph-model"]
         # TODO: Add shor algorithm to check ICCC
         N = len(Ga.nodes)
@@ -145,12 +143,12 @@ def run_quantum_partition_function(
     elif step == "qft":
         print("State Preparation and Quantum Fourier Transform")
         if "iccc-check" not in potts_model.keys():
-            raise Exception("no iccc-check found in potts_model, please run ICCC-check step!")
+            raise KeyError("no iccc-check found in potts_model, please run ICCC-check step!")
         check_result = potts_model["iccc-check"]
         assert check_result is True, "ICCC check didn't pass, no efficient quantum alogrithm!"
 
         if "qft-func" not in potts_model.keys():
-            raise Exception("no qft-func found in potts_model, please generate circuit!")
+            raise KeyError("no qft-func found in potts_model, please generate circuit!")
 
         qft_circuit = potts_model["qft-func"]["circuit"]
         # Add desired results_types
@@ -182,35 +180,14 @@ def run_quantum_partition_function(
 
 
 def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
-    """
-    Function to postprocess dictionary returned by run_quantum_partition_function
-        and pretty print results
+    """Function to postprocess dictionary returned by run_quantum_partition_function and pretty
+        print results.
 
     Args:
-        results (Dict[str, Any]): Results associated with quantum partition function
-        run as produced by run_quantum_partition_function
+        results (Dict[str, Any]): Results associated with quantum partition function run as produced
+        by run_quantum_partition_function
     """
     task = potts_model["qft-func"]["task"]
-
-    # get id and status of submitted task
-    status = task.state()
-    # print('ID of task:', task_id)
-    print("Status of task:", status)
-
-    # wait for job to complete
-    while status != "COMPLETED":
-        status = task.state()
-        print("Status:", status)
-
-    # get results of task
+    print(task)
     result = task.result()
-
-    # get measurement shots
-    counts = result.measurement_counts
-
-    print(counts)
-
-    # # plot using Counter
-    # plt.bar(counts.keys(), counts.values())
-    # plt.xlabel("bitstrings")
-    # plt.ylabel("counts")
+    return result
