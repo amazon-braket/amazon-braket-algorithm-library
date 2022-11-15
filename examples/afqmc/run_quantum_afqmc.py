@@ -94,7 +94,7 @@ def get_pennylane_device(n_wires: int) -> qml.Device:
 
     Args:
         n_wires (int): number of qubits to initiate the local simulator.
-    
+
     Returns:
         qml.Device: PennyLane device
 
