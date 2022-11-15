@@ -11,35 +11,30 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-## Quantum Fourier Transform: Amazon Braket Algorithm Library
+# Quantum Fourier Transform: Amazon Braket Algorithm Library
 
-## See https://en.wikipedia.org/wiki/Quantum_Fourier_transform
-## See tutorial at https://github.com/aws/amazon-braket-examples/blob/main/examples/advanced_circuits_algorithms/Quantum_Fourier_Transform/Quantum_Fourier_Transform.ipynb
-
-# general imports
-import numpy as np
 import math
+from typing import List
+
 import matplotlib.pyplot as plt
-from itertools import product
-
-# AWS imports: Import Braket SDK modules
 from braket.circuits import Circuit
+from braket.devices.device import Device
+from braket.tasks.gate_model_quantum_task_result import GateModelQuantumTaskResult
 
 
-# @circuit.subroutine(register=True)
-def quantum_fourier_transform(qubits):
+def quantum_fourier_transform(qubits: List[int]) -> Circuit:
     """
     Construct a circuit object corresponding to the Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the QFT.
 
     Args:
-        qubits (list): The list of qubits labels on which to apply the QFT
+        qubits (List[int]): The list of qubits labels on which to apply the QFT
+
+    Returns:
+        Circuit: inverse qft circuit
     """
 
     qftcirc = Circuit()
-
-    if isinstance(qubits, int):
-        qubits = list(range(qubits))
 
     # get number of qubits
     num_qubits = len(qubits)
@@ -48,8 +43,9 @@ def quantum_fourier_transform(qubits):
         # First add a Hadamard gate
         qftcirc.h(qubits[k])
 
-        # Then apply the controlled rotations, with weights (angles) defined by the distance to the control qubit.
-        # Start on the qubit after qubit k, and iterate until the end.  When num_qubits==1, this loop does not run.
+        # Then apply the controlled rotations, with weights (angles) defined by the distance
+        # to the control qubit. Start on the qubit after qubit k, and iterate until the end.
+        # When num_qubits==1, this loop does not run.
         for j in range(1, num_qubits - k):
             angle = 2 * math.pi / (2 ** (j + 1))
             qftcirc.cphaseshift(qubits[k + j], qubits[k], angle)
@@ -61,20 +57,19 @@ def quantum_fourier_transform(qubits):
     return qftcirc
 
 
-# @circuit.subroutine(register=True)
-def inverse_quantum_fourier_transform(qubits):
+def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
     """
     Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the circuit.
 
     Args:
-        qubits (list): The list of qubits on which to apply the inverse QFT
+        qubits (List[int]): The list of qubits on which to apply the inverse QFT
+
+    Returns:
+        Circuit: inverse qft circuit
     """
     # instantiate circuit object
     qftcirc = Circuit()
-
-    if isinstance(qubits, int):
-        qubits = list(range(qubits))
 
     # get number of qubits
     num_qubits = len(qubits)
@@ -86,8 +81,8 @@ def inverse_quantum_fourier_transform(qubits):
     # Start on the last qubit and work to the first.
     for k in reversed(range(num_qubits)):
 
-        # Apply the controlled rotations, with weights (angles) defined by the distance to the control qubit.
-        # These angles are the negative of the angle used in the QFT.
+        # Apply the controlled rotations, with weights (angles) defined by the distance
+        # to the control qubit. # These angles are the negative of the angle used in the QFT.
         # Start on the last qubit and iterate until the qubit after k.
         # When num_qubits==1, this loop does not run.
         for j in reversed(range(1, num_qubits - k)):
@@ -101,127 +96,66 @@ def inverse_quantum_fourier_transform(qubits):
 
 
 def run_quantum_fourier_transform(
-    qubits, nshots=1000, device=None, state_prep_cir=None, analysis_cir=None, doInverse=False
-):
+    n_qubits: int,
+    n_shots: int,
+    device: Device,
+    state_prep_circ: Circuit = Circuit(),
+    analysis_circ: Circuit = Circuit(),
+    inverse: bool = False,
+) -> GateModelQuantumTaskResult:
     """Execute QFT algorithm and returns results.
 
     Args:
-        device                The requested device (default: LocalSimulator)
-        qubits                (int or list)  number of qubits or a list of qubits
-        state_perp_cir        (circuit) to be run before qft
-        analysis_cir          (circuit) to be run after  qft
-        doInverse             (bool) do the inverse qft
+        n_qubits (int): number of qubits
+        n_shots (int): number of shots
+        device (Device): The requested device (default: LocalSimulator)
+        state_prep_circ (Circuit): circuit to be run before qft
+        analysis_circ (Circuit): circuit to be run after  qft
+        inverse (bool): do the inverse qft
+
+    Returns:
+        GateModelQuantumTaskResult: circuit execution result
+
     """
+    circuit = state_prep_circ
+    qubits = list(range(n_qubits))
 
-    if isinstance(qubits, int):
-        qubits = list(range(qubits))
-
-    if not state_prep_cir:
-        circuit = Circuit()
-    else:
-        circuit = state_prep_cir
-
-    if doInverse:
+    if inverse:
         circuit = circuit + inverse_quantum_fourier_transform(qubits)
     else:
         circuit = circuit + quantum_fourier_transform(qubits)
 
-    if analysis_cir:
-        circuit = circuit + analysis_cir
+    circuit = circuit + analysis_circ
+    circuit.probability()
 
-    if device == None:
-        device = braket.devices.LocalSimulator()
-
-    results = device.run(circuit, shots=nshots).result()
+    results = device.run(circuit, shots=n_shots).result()
 
     return results
 
 
-def postprocess_qft_results(result, verbose=False):
-    """
-    Function to postprocess results returned by run_qpe
+def get_qft_results(result: GateModelQuantumTaskResult, verbose: bool = False) -> None:
+    """Function to postprocess results returned by run_qpe
 
     Args:
-        out (dict): Results/information associated with QPE run as produced by run_quantum_fourier_transform
+        result (GateModelQuantumTaskResult): Results/information associated with QPE run
+            as produced by run_quantum_fourier_transform
+        verbose (bool): print results
     """
 
     if verbose:
         print(result.result_types)
 
-    probs = []
+    probs = result.values[0]
 
-    if len(result.measured_qubits) < 6:
+    n = len(result.measured_qubits)
 
-        n = len(result.measured_qubits)
+    format_bitstring = "{0:0" + str(n) + "b}"
+    bitstring_keys = [format_bitstring.format(ii) for ii in range(2**n)]
 
-        # bitstrings
-        format_bitstring = "{0:0" + str(n) + "b}"
-        bitstring_keys = [format_bitstring.format(ii) for ii in range(2**n)]
+    xlocs = [ii for ii in range(2**n)]
 
-        for key in bitstring_keys:
-            if key in result.measurement_probabilities:
-                probs.append(result.measurement_probabilities[key])
-            else:
-                probs.append(0.0)
-
-        xlocs = [ii for ii in range(2**n)]
-
-        plt.bar(xlocs, probs)
-
-        plt.ylabel("probabilities")
-        plt.xlabel("bitstrings")
-
-        plt.xticks(xlocs, labels=bitstring_keys, rotation=90)
-        plt.ylim([0, 1])
-
-        plt.show()
-
-        return
-
-    plt.bar(result.measurement_counts.keys(), result.measurement_counts.values())
-    plt.xticks(rotation=90)
+    plt.bar(range(2**n), probs)
+    plt.ylabel("probabilities")
     plt.xlabel("bitstrings")
-    plt.ylabel("counts")
-    plt.show()
-
-
-### QFT IMPLEMENTATION 2:
-def qft_alt2(num_qubits, inverse=False):
-    """
-    Construct a circuit object corresponding to the Quantum Fourier Transform (QFT)
-    algorithm over a fixed number of qubits.  Does not use recursion to generate the QFT.
-
-    Args:
-        num_qubits (int): The number of qubits on which to apply the QFT.
-    """
-    qc = Circuit()
-    N = num_qubits - 1
-
-    if inverse == False:
-        # First add a Hadamard gate
-        qc.h(N)
-
-        # Then apply the controlled rotations, with weights (angles) defined by the distance to the control qubit.
-        # Start on the qubit after qubit k, and iterate until the end.
-        for n in range(1, N + 1):
-            qc.cphaseshift(N - n, N, 2 * np.pi / 2 ** (n + 1))
-
-        # repeat structure for all lower values of i < N
-        for i in range(1, N):
-            qc.h(N - i)
-            for n in range(1, N - i + 1):
-                qc.cphaseshift(N - (n + i), N - i, 2 * np.pi / 2 ** (n + 1))
-        qc.h(0)
-    else:
-        qc.h(0)
-        for i in range(N - 1, 0, -1):
-            for n in range(N - i, 0, -1):
-                qc.cphaseshift(N - (n + i), N - i, -2 * np.pi / 2 ** (n + 1))
-            qc.h(N - i)
-
-        for n in range(N, 0, -1):
-            qc.cphaseshift(N - n, N, -2 * np.pi / 2 ** (n + 1))
-
-        qc.h(N)
-
-    return qc
+    plt.xticks(xlocs, labels=bitstring_keys, rotation=90)
+    plt.ylim([0, 1])

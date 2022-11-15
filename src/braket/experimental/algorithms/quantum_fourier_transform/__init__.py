@@ -11,6 +11,6 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from braket.experimental.algorithms.quantum_fourier_transform import (
+from braket.experimental.algorithms.quantum_fourier_transform import (  # noqa: F401
     quantum_fourier_transform,
 )
