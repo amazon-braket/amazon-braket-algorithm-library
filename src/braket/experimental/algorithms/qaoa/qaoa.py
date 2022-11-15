@@ -13,10 +13,23 @@
 
 
 import numpy as np
-from braket.circuits import Circuit, FreeParameter, Observable
+from braket.circuits import Circuit, FreeParameter, Observable, circuit
+from braket.devices import Device
+from braket.tasks import QuantumTask
 
 
-def evaluate_circuit(device, circ, values, shots):
+def evaluate_circuit(device: Device, circ: Circuit, values: np.ndarray, shots: int) -> QuantumTask:
+    """Evaluate a QAOA circuit with parameters=values.
+
+    Args:
+        device (Device): Braket device to run on.
+        circ (Circuit): QAAO circuit to run.
+        values (np.ndarray): Values for the parameters.
+        shots (int): Number of shots.
+
+    Returns:
+        QuantumTask: The Braket task to run.
+    """
     fixed_circuit = circ.make_bound_circuit(
         dict(zip(np.array(list(circ.parameters), dtype=str), values))
     )
@@ -24,9 +37,18 @@ def evaluate_circuit(device, circ, values, shots):
     return task
 
 
-def evaluate_loss(task, js):
+def evaluate_loss(task: QuantumTask, coeffs: np.ndarray) -> float:
+    """Evaluate the loss function from a QAOA task.
+
+    Args:
+        task (QuantumTask): QAOA task.
+        coeffs (np.ndarray): The coefficients of the cost Hamiltonian.
+
+    Returns:
+        float: Loss function value.
+    """
     exp_vals = task.result().result_types
-    loss = sum(j * s.value for j, s in zip(js, exp_vals))
+    loss = sum(c * s.value for c, s in zip(coeffs, exp_vals))
     return loss
 
 
@@ -48,8 +70,8 @@ def qaoa(n_qubits: int, n_layers: int, ising: np.ndarray) -> Circuit:
     circ = Circuit()
     circ.h(range(n_qubits))  # prepare |+> state
     for gamma, beta in zip(gammas, betas):
-        circ.add(cost_layer(gamma, ising))
-        circ.add(driver_layer(beta, n_qubits))
+        circ.cost_layer(gamma, ising)
+        circ.driver_layer(beta, n_qubits)
 
     # add Result types
     idx = ising.nonzero()
@@ -59,6 +81,7 @@ def qaoa(n_qubits: int, n_layers: int, ising: np.ndarray) -> Circuit:
     return circ
 
 
+@circuit.subroutine(register=True)
 def driver_layer(beta: float, n_qubits: int) -> Circuit:
     """Returns circuit for driver Hamiltonian U(Hb, beta).
 
@@ -72,23 +95,7 @@ def driver_layer(beta: float, n_qubits: int) -> Circuit:
     return Circuit().rx(range(n_qubits), 2 * beta)
 
 
-def decomposed_zz_gate(qubit0: int, qubit1: int, gamma: float) -> Circuit:
-    """Return a circuit implementing exp(-i gamma Z_i Z_j) using CNOT gates if ZZ not supported.
-
-    Args:
-        qubit0 (int): Index value for the controlling qubit for CNOT gate
-        qubit1 (int): Index value for the target qubit for CNOT gate
-        gamma (float): Rotation angle to apply parameterized rotation around z
-
-    Returns:
-        Circuit: Circuit object that implements ZZ gate using CNOT gates
-    """
-    circ_zz = Circuit()
-    # construct decomposition of ZZ
-    circ_zz.cnot(qubit0, qubit1).rz(qubit1, gamma).cnot(qubit0, qubit1)
-    return circ_zz
-
-
+@circuit.subroutine(register=True)
 def cost_layer(
     gamma: float,
     ising: np.ndarray,
@@ -110,12 +117,12 @@ def cost_layer(
     for qubit_pair in edges:
         # get interaction strength from Ising matrix
         interaction_strength = ising[qubit_pair[0], qubit_pair[1]]
-        gate = _zz_gate(qubit_pair[0], qubit_pair[1], gamma * interaction_strength)
-        circ.add(gate)
+        circ.decomposed_zz_gate(qubit_pair[0], qubit_pair[1], gamma * interaction_strength)
     return circ
 
 
-def _zz_gate(qubit0: int, qubit1: int, gamma: float) -> Circuit:
+@circuit.subroutine(register=True)
+def decomposed_zz_gate(qubit0: int, qubit1: int, gamma: float) -> Circuit:
     """Return a circuit implementing exp(-i gamma Z_i Z_j) using CNOT gates if ZZ not supported.
 
     Args:
@@ -127,6 +134,5 @@ def _zz_gate(qubit0: int, qubit1: int, gamma: float) -> Circuit:
         Circuit: Circuit object that implements ZZ gate using CNOT gates
     """
     circ_zz = Circuit()
-    # construct decomposition of ZZ
     circ_zz.cnot(qubit0, qubit1).rz(qubit1, gamma).cnot(qubit0, qubit1)
     return circ_zz
