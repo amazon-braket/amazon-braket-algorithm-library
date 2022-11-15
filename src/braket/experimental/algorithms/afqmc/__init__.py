@@ -12,7 +12,7 @@
 # language governing permissions and limitations under the License.
 
 # from braket.experimental.algorithms.afqmc.quantum_afqmc import (  # noqa: F401
-#     prepare_slater_circuit, 
+#     prepare_slater_circuit,
 #     reortho,
 # )
 

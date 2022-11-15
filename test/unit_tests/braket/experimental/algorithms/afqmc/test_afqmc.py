@@ -1,10 +1,12 @@
 import numpy as np
 import pennylane as qml
-from braket.experimental.algorithms.afqmc.classical_afqmc import chemistry_preparation, greens_pq, local_energy
-from braket.experimental.algorithms.afqmc.quantum_afqmc import quantum_afqmc
 from pyscf import fci, gto
 
+from braket.experimental.algorithms.afqmc.classical_afqmc import chemistry_preparation
+from braket.experimental.algorithms.afqmc.quantum_afqmc import quantum_afqmc
+
 np.set_printoptions(precision=4, edgeitems=10, linewidth=150, suppress=True)
+
 
 def test_quantum_afqmc():
 
@@ -31,5 +33,5 @@ def test_quantum_afqmc():
         max_pool=2,
         dev=dev,
     )
-    assert len(energies)==num_steps
-    assert len(quantum_energies)==num_steps//qe_step_size
+    assert len(energies) == num_steps
+    assert len(quantum_energies) == num_steps // qe_step_size

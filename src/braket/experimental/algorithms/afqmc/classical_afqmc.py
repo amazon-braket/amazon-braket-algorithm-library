@@ -2,13 +2,13 @@ import copy
 import multiprocessing as mp
 import os
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 from openfermion.circuits.low_rank import low_rank_two_body_decomposition
-from scipy.linalg import det, expm, qr
 from pyscf.gto.mole import Mole
 from pyscf.scf.hf import RHF
+from scipy.linalg import det, expm, qr
 
 
 @dataclass
@@ -66,7 +66,7 @@ def classical_afqmc(
 
 
 def hartree_fock_energy(trial: np.ndarray, prop: ChemicalProperties) -> float:
-    """ Compute Hatree Fock energy
+    """Compute Hatree Fock energy
 
     Args:
         trial (np.ndarray): Trial wavefunction.
@@ -93,15 +93,16 @@ def full_imag_time_evolution(
     walker: np.ndarray,
     weight: float,
 ):
-    """ Imaginary time evolution of a single walker
+    """Imaginary time evolution of a single walker
     Args:
-        num_steps (int): number of time steps 
+        num_steps (int): number of time steps
         dtau (float): imaginary time step size
-        trial (np.ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is np.array([[1,0], [0,1], [0,0], [0,0]])
+        trial (np.ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is
+            np.array([[1,0], [0,1], [0,0], [0,0]])
         prop (ChemicalProperties): Chemical properties.
         E_shift (float): Reference energy, i.e. Hartree-Fock energy
         walker (np.ndarray): normalized walker state as np.ndarray, others are the same as trial
-        weight (float): weight for sampling.        
+        weight (float): weight for sampling.
     """
     # random seed for multiprocessing
     np.random.seed(int.from_bytes(os.urandom(4), byteorder="little"))
@@ -122,11 +123,12 @@ def imag_time_propogator(
     prop: ChemicalProperties,
     E_shift: float,
 ):
-    """ Propagate a walker by one time step
+    """Propagate a walker by one time step
 
     Args:
         dtau (float): imaginary time step size
-        trial (np.ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is np.array([[1,0], [0,1], [0,0], [0,0]])
+        trial (np.ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is
+            np.array([[1,0], [0,1], [0,0], [0,0]])
         walker (np.ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
         prop (ChemicalProperties): Chemical properties.
@@ -295,24 +297,27 @@ def chemistry_preparation(mol: Mole, hf: RHF, trial: np.ndarray):
     )
 
 
-def propagate_walker(x: np.ndarray, 
-                     v_0: List[np.ndarray], 
-                     v_gamma: List[np.ndarray], 
-                     mf_shift: np.ndarray, 
-                     dtau: float, 
-                     trial: np.ndarray, 
-                     walker: np.ndarray, 
-                     G: List[np.ndarray]
-    ):
+def propagate_walker(
+    x: np.ndarray,
+    v_0: List[np.ndarray],
+    v_gamma: List[np.ndarray],
+    mf_shift: np.ndarray,
+    dtau: float,
+    trial: np.ndarray,
+    walker: np.ndarray,
+    G: List[np.ndarray],
+):
     r"""This function updates the walker from imaginary time propagation.
 
     Args:
         x: auxiliary fields
         v_0: modified one-body term from reordering the two-body operator + mean-field subtraction.
-        v_gamma: Cholesky vectors stored in list (L, num_spin_orbitals, num_spin_orbitals), without mf_shift
+        v_gamma: Cholesky vectors stored in list (L, num_spin_orbitals, num_spin_orbitals), without
+            mf_shift
         mf_shift: mean-field shift \Bar{v}_{\gamma} stored in np.array format
         dtau: imaginary time step size
-        trial: trial state as np.ndarray, e.g., for h2 HartreeFock state, it is np.array([[1,0], [0,1], [0,0], [0,0]])
+        trial: trial state as np.ndarray, e.g., for h2 HartreeFock state,
+            it is np.array([[1,0], [0,1], [0,0], [0,0]])
         walker: walker state as np.ndarray, others are the same as trial
         G: one-body Green's function
 
