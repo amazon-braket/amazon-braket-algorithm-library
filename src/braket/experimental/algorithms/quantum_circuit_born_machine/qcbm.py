@@ -12,10 +12,10 @@
 # language governing permissions and limitations under the License.
 
 
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
-from braket.circuits import Circuit, FreeParameter
+from braket.circuits import Circuit, FreeParameter, circuit
 from braket.devices import Device
 
 
@@ -76,34 +76,9 @@ class QCBM:
             Circuit: Circuit with parameters fixed to `params`.
         """
         circ = Circuit()
-        self._rotation_layer(circ, self.parameters[0])
-        for L in range(1, self.n_layers):
-            circ._entangler(circ)
-            circ._rotation_layer(circ, self.parameters[L])
-        self._entangler(circ)
-
+        circ.qcbm_layers(self.neighbors, self.parameters)
+        circ.probability()
         return circ
-
-    def _entangler(self, circ: Circuit) -> None:
-        """Add CNot gates to circuit.
-
-        Args:
-            circ (Circuit): The circuit to add CNots to.
-        """
-        for i, j in self.neighbors:
-            circ.cnot(i, j)
-
-    def _rotation_layer(self, circ: Circuit, parameters: List[List[FreeParameter]]) -> None:
-        """Add rotation layers  to circuit.
-
-        Args:
-            circ (Circuit): The circuit to add CNots to.
-            parameters (List[List[FreeParameter]]): Parameters for rotation layers.
-        """
-        for n in range(self.n_qubits):
-            circ.rx(n, parameters[n][0])
-            circ.rz(n, parameters[n][1])
-            circ.rx(n, parameters[n][2])
 
     def get_probabilities(self, values: np.ndarray) -> np.ndarray:
         """Run and get probability results.
@@ -221,3 +196,62 @@ def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1])
     mmd_yy = _compute_kernel(py, py, sigma_list)
     mmd_xy = _compute_kernel(px, py, sigma_list)
     return mmd_xx + mmd_yy - 2 * mmd_xy
+
+
+@circuit.subroutine(register=True)
+def qcbm_layers(
+    neighbors: List[Tuple[int, int]], parameters: List[List[List[FreeParameter]]]
+) -> Circuit:
+    """QCBM layers.
+
+    Args:
+        neighbors (List[Tuple[int,int]]): List of qubit pairs.
+        parameters (List[List[List[FreeParameter]]]): List of FreeParameters. First index is
+            n_layers, second is n_qubits, and third is [0,1,2]
+
+    Returns:
+        Circuit: QCBM circuit.
+    """
+    n_layers = len(parameters)
+    circ = Circuit()
+    circ.rotation_layer(parameters[0])
+    for L in range(1, n_layers):
+        circ.entangler(neighbors)
+        circ.rotation_layer(parameters[L])
+    circ.entangler(neighbors)
+    return circ
+
+
+@circuit.subroutine(register=True)
+def entangler(neighbors: List[Tuple[int, int]]) -> Circuit:
+    """Add CNot gates to circuit.
+
+    Args:
+        neighbors (List[Tuple[int,int]]): Neighbors for CNots to connect
+
+    Returns:
+        Circuit: CNot entangling layer
+    """
+    circ = Circuit()
+    for i, j in neighbors:
+        circ.cnot(i, j)
+    return circ
+
+
+@circuit.subroutine(register=True)
+def rotation_layer(parameters: List[List[FreeParameter]]) -> Circuit:
+    """Add rotation layers  to circuit.
+
+    Args:
+        parameters (List[List[FreeParameter]]): Parameters for rotation layers.
+
+    Returns:
+        Circuit: Rotation layer
+    """
+    circ = Circuit()
+    n_qubits = len(parameters)
+    for n in range(n_qubits):
+        circ.rx(n, parameters[n][0])
+        circ.rz(n, parameters[n][1])
+        circ.rx(n, parameters[n][2])
+    return circ
