@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from itertools import product
 
 # AWS imports: Import Braket SDK modules
-from braket.circuits import Circuit, circuit
+from braket.circuits import Circuit
 
  
 #@circuit.subroutine(register=True)
@@ -117,7 +117,6 @@ def run_quantum_fourier_transform(qubits, nshots=1000, device=None, state_prep_c
     else:
         circuit = state_prep_cir
         
-    
     if doInverse:
         circuit = circuit + inverse_quantum_fourier_transform(qubits)
     else:
