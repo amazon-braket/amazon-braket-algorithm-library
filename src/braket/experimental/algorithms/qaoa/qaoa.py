@@ -58,7 +58,7 @@ def qaoa(n_qubits: int, n_layers: int, ising: np.ndarray) -> Circuit:
     Args:
         n_qubits (int): Number of qubits
         n_layers (int): Number of layers. Defaults to 1.
-        ising (ndarray): Ising interaction matrix. Defaults to the .
+        ising (ndarray): Ising interaction matrix.
 
     Returns:
         Circuit: The parameteric QAOA Circuit
