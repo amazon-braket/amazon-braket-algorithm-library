@@ -54,58 +54,59 @@ def balanced_oracle(n_qubits: int) -> Circuit:
     # generate a random array of 0s and 1s to figure out where to place x gates
     random_num = np.random.randint(2, size=n_qubits)
 
-    circuit = Circuit()
+    circ = Circuit()
 
     # place initial x gates
     for qubit in range(n_qubits):
         if random_num[qubit] == 1:
-            circuit.x(qubit)
+            circ.x(qubit)
 
     # place cnot gates
     for qubit in range(n_qubits):
-        circuit.cnot(control=qubit, target=n_qubits)
+        circ.cnot(control=qubit, target=n_qubits)
 
     # place final x gates
     for qubit in range(n_qubits):
         if random_num[qubit] == 1:
-            circuit.x(qubit)
+            circ.x(qubit)
 
-    return circuit
+    return circ
 
 
-def deutsch_jozsa_circuit(oracle: Circuit, n_qubits: int) -> Circuit:
+def deutsch_jozsa_circuit(oracle: Circuit) -> Circuit:
     """Deutsch-Jozsa circuit.
 
     Args:
         oracle (Circuit): Constant or balanced oracle circuit.
-        n_qubits (int): Number of qubits.
 
     Returns:
         Circuit: The Deutsch-Jozsa circuit and result types.
     """
-    circuit = Circuit()
-    circuit.deutsch_jozsa(oracle, n_qubits)
-    circuit.probability(range(n_qubits))
-    return circuit
+    n_qubits = oracle.qubit_count - 1
+    circ = Circuit()
+    circ.deutsch_jozsa(oracle)
+    circ.probability(range(n_qubits))
+    return circ
 
 
 @circuit.subroutine(register=True)
-def deutsch_jozsa(oracle: Circuit, n_qubits: int) -> Circuit:
+def deutsch_jozsa(oracle: Circuit) -> Circuit:
     """Deutsch-Jozsa subroutine.
 
     Args:
         oracle (Circuit): Constant or balanced oracle circuit.
-        n_qubits (int): Number of qubits.
 
     Returns:
         Circuit: The Deutsch-Jozsa circuit.
     """
-    circuit = Circuit()
-    circuit.h(range(n_qubits))
-    circuit.x(n_qubits).h(n_qubits)
-    circuit.add_circuit(oracle, range(n_qubits + n_qubits))
-    circuit.h(range(n_qubits))
-    return circuit
+    n_qubits = oracle.qubit_count - 1
+    circ = Circuit()
+    circ.h(range(n_qubits))
+    circ.x(n_qubits)
+    circ.h(n_qubits)
+    circ.add_circuit(oracle)
+    circ.h(range(n_qubits))
+    return circ
 
 
 def get_deutsch_jozsa_results(task: QuantumTask) -> Dict[str, float]:

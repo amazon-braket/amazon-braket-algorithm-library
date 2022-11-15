@@ -45,24 +45,30 @@ def test_fail_balanced_oracle_circuit():
 
 
 def test_dj_circuit():
-    dj = deutsch_jozsa_circuit(Circuit(), 0)
-    expected = Circuit().x(0).h(0).probability()
+    dj = deutsch_jozsa_circuit(Circuit().i(0))
+    expected = Circuit().x(0).h(0).i(0).probability()
+    print(dj)
+    print(expected)
     assert dj == expected
 
 
 def test_get_deutsch_jozsa_results_constant():
     device = LocalSimulator()
     const_oracle = constant_oracle(3)
-    dj_circuit = deutsch_jozsa_circuit(const_oracle, 3)
+    dj_circuit = deutsch_jozsa_circuit(const_oracle)
     task = device.run(dj_circuit, shots=0)
     dj_probabilities = get_deutsch_jozsa_results(task)
+    print(dj_circuit)
+    print(dj_probabilities)
     assert np.isclose(dj_probabilities["000"], 1.0)
 
 
 def test_get_deutsch_jozsa_results_balanced():
     device = LocalSimulator()
     bal_oracle = balanced_oracle(3)
-    dj_circuit = deutsch_jozsa_circuit(bal_oracle, 3)
+    dj_circuit = deutsch_jozsa_circuit(bal_oracle)
     task = device.run(dj_circuit, shots=0)
     dj_probabilities = get_deutsch_jozsa_results(task)
+    print(dj_circuit)
+    print(dj_probabilities)
     assert np.isclose(dj_probabilities["111"], 1.0)
