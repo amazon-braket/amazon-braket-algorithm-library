@@ -24,7 +24,7 @@ def test_quantum_afqmc():
 
     # Start QC-QFQMC computation
     quantum_energies, energies = quantum_afqmc(
-        num_walkers=10,
+        num_walkers=15,
         num_steps=num_steps,
         dtau=1,
         quantum_evaluations_every_n_steps=qe_step_size,
