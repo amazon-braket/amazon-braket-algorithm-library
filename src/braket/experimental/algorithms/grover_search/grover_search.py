@@ -151,7 +151,7 @@ def multi_control_not_constructor(
 
         circ = Circuit()
 
-        qd1 = list(range(0, nq1))
+        qd1 = list(range(nq1))
         qa1 = list(range(n_qubit + n_ancilla, n_qubit + n_ancilla + na1))
         circ.add_circuit(circ1, target=qd1 + qa1)
         n_ancilla += na1
