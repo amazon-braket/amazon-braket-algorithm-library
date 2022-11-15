@@ -31,6 +31,7 @@ setup(
         "amazon-braket-pennylane-plugin",
         "boto3>=1.22.3",
         "numpy>=1.19.2",
+        "matplotlib",
         "openfermion>=1.0.0",
         "pyscf>=2.1.1",
         "",
