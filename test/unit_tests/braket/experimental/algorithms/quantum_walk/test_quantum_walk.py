@@ -3,7 +3,7 @@ import pytest
 from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.quantum_walk.quantum_walk import (
+from braket.experimental.algorithms.quantum_walk import (
     qft_conditional_add_1,
     quantum_walk,
     run_quantum_walk,
@@ -73,11 +73,9 @@ def test_qft_conditional_add_1(num_qubits, a, action):
         assert np.mod(a + 1 - c, 2**num_qubits) == 0
 
 
+@pytest.mark.xfail(raises=ValueError)
 def test_value_error_num_nodes():
-    try:
-        quantum_walk(3)
-    except Exception as e:
-        assert str(e) == ("The number of nodes has to be 2^n for integer n.")
+    quantum_walk(3)
 
 
 def test_run_quantum_walk():

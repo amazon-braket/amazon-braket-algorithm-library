@@ -122,7 +122,7 @@ def run_quantum_walk(
         Dict[str, Any]: measurements and results from running Quantum Phase Estimation
     """
 
-    # Add desired results_types
+    # Add results_types
     circ.probability()
 
     # get total number of qubits
@@ -132,26 +132,17 @@ def run_quantum_walk(
     # The query_circuit subcircuit generates the desired input from all zeros.
     task = device.run(circ, shots=shots)
 
-    # get result for this task
     result = task.result()
-
-    # get metadata
-    metadata = result.task_metadata
 
     # get output probabilities (see result_types above)
     probs_values = result.values[0]
 
     # get measurement results
-    measurements = result.measurements
-    measured_qubits = result.measured_qubits
     measurement_counts = result.measurement_counts
-    measurement_probabilities = result.measurement_probabilities
 
-    # bitstrings
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
     bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
 
-    #
     quantum_walk_measurement_counts = {}
     for key, val in measurement_counts.items():
         node = int(key[1:][::-1], 2)
@@ -159,17 +150,17 @@ def run_quantum_walk(
             quantum_walk_measurement_counts[node] += val / shots
         else:
             quantum_walk_measurement_counts[node] = val / shots
-    # aggregate results
-    out = {
+
+    output = {
         "circuit": circ,
-        "task_metadata": metadata,
-        "measurements": measurements,
-        "measured_qubits": measured_qubits,
+        "task_metadata": result.task_metadata,
+        "measurements": result.measurements,
+        "measured_qubits": result.measured_qubits,
         "measurement_counts": measurement_counts,
-        "measurement_probabilities": measurement_probabilities,
+        "measurement_probabilities": result.measurement_probabilities,
         "probs_values": probs_values,
         "bitstring_keys": bitstring_keys,
         "quantum_walk_measurement_counts": quantum_walk_measurement_counts,
     }
 
-    return out
+    return output
