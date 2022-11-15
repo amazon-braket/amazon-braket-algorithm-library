@@ -1,3 +1,16 @@
+# Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+#     http://aws.amazon.com/apache2.0/
+#
+# or in the "license" file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+
 ## Quantum Fourier Transform: Amazon Braket Algorithm Library
 
 ## See https://en.wikipedia.org/wiki/Quantum_Fourier_transform
@@ -7,6 +20,7 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from itertools import product
 
 # AWS imports: Import Braket SDK modules
 from braket.circuits import Circuit, circuit
@@ -135,13 +149,8 @@ def postprocess_qft_results(result,verbose=False):
     
     if len(result.measured_qubits) < 6:
         
-        from itertools import product
         
         n = len(result.measured_qubits)
-        
-        # generate product in reverse lexicographic order
-        #bin_str = [''.join(p) for p in product('10', repeat=n)]
-        
         
         # bitstrings
         format_bitstring = '{0:0' + str(n) + 'b}'
@@ -156,7 +165,6 @@ def postprocess_qft_results(result,verbose=False):
         xlocs = [ii for ii in range(2**n)]
         
         plt.bar(xlocs,probs)
-        #plt.plot(xlocs,probs,marker='o')
         
         plt.ylabel('probabilities');
         plt.xlabel('bitstrings');
@@ -215,63 +223,3 @@ def qft_alt2(num_qubits, inverse=False):
         qc.h(N)        
         
     return qc
-
-### QFT helper functions
-def qft_add(num_qubits: int, const: int):
-    """
-    This implements the shift of a binary number register
-    """    
-    qc = Circuit()
-
-    N = num_qubits-1
-
-    bin_const = [int(x) for x in bin(abs(const))[2:]] # Big endian
-    bin_const = [0]*(N-len(bin_const)) + bin_const
-    
-    for n in range(1, N+1):
-        if bin_const[n-1]:
-            qc.phaseshift(N, np.sign(const) * 2*np.pi / 2**(n+1))
-
-    for i in range(1, N+1):
-        for n in range(N-i+1):
-            if bin_const[n+i-1]:
-                qc.phaseshift(N-i, np.sign(const) * 2*np.pi / 2**(n+1))
-
-    return qc
-
-def qft_adder(a, b, num_qubits):
-#     data_qubits = math.ceil(math.log(abs(a)+abs(b), 2)) + 1 if not abs(a)+abs(b) & (abs(a)+abs(b) - 1) == 0 else math.ceil(math.log(abs(a)+abs(b), 2)) + 2
-    qc = Circuit()
-
-    # Step 1: Encode the number a into the qr_data register
-    binary_a = bin(abs(a))[2:]
-    for i, bit in enumerate(reversed(binary_a)):
-        if bit == '1':
-            qc.x(i)
-    
-    # Step 2: Apply Quantum Fourier Transform
-    qc.add_circuit(quantum_fourier_transform(num_qubits))
-    
-    # Step 3: Add the number b using QFT adder
-    qc.add_circuit(qft_add(num_qubits, b))
-    
-    # Step 4: Apply Inverse Fourier Transform
-    qc.add_circuit(inverse_quantum_fourier_transform(num_qubits))
-    
-    return qc
-
-def test_qft_adder(a, b, num_qubits):
-    """ Calculate a + b using the QFT adder. """
-    
-    qc = qft_adder(a, b, num_qubits)
-    result = device.run(qc, shots=1000).result()
-    counts = result.measurement_counts
-    
-    # Make sure the measurement outcome corresponds to the addition a+b
-    values = np.asarray([int(v[::-1], 2) for v in counts.keys()])
-    counts = np.asarray(list(counts.values()))
-    c = values[np.argmax(counts)]
-#     assert c == a+b
-    assert np.mod(a+b-c, 2**num_qubits) == 0
-    
-    print(f"{a}+{b} = {c} mod {2**num_qubits}")    
