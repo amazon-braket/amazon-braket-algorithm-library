@@ -30,6 +30,7 @@ setup(
         "amazon-braket-sdk",
         "boto3>=1.22.3",
         "numpy>=1.19.2",
+        "matplotlib",
     ],
     extras_require={
         "test": [
