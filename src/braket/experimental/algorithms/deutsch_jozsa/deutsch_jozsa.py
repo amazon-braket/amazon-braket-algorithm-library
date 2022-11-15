@@ -50,10 +50,11 @@ def balanced_oracle(n_qubits: int) -> Circuit:
     """
     if n_qubits < 1:
         raise ValueError(f"Number of qubits must be greater than 0. Recieved {n_qubits}")
-    circuit = Circuit()
 
     # generate a random array of 0s and 1s to figure out where to place x gates
     random_num = np.random.randint(2, size=n_qubits)
+
+    circuit = Circuit()
 
     # place initial x gates
     for qubit in range(n_qubits):
