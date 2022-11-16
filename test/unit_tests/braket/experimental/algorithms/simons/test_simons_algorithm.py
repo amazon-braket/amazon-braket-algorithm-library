@@ -14,7 +14,7 @@
 import pytest
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.simons_algorithm import (
+from braket.experimental.algorithms.simons import (
     get_simons_algorithm_results,
     run_simons_algorithm,
     simons_oracle,
