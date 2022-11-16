@@ -29,7 +29,7 @@ def grover_search(
 
 
 def build_oracle(solution: str, decompose_ccnot: bool = False) -> Circuit:
-    """Oraclc circuit of a given solution.
+    """Oracle circuit of a given solution.
 
     Args:
         solution (str): Target solution (e.g., '010')
