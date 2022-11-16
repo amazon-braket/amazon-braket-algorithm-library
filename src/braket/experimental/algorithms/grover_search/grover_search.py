@@ -1,8 +1,8 @@
 from typing import List, Tuple
-
+import math
 import matplotlib.pyplot as plt
-import numpy as np
-from braket.circuits import Circuit, QubitSetInput, circuit
+
+from braket.circuits import Circuit, circuit
 
 
 def grover_search(
@@ -19,7 +19,7 @@ def grover_search(
     Returns:
         Circuit: Grover's circuit
     """
-    grover_circ = Circuit().h(np.arange(n_qubits))
+    grover_circ = Circuit().h(range(n_qubits))
     for _ in range(n_reps):
         grover_circ.add(oracle)
         amplification = amplify(n_qubits, decompose_ccnot)
@@ -60,9 +60,9 @@ def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
     """
     oracle = build_oracle(n_qubits * "0", decompose_ccnot)
     circ = Circuit()
-    circ.h(np.arange(n_qubits))
+    circ.h(range(n_qubits))
     circ.add_circuit(oracle)
-    circ.h(np.arange(n_qubits))
+    circ.h(range(n_qubits))
     return circ
 
 
@@ -72,7 +72,7 @@ def plot_bitstrings(probabilities: List[float]) -> None:
     Args:
         probabilities (List[float]): Probabilities of measuring each bitstring.
     """
-    num_qubits = int(np.log2(len(probabilities)))
+    num_qubits = int(math.log2(len(probabilities)))
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
     bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
 
@@ -83,18 +83,19 @@ def plot_bitstrings(probabilities: List[float]) -> None:
 
 
 @circuit.subroutine(register=True)
-def CCNot(controls: QubitSetInput = [0, 1], target: int = 2) -> Circuit:
+def ccnot_decomposed(control_1: int, control_2: int, target: int) -> Circuit:
     """
     Build CCNOT (Toffoli gate) from H, CNOT, T, Ti.
 
     Args:
-        controls (QubitSetInput): control qubits of CCNot gates
-        target (int): target qubit of CCNot gates
+        control_1 (int): control qubit 1 of CCNot gate
+        control_2 (int): control qubit 2 of CCNot gate
+        target (int): target qubit of CCNot gate
 
     Returns:
         Circuit: CCNot circuit.
     """
-    qubit_0, qubit_1 = controls
+    qubit_0, qubit_1 = control_1, control_2
     circ = Circuit()
     circ.h(target)
     circ.cnot(qubit_1, target)
@@ -137,7 +138,7 @@ def multi_control_not_constructor(
     elif n_qubit == 2:
         n_ancilla = 1
         if decompose_ccnot:
-            circ = Circuit().CCNot([0, 1], 2)
+            circ = Circuit().ccnot_decomposed(0, 1, 2)
         else:
             circ = Circuit().ccnot(0, 1, 2)
         return circ, n_ancilla
@@ -163,7 +164,7 @@ def multi_control_not_constructor(
 
         q0, q1, q2 = qa1[-1], qa2[-1], n_qubit + n_ancilla
         if decompose_ccnot:
-            circ.CCNot([q0, q1], q2)
+            circ.ccnot_decomposed(q0, q1, q2)
         else:
             circ.ccnot(q0, q1, q2)
         n_ancilla += 1
