@@ -48,17 +48,16 @@ def qft(num_qubits: int, inverse: bool = False) -> Circuit:
 def qft_conditional_add_1(num_qubits: int) -> Circuit:
     """Creates the quantum circuit that conditionally add +1 or -1 using:
 
-    1) The first qubit to control if add 1 or subtract 1: when the first qubit is 0, we add 1 from the number, and when
-    the first qubit is 1, we subtract 1 from the number.
+    1) The first qubit to control if add 1 or subtract 1: when the first qubit is 0, we add 1 from
+    the number, and when the first qubit is 1, we subtract 1 from the number.
 
-    2) The second register with `num_qubits`
-    qubits to save the result.
+    2) The second register with `num_qubits` qubits to save the result.
 
     Args:
         num_qubits (int): Number of qubits that saves the result.
 
     Returns:
-        Circuit: Circuit object that implements the circuit that conditionally add +1 or -1
+        Circuit: Circuit object that implements the circuit that conditionally add +1 or -1.
     """
 
     qc = Circuit()
