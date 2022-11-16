@@ -1,7 +1,7 @@
-from typing import List, Tuple
 import math
-import matplotlib.pyplot as plt
+from typing import List, Tuple
 
+import matplotlib.pyplot as plt
 from braket.circuits import Circuit, circuit
 
 
