@@ -106,7 +106,7 @@ def run_simons_algorithm(
 
 
 def get_simons_algorithm_results(task: QuantumTask) -> Dict[str, Any]:
-    """Get and print classically post-processed results from Simon's algorithm execution
+    """Get and print classically post-processed results from Simon's algorithm execution.
 
     Args:
         task (QuantumTask): Task for Simon's algorithm.

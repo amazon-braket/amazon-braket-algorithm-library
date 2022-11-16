@@ -6,8 +6,7 @@ from braket.devices import Device
 
 
 def qft(num_qubits: int, inverse: bool = False) -> Circuit:
-    """
-    Creates the quantum Fourier transform circuit and its inverse
+    """Creates the quantum Fourier transform circuit and its inverse.
 
     Args:
         num_qubits (int): Number of qubits in the circuit
@@ -47,18 +46,18 @@ def qft(num_qubits: int, inverse: bool = False) -> Circuit:
 
 
 def qft_conditional_add_1(num_qubits: int) -> Circuit:
-    """
-    Creates the quantum circuit that conditionally add +1 or -1 using
-    1) The first qubit to control if add 1 or subtract 1: when the first qubit
-        is 0, we add 1 from the number, and when the first qubit
-        is 1, we subtract 1 from the number.
-    2) The second register with `num_qubits` qubits to save the result
+    """Creates the quantum circuit that conditionally add +1 or -1 using:
+
+    1) The first qubit to control if add 1 or subtract 1: when the first qubit is 0, we add 1 from
+    the number, and when the first qubit is 1, we subtract 1 from the number.
+
+    2) The second register with `num_qubits` qubits to save the result.
 
     Args:
         num_qubits (int): Number of qubits that saves the result.
 
     Returns:
-        Circuit: Circuit object that implements the circuit that conditionally add +1 or -1
+        Circuit: Circuit object that implements the circuit that conditionally add +1 or -1.
     """
 
     qc = Circuit()
@@ -75,8 +74,7 @@ def qft_conditional_add_1(num_qubits: int) -> Circuit:
 
 
 def quantum_walk(n_nodes: int, num_steps: int = 1) -> Circuit:
-    """
-    Creates the quantum random walk circuit
+    """Creates the quantum random walk circuit.
 
     Args:
         n_nodes (int): The number of nodes in the graph
@@ -110,8 +108,7 @@ def run_quantum_walk(
     device: Device,
     shots: int = 1000,
 ) -> Dict[str, Any]:
-    """
-    Function to run quantum random walk algorithm and return measurement counts.
+    """Function to run quantum random walk algorithm and return measurement counts.
 
     Args:
         circ (Circuit): Quantum random walk circuit
