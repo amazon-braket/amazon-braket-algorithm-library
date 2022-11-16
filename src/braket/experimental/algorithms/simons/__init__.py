@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from braket.experimental.algorithms.simons_algorithm.simons_algorithm import (  # noqa: F401
+from braket.experimental.algorithms.simons.simons import (  # noqa: F401
     get_simons_algorithm_results,
     run_simons_algorithm,
     simons_algorithm,
