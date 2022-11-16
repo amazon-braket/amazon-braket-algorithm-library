@@ -48,8 +48,7 @@ def build_oracle(solution: str, decompose_ccnot: bool = False) -> Circuit:
 
 
 def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
-    """
-    Perform a single iteration of amplitude amplification.
+    """Perform a single iteration of amplitude amplification.
 
     Args:
         n_qubits (int): Number of data qubits.
@@ -84,8 +83,7 @@ def plot_bitstrings(probabilities: List[float]) -> None:
 
 @circuit.subroutine(register=True)
 def ccnot_decomposed(control_1: int, control_2: int, target: int) -> Circuit:
-    """
-    Build CCNOT (Toffoli gate) from H, CNOT, T, Ti.
+    """Build CCNOT (Toffoli gate) from H, CNOT, T, Ti.
 
     Args:
         control_1 (int): control qubit 1 of CCNot gate
@@ -177,7 +175,7 @@ def multi_control_not_constructor(
 
 
 def multi_control_not(n_qubit: int, decompose_ccnot: bool) -> Circuit:
-    """Multi-control Not circuit
+    """Multi-control Not circuit.
 
     Args:
         n_qubit (int): Number of qubits.
@@ -191,7 +189,7 @@ def multi_control_not(n_qubit: int, decompose_ccnot: bool) -> Circuit:
 
 
 def multi_control_z(n_qubit: int, decompose_ccnot: bool) -> Circuit:
-    """Multi-control Z circuit
+    """Multi-control Z circuit.
 
     Args:
         n_qubit (int): Number of qubits.

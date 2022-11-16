@@ -70,7 +70,7 @@ class QCBM:
         self.parametric_circuit = self._create_circuit()
 
     def _create_circuit(self) -> Circuit:
-        """Creates a QCBM circuit, and returns the probabilities
+        """Creates a QCBM circuit, and returns the probabilities.
 
         Returns:
             Circuit: Circuit with parameters fixed to `params`.
