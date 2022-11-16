@@ -29,13 +29,9 @@ setup(
     install_requires=[
         "amazon-braket-sdk",
         "amazon-braket-pennylane-plugin",
-        "boto3>=1.22.3",
-        "numpy>=1.19.2",
-        "scipy>=1.5.2",
+        "scipy",
         "matplotlib",
-        "openfermion>=1.0.0",
-        "pyscf>=2.1.1",
-        "",
+        "openfermionpyscf>=0.5",
     ],
     extras_require={
         "test": [
