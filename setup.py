@@ -13,7 +13,7 @@
 
 from setuptools import find_namespace_packages, setup
 
-with open("README.md", "r") as fh:
+with open("README.md") as fh:
     long_description = fh.read()
 
 with open("src/braket/_algos/_version.py") as f:
@@ -26,11 +26,7 @@ setup(
     python_requires=">= 3.7.2",
     packages=find_namespace_packages(where="src", exclude=("test",)),
     package_dir={"": "src"},
-    install_requires=[
-        "amazon-braket-sdk",
-        "boto3>=1.22.3",
-        "numpy>=1.19.2",
-    ],
+    install_requires=["amazon-braket-sdk", "boto3>=1.22.3", "numpy>=1.19.2", "matplotlib", "sympy"],
     extras_require={
         "test": [
             "black>=22.3.0",
