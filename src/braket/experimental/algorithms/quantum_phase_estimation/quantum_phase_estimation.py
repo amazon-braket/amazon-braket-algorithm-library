@@ -28,15 +28,14 @@ def quantum_phase_estimation(
     query_qubits: QubitSetInput,
     unitary_apply_func: Callable,
 ) -> Circuit:
-    """
-    Creates the Quantum Phase Estimation circuit using:
-      1) The first register for precision
-      2) The second register for query qubits which hosts the eigenstate
-         and should already be prepared in its initial state
-      3) A function that applies a controlled unitary circuit. This function accepts a control qubit
-         and the target qubits on which to apply the unitary. Quantum Phase Estimation will
-         repeatedly apply this function for the target qubits. This is a necessary input because the
-         controlled unitary needs to be defined in terms of available gates for a given QPU.
+    """Creates the Quantum Phase Estimation circuit using:
+
+    1) The first register for precision.
+    2)The second register for query qubits which hosts the eigenstate and should already be prepared
+    in its initial state. 3) A function that applies a controlled unitary circuit. This function
+    accepts a control qubit and the target qubits on which to apply the unitary. Quantum Phase
+    Estimation will repeatedly apply this function for the target qubits. This is a necessary input
+    because the controlled unitary needs to be defined in terms of available gates for a given QPU.
 
     Example:
         >>> def cnot_apply_func(circ, control_qubit, query_qubits):
@@ -83,8 +82,7 @@ def run_quantum_phase_estimation(
     device: Device,
     shots: int = 1000,
 ) -> GateModelQuantumTaskResult:
-    """
-    Function to run Quantum Phase Estimation algorithm and return measurement counts.
+    """Function to run Quantum Phase Estimation algorithm and return measurement counts.
 
     Args:
         circuit (Circuit): Quantum Phase Estimation circuit
@@ -114,9 +112,8 @@ def get_quantum_phase_estimation_results(
     query_qubits: QubitSetInput,
     verbose: bool = False,
 ) -> Dict[str, Any]:
-    """
-    Function to postprocess results returned by run_quantum_phase_estimation
-        and pretty print results
+    """Function to postprocess results returned by run_quantum_phase_estimation and pretty print
+    results.
 
     Args:
         result (GateModelQuantumTaskResult): Results associated with quantum phase estimation run
@@ -177,8 +174,7 @@ def get_quantum_phase_estimation_results(
 
 
 def _binary_to_decimal(binary: str) -> float:
-    """
-    Helper function to convert binary string (example: '01001') to decimal
+    """Helper function to convert binary string (example: '01001') to decimal.
 
     Args:
         binary (str): value to convert to decimal fraction
@@ -203,9 +199,8 @@ def _binary_to_decimal(binary: str) -> float:
 def _get_quantum_phase_estimation_phases(
     measurement_counts: Counter, precision_qubits: QubitSetInput
 ) -> Tuple[List[float], Dict[str, int]]:
-    """
-    Get Quantum Phase Estimates phase estimate from measurement_counts for given number
-    of precision qubits
+    """Get Quantum Phase Estimates phase estimate from measurement_counts for given number of
+    precision qubits.
 
     Args:
         measurement_counts (Counter) : measurement results from a device run
@@ -253,8 +248,7 @@ def _get_quantum_phase_estimation_phases(
 # inverse QFT
 @circuit.subroutine(register=True)
 def inverse_qft(qubits: QubitSetInput) -> Circuit:
-    """
-    Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
+    """Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the circuit.
 
     Args:

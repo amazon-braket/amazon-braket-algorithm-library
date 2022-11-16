@@ -64,7 +64,7 @@ def get_bernstein_vazirani_results(task: QuantumTask) -> Dict[str, float]:
 
 
 def plot_bitstrings(probabilities: Dict[str, float], title: str = None) -> None:
-    """Plot the measure results
+    """Plot the measure results.
 
     Args:
         probabilities (Dict[str, float]): Measurement probabilities.
