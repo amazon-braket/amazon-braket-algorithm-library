@@ -26,7 +26,7 @@ def test_qft():
     result = qft.run_quantum_fourier_transform(
         n_qubits=2, n_shots=100, state_prep_circ=Circuit().h(0).h(1), device=LocalSimulator()
     )
-    assert np.isclose(result.values[0][0], 1.0)
+    assert np.allclose(result.values[0], [1.0, 0.0, 0.0, 0.0])
 
 
 def test_inverse_qft():
@@ -37,11 +37,8 @@ def test_inverse_qft():
         device=LocalSimulator(),
         inverse=True,
     )
-    assert np.isclose(result.values[0][0], 1.0)
+    assert np.allclose(result.values[0], [1.0, 0.0, 0.0, 0.0])
 
 
-def test_get_qft_results():
-    circuit = Circuit().x(0).probability()
-    result = LocalSimulator().run(circuit, shots=1000).result()
-    qft.get_qft_results(result, verbose=True)
-    qft.get_qft_results(result, verbose=False)
+def test_plot_bitstrings():
+    qft.plot_bitstrings([0.5, 0.5])

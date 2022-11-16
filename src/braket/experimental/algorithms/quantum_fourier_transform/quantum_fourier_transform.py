@@ -17,6 +17,7 @@ import math
 from typing import List
 
 import matplotlib.pyplot as plt
+import numpy as np
 from braket.circuits import Circuit
 from braket.devices.device import Device
 from braket.tasks.gate_model_quantum_task_result import GateModelQuantumTaskResult
@@ -34,27 +35,27 @@ def quantum_fourier_transform(qubits: List[int]) -> Circuit:
         Circuit: inverse qft circuit
     """
 
-    qftcirc = Circuit()
+    qft_circ = Circuit()
 
     # get number of qubits
     num_qubits = len(qubits)
 
     for k in range(num_qubits):
         # First add a Hadamard gate
-        qftcirc.h(qubits[k])
+        qft_circ.h(qubits[k])
 
         # Then apply the controlled rotations, with weights (angles) defined by the distance
         # to the control qubit. Start on the qubit after qubit k, and iterate until the end.
         # When num_qubits==1, this loop does not run.
         for j in range(1, num_qubits - k):
             angle = 2 * math.pi / (2 ** (j + 1))
-            qftcirc.cphaseshift(qubits[k + j], qubits[k], angle)
+            qft_circ.cphaseshift(qubits[k + j], qubits[k], angle)
 
     # Then add SWAP gates to reverse the order of the qubits:
     for i in range(math.floor(num_qubits / 2)):
-        qftcirc.swap(qubits[i], qubits[-i - 1])
+        qft_circ.swap(qubits[i], qubits[-i - 1])
 
-    return qftcirc
+    return qft_circ
 
 
 def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
@@ -69,14 +70,14 @@ def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
         Circuit: inverse qft circuit
     """
     # instantiate circuit object
-    qftcirc = Circuit()
+    qft_circ = Circuit()
 
     # get number of qubits
     num_qubits = len(qubits)
 
     # First add SWAP gates to reverse the order of the qubits:
     for i in range(math.floor(num_qubits / 2)):
-        qftcirc.swap(qubits[i], qubits[-i - 1])
+        qft_circ.swap(qubits[i], qubits[-i - 1])
 
     # Start on the last qubit and work to the first.
     for k in reversed(range(num_qubits)):
@@ -87,12 +88,12 @@ def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
         # When num_qubits==1, this loop does not run.
         for j in reversed(range(1, num_qubits - k)):
             angle = -2 * math.pi / (2 ** (j + 1))
-            qftcirc.cphaseshift(qubits[k + j], qubits[k], angle)
+            qft_circ.cphaseshift(qubits[k + j], qubits[k], angle)
 
         # Then add a Hadamard gate
-        qftcirc.h(qubits[k])
+        qft_circ.h(qubits[k])
 
-    return qftcirc
+    return qft_circ
 
 
 def run_quantum_fourier_transform(
@@ -133,29 +134,17 @@ def run_quantum_fourier_transform(
     return results
 
 
-def get_qft_results(result: GateModelQuantumTaskResult, verbose: bool = False) -> None:
-    """Function to postprocess results returned by run_qpe
-
+def plot_bitstrings(probabilities: List[float]) -> None:
+    """Plot the measure results.
     Args:
-        result (GateModelQuantumTaskResult): Results/information associated with QPE run
-            as produced by run_quantum_fourier_transform
-        verbose (bool): print results
+        probabilities (List[float]): Probabilities of measuring each bitstring.
     """
+    num_qubits = int(np.log2(len(probabilities)))
+    format_bitstring = "{0:0" + str(num_qubits) + "b}"
+    bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
 
-    if verbose:
-        print(result.result_types)
-
-    probs = result.values[0]
-
-    n = len(result.measured_qubits)
-
-    format_bitstring = "{0:0" + str(n) + "b}"
-    bitstring_keys = [format_bitstring.format(ii) for ii in range(2**n)]
-
-    xlocs = [ii for ii in range(2**n)]
-
-    plt.bar(range(2**n), probs)
-    plt.ylabel("probabilities")
+    plt.bar(bitstring_keys, probabilities)
     plt.xlabel("bitstrings")
-    plt.xticks(xlocs, labels=bitstring_keys, rotation=90)
+    plt.ylabel("probability")
+    plt.xticks(rotation=90)
     plt.ylim([0, 1])
