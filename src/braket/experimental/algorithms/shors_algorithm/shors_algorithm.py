@@ -23,28 +23,30 @@ from braket.devices import Device
 
 
 @circuit.subroutine(register=True)
-def shors_algorithm(N: int, a: int) -> Circuit:
+def shors_algorithm(integer_N: int, integer_a: int) -> Circuit:
     """
     Creates the circuit for Shor's algorithm.
+      1) Based on integer N, calculate number of counting qubits for the first register
+      2) Setup same number of auxiliary qubits for the second register
+         and apply modular exponentian function
+      3) Apply inverse_QFT
 
     Args:
-        N (int) : The integer to be factored
-        a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
+        integer_N (int) : The integer N to be factored
+        integer_a (int) : Any integer 'a' that satisfies 1 < a < N and gcd(a, N) = 1.
 
     Returns:
         Circuit: Circuit object that implements the Shor's algorithm
     """
 
     # validate the inputs
-    if N < 1 or N % 2 == 0:
+    if integer_N < 1 or integer_N % 2 == 0:
         raise ValueError("The input N needs to be an odd integer greater than 1.")
-    if a >= N or math.gcd(a, N) != 1:
+    if integer_a >= integer_N or math.gcd(integer_a, integer_N) != 1:
         raise ValueError('The integer "a" needs to satisfy 1 < a < N and gcd(a, N) = 1.')
 
-    #
-
     # calculate number of qubits needed
-    n = int(np.ceil(np.log2(N)))
+    n = int(np.ceil(np.log2(integer_N)))
     m = n
 
     counting_qubits = [*range(n)]
@@ -57,7 +59,7 @@ def shors_algorithm(N: int, a: int) -> Circuit:
     shors_circuit.x(aux_qubits[0])
 
     # Apply modular exponentiation
-    shors_circuit.modular_exponentiation_amod15(counting_qubits, aux_qubits, a)
+    shors_circuit.modular_exponentiation_amod15(counting_qubits, aux_qubits, integer_a)
 
     # Apply inverse QFT
     shors_circuit.inverse_qft_noswaps(counting_qubits)
@@ -71,10 +73,10 @@ def run_shors_algorithm(
     shots: Optional[int] = 1000,
 ) -> Dict[str, Any]:
     """
-    Function to run Quantum Phase Estimation algorithm and return measurement counts.
+    Function to run Shor's algorithm and return measurement counts.
 
     Args:
-        circuit (Circuit): Quantum Phase Estimation circuit
+        circuit (Circuit): Shor's algorithm circuit
         device (Device): Braket device backend
         shots (Optional[int]) : Number of measurement shots (default is 1000).
             0 shots results in no measurement.
@@ -138,15 +140,15 @@ def inverse_qft_noswaps(qubits: QubitSetInput) -> Circuit:
 
 @circuit.subroutine(register=True)
 def modular_exponentiation_amod15(
-    counting_qubits: List[int], aux_qubits: List[int], a: int
+    counting_qubits: QubitSetInput, aux_qubits: QubitSetInput, integer_a: int
 ) -> Circuit:
     """
     Construct a circuit object corresponding the modular exponentiation of a^x Mod 15
 
     Args:
-        counting_qubits (List[int]): Qubits defining the counting register
-        aux_qubits (List[int]) : Qubits defining the auxilary register
-        a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
+        counting_qubits (QubitSetInput): Qubits defining the counting register
+        aux_qubits (QubitSetInput) : Qubits defining the auxilary register
+        integer_a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
     Returns:
         Circuit: Circuit object that implements the modular exponentiation of a^x Mod 15
     """
@@ -156,52 +158,33 @@ def modular_exponentiation_amod15(
 
     for x in counting_qubits:
         r = 2**x
-        if a not in [2, 7, 8, 11, 13]:
-            raise ValueError("'a' must be 2,7,8,11 or 13")
+        if integer_a not in [2, 7, 8, 11, 13]:
+            raise ValueError("integer 'a' must be 2,7,8,11 or 13")
         for iteration in range(r):
-            if a in [2, 13]:
+            if integer_a in [2, 13]:
                 mod_exp_amod15.cswap(x, aux_qubits[0], aux_qubits[1])
                 mod_exp_amod15.cswap(x, aux_qubits[1], aux_qubits[2])
                 mod_exp_amod15.cswap(x, aux_qubits[2], aux_qubits[3])
-            if a in [7, 8]:
+            if integer_a in [7, 8]:
                 mod_exp_amod15.cswap(x, aux_qubits[2], aux_qubits[3])
                 mod_exp_amod15.cswap(x, aux_qubits[1], aux_qubits[2])
                 mod_exp_amod15.cswap(x, aux_qubits[0], aux_qubits[1])
-            if a == 11:
+            if integer_a == 11:
                 mod_exp_amod15.cswap(x, aux_qubits[1], aux_qubits[3])
                 mod_exp_amod15.cswap(x, aux_qubits[0], aux_qubits[2])
-            if a in [7, 11, 13]:
+            if integer_a in [7, 11, 13]:
                 for q in aux_qubits:
                     mod_exp_amod15.cnot(x, q)
 
     return mod_exp_amod15
 
 
-@circuit.subroutine(register=True)
-def modular_exponentiation_amodN(
-    counting_qubits: List[int], aux_qubits: List[int], N: int, a: int
-) -> Circuit:
-    """
-    Construct a circuit object corresponding the modular exponentiation of a^x Mod N
-
-    Args:
-        counting_qubits (List[int]): Qubits defining the counting register
-        aux_qubits (List[int]) : Qubits defining the auxilary register
-        N (int) : The integer to be factored
-        a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
-    Returns:
-        Circuit: Circuit object that implements the modular exponentiation of a^x Mod N
-    """
-
-    # Instantiate circuit object
-    # mod_exp_amodN = Circuit()
-
-    # TODO Generic Modular exponentaton for any N
-
-    # return mod_exp_amodN
-
-
-def get_factors_from_results(results: Dict[str, Any], N: int, a: int) -> None:
+def get_factors_from_results(
+    results: Dict[str, Any],
+    integer_N: int,
+    integer_a: int,
+    verbose: bool = True,
+) -> Dict[str, Any]:
     """
     Function to postprocess dictionary returned by run_shors_algorithm
         and pretty print results
@@ -209,8 +192,11 @@ def get_factors_from_results(results: Dict[str, Any], N: int, a: int) -> None:
     Args:
         results (Dict[str, Any]): Results associated with quantum phase estimation run as produced
             by run_shors_algorithm
-        N (int) : The integer to be factored
-        a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
+        integer_N (int) : The integer to be factored
+        integer_a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
+        verbose (bool) : If True, prints aggregate results (default is False)
+    Returns:
+        Dict[str, Any]: Factors of the integer N
     """
 
     # unpack results
@@ -221,26 +207,38 @@ def get_factors_from_results(results: Dict[str, Any], N: int, a: int) -> None:
 
     r_guesses = []
     factors = []
-    print(f"Number of Measured phases (s/r) : {len(phases_decimal)}")
+    if verbose:
+        print(f"Number of Measured phases (s/r) : {len(phases_decimal)}")
     for phase in phases_decimal:
-        print(f"\nFor phase {phase} :")
-        r = (Fraction(phase).limit_denominator(N)).denominator
+        if verbose:
+            print(f"\nFor phase {phase} :")
+        r = (Fraction(phase).limit_denominator(integer_N)).denominator
         r_guesses.append(r)
-        print(f"Estimate for r is : {r}")
-        factor = [math.gcd(a ** (r // 2) - 1, N), math.gcd(a ** (r // 2) + 1, N)]
+        if verbose:
+            print(f"Estimate for r is : {r}")
+        factor = [
+            math.gcd(integer_a ** (r // 2) - 1, integer_N),
+            math.gcd(integer_a ** (r // 2) + 1, integer_N),
+        ]
         factors.append(factor[0])
         factors.append(factor[1])
-        print(f"Factors are : {factor[0]} and {factor[1]}")
+        if verbose:
+            print(f"Factors are : {factor[0]} and {factor[1]}")
     factors_set = set(factors)
     factors_set.discard(1)
-    factors_set.discard(N)
+    factors_set.discard(integer_N)
+    if verbose:
+        print(f"\n\nNon-trivial factors found are : {factors_set}")
 
-    print(f"\n\nNon-trivial factors found are : {factors_set}")
+    aggregate_results = {"guessed_factors": factors_set}
+
+    return aggregate_results
 
 
 def _get_phases(measurement_counts: Counter) -> List[float]:
     """
     Get phase estimate from measurement_counts using top half qubits
+
     Args:
         measurement_counts (Counter) : measurement results from a device run
     Returns:

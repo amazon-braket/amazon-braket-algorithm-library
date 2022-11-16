@@ -16,7 +16,7 @@ import pytest
 # from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.shors_algorithm.shors_algorithm import (  # noqa: F401,E501
+from braket.experimental.algorithms.shors_algorithm.shors_algorithm import (
     get_factors_from_results,
     run_shors_algorithm,
     shors_algorithm,
@@ -41,26 +41,28 @@ def test_invalid_a_N():
 
 
 def test_shors_algorithm():
-    N = 15
-    a = 2
-    shor = shors_algorithm(N, a)
+    integer_N = 15
+    integer_a = 2
+    shor = shors_algorithm(integer_N, integer_a)
     local_simulator = LocalSimulator()
     output = run_shors_algorithm(shor, local_simulator)
-    get_factors_from_results(output, N, a)
+    aggregate_results = get_factors_from_results(output, integer_N, integer_a, False)
+    assert aggregate_results["guessed_factors"] == {3, 5}
 
 
 def test_all_valid_a():
     local_simulator = LocalSimulator()
-    N = 15
-    for a in [2, 7, 8, 11, 13]:
-        shor = shors_algorithm(N, a)
+    integer_N = 15
+    for integer_a in [2, 7, 8, 11, 13]:
+        shor = shors_algorithm(integer_N, integer_a)
         output = run_shors_algorithm(shor, local_simulator)
-        get_factors_from_results(output, N, a)
+        aggregate_results = get_factors_from_results(output, integer_N, integer_a, True)
+        assert aggregate_results["guessed_factors"] == {3, 5}
 
 
 def test_no_counts():
     with pytest.raises(TypeError):
         output = {"measurement_counts": False}
-        N = 15
-        a = 7
-        get_factors_from_results(output, N, a)
+        integer_N = 15
+        integer_a = 7
+        get_factors_from_results(output, integer_N, integer_a, True)
