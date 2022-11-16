@@ -2,7 +2,7 @@
 The Braket Algorithm Library provides Amazon Braket customers with 20 pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
 
 ---
-Currently, braket algorithms are tested on Linux and Max. We recommend using Linux or Max because the certain electronic structure packages are only compatible on these platforms.
+Currently, braket algorithms are tested on Linux and Mac. We recommend using Linux or Mac because the certain electronic structure packages are only compatible on these platforms.
 
   * [**Grover's search algorithm**]
 
