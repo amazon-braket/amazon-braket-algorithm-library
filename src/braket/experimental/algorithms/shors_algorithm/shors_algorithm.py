@@ -13,23 +13,20 @@
 
 import math
 from collections import Counter
-from typing import Any, Callable, Dict, List, Tuple, Optional
 from fractions import Fraction
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from braket.circuits import Circuit, circuit
 from braket.circuits.qubit_set import QubitSetInput
 from braket.devices import Device
-from braket.tasks import GateModelQuantumTaskResult
 
 
 @circuit.subroutine(register=True)
-def shors_algorithm(
-    N: int,
-    a: int
-) -> Circuit:
+def shors_algorithm(N: int, a: int) -> Circuit:
     """
     Creates the circuit for Shor's algorithm.
+
     Args:
         N (int) : The integer to be factored
         a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
@@ -40,16 +37,18 @@ def shors_algorithm(
 
     # validate the inputs
     if N < 1 or N % 2 == 0:
-        raise ValueError('The input N needs to be an odd integer greater than 1.')
+        raise ValueError("The input N needs to be an odd integer greater than 1.")
     if a >= N or math.gcd(a, N) != 1:
         raise ValueError('The integer "a" needs to satisfy 1 < a < N and gcd(a, N) = 1.')
+
+    #
 
     # calculate number of qubits needed
     n = int(np.ceil(np.log2(N)))
     m = n
 
     counting_qubits = [*range(n)]
-    aux_qubits = [*range(n,n+m)]
+    aux_qubits = [*range(n, n + m)]
 
     shors_circuit = Circuit()
 
@@ -58,12 +57,13 @@ def shors_algorithm(
     shors_circuit.x(aux_qubits[0])
 
     # Apply modular exponentiation
-    shors_circuit.modular_exponentiation_amod15(counting_qubits,aux_qubits,a)
+    shors_circuit.modular_exponentiation_amod15(counting_qubits, aux_qubits, a)
 
     # Apply inverse QFT
     shors_circuit.inverse_qft_noswaps(counting_qubits)
 
     return shors_circuit
+
 
 def run_shors_algorithm(
     circuit: Circuit,
@@ -84,7 +84,7 @@ def run_shors_algorithm(
     """
 
     task = device.run(circuit, shots=shots)
-    
+
     result = task.result()
 
     out = {
@@ -95,6 +95,7 @@ def run_shors_algorithm(
     }
 
     return out
+
 
 @circuit.subroutine(register=True)
 def inverse_qft_noswaps(qubits: QubitSetInput) -> Circuit:
@@ -134,11 +135,10 @@ def inverse_qft_noswaps(qubits: QubitSetInput) -> Circuit:
 
     return qft_circuit
 
+
 @circuit.subroutine(register=True)
 def modular_exponentiation_amod15(
-    counting_qubits: List[int],
-    aux_qubits: List[int],
-    a: int
+    counting_qubits: List[int], aux_qubits: List[int], a: int
 ) -> Circuit:
     """
     Construct a circuit object corresponding the modular exponentiation of a^x Mod 15
@@ -155,32 +155,31 @@ def modular_exponentiation_amod15(
     mod_exp_amod15 = Circuit()
 
     for x in counting_qubits:
-        r = 2**x   
-        if a not in [2,7,8,11,13]:
-            raise ValueError("'a' must be 2,7,8,11 or 13")    
+        r = 2**x
+        if a not in [2, 7, 8, 11, 13]:
+            raise ValueError("'a' must be 2,7,8,11 or 13")
         for iteration in range(r):
-            if a in [2,13]:
-                mod_exp_amod15.cswap(x,aux_qubits[0],aux_qubits[1])
-                mod_exp_amod15.cswap(x,aux_qubits[1],aux_qubits[2])
-                mod_exp_amod15.cswap(x,aux_qubits[2],aux_qubits[3])
-            if a in [7,8]:
-                mod_exp_amod15.cswap(x,aux_qubits[2],aux_qubits[3])
-                mod_exp_amod15.cswap(x,aux_qubits[1],aux_qubits[2])
-                mod_exp_amod15.cswap(x,aux_qubits[0],aux_qubits[1])
+            if a in [2, 13]:
+                mod_exp_amod15.cswap(x, aux_qubits[0], aux_qubits[1])
+                mod_exp_amod15.cswap(x, aux_qubits[1], aux_qubits[2])
+                mod_exp_amod15.cswap(x, aux_qubits[2], aux_qubits[3])
+            if a in [7, 8]:
+                mod_exp_amod15.cswap(x, aux_qubits[2], aux_qubits[3])
+                mod_exp_amod15.cswap(x, aux_qubits[1], aux_qubits[2])
+                mod_exp_amod15.cswap(x, aux_qubits[0], aux_qubits[1])
             if a == 11:
-                mod_exp_amod15.cswap(x,aux_qubits[1],aux_qubits[3])
-                mod_exp_amod15.cswap(x,aux_qubits[0],aux_qubits[2])
-            if a in [7,11,13]:
+                mod_exp_amod15.cswap(x, aux_qubits[1], aux_qubits[3])
+                mod_exp_amod15.cswap(x, aux_qubits[0], aux_qubits[2])
+            if a in [7, 11, 13]:
                 for q in aux_qubits:
-                    mod_exp_amod15.cnot(x,q)
+                    mod_exp_amod15.cnot(x, q)
 
     return mod_exp_amod15
 
+
 @circuit.subroutine(register=True)
 def modular_exponentiation_amodN(
-    counting_qubits: List[int],
-    aux_qubits: List[int],
-    a: int
+    counting_qubits: List[int], aux_qubits: List[int], N: int, a: int
 ) -> Circuit:
     """
     Construct a circuit object corresponding the modular exponentiation of a^x Mod N
@@ -195,17 +194,14 @@ def modular_exponentiation_amodN(
     """
 
     # Instantiate circuit object
-    mod_exp_amodN = Circuit()
+    # mod_exp_amodN = Circuit()
 
-    # Generic Modular exponentaton for any N
+    # TODO Generic Modular exponentaton for any N
 
-    return mod_exp_amodN
+    # return mod_exp_amodN
 
-def get_factors_from_results(
-        results: Dict[str, Any],
-        N: int,
-        a: int 
-    ) -> None:
+
+def get_factors_from_results(results: Dict[str, Any], N: int, a: int) -> None:
     """
     Function to postprocess dictionary returned by run_shors_algorithm
         and pretty print results
@@ -222,18 +218,25 @@ def get_factors_from_results(
 
     # get phases
     phases_decimal = _get_phases(measurement_counts)
-    
-    # print 
-    print(phases_decimal)
-    
-    r_guesses=[]
-    factors=[]
+
+    r_guesses = []
+    factors = []
+    print(f"Number of Measured phases (s/r) : {len(phases_decimal)}")
     for phase in phases_decimal:
-        r=(Fraction(phase).limit_denominator(15)).denominator
+        print(f"\nFor phase {phase} :")
+        r = (Fraction(phase).limit_denominator(N)).denominator
         r_guesses.append(r)
-        factor = [math.gcd(a**(r//2)-1, N), math.gcd(a**(r//2)+1, N)]
-        factors.append(factor)
-    print(r_guesses,factors)
+        print(f"Estimate for r is : {r}")
+        factor = [math.gcd(a ** (r // 2) - 1, N), math.gcd(a ** (r // 2) + 1, N)]
+        factors.append(factor[0])
+        factors.append(factor[1])
+        print(f"Factors are : {factor[0]} and {factor[1]}")
+    factors_set = set(factors)
+    factors_set.discard(1)
+    factors_set.discard(N)
+
+    print(f"\n\nNon-trivial factors found are : {factors_set}")
+
 
 def _get_phases(measurement_counts: Counter) -> List[float]:
     """
@@ -243,17 +246,15 @@ def _get_phases(measurement_counts: Counter) -> List[float]:
     Returns:
         List[float] : decimal phase estimates
     """
-    
+
     # Aggregate the results (i.e., ignore/trace out the query register qubits):
     if not measurement_counts:
-        return None, None
-    
+        return None
+
     # First get bitstrings with corresponding counts for counting qubits only (top half)
     num_counting_qubits = int(len(list(measurement_counts.keys())[0]) / 2)
-    
-    bitstrings_precision_register = [
-        key[: num_counting_qubits] for key in measurement_counts.keys()
-    ]
+
+    bitstrings_precision_register = [key[:num_counting_qubits] for key in measurement_counts.keys()]
 
     # Then keep only the unique strings
     bitstrings_precision_register_set = set(bitstrings_precision_register)
@@ -269,14 +270,14 @@ def _get_phases(measurement_counts: Counter) -> List[float]:
         # Save the measurement count for this outcome
         counts = measurement_counts[key]
         # Generate the corresponding shortened key (supported only on the precision_qubits register)
-        count_key = key[: num_counting_qubits]
+        count_key = key[:num_counting_qubits]
         # Add these measurement counts to the corresponding key in our new dict
         precision_results_dict[count_key] += counts
-    
 
     phases_decimal = [_binary_to_decimal(item) for item in precision_results_dict.keys()]
 
     return phases_decimal
+
 
 def _binary_to_decimal(binary: str) -> float:
     """
