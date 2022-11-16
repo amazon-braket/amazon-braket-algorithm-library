@@ -12,7 +12,7 @@ def grover_search(
 
     Args:
         oracle (Circuit): Oracle circuit for a solution.
-        n_qubits (int): Number of qubits.
+        n_qubits (int): Number of data qubits.
         n_reps (int): Number of repititions for amplification. Defaults to 1.
         decompose_ccnot (bool): To decompose CCNOT (Toffoli) gate in the circuit.
 
@@ -52,7 +52,7 @@ def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
     Perform a single iteration of amplitude amplification.
 
     Args:
-        n_qubits (int): Number of qubits.
+        n_qubits (int): Number of data qubits.
         decompose_ccnot (bool): Whether to decompose CCNOT (Toffoli) gate in the circuit.
 
     Returns:
