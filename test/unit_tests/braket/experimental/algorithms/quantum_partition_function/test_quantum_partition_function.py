@@ -14,9 +14,10 @@
 from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.quantum_partition_function import (
-    quantum_partition_function as qpf,
-)
+# from braket.experimental.algorithms.quantum_partition_function import (
+#     quantum_partition_function as qpf,
+# )
+import braket.experimental.algorithms.quantum_partition_function as qpf
 
 
 # CNOT controlled unitary with 2 precision qubits, and H gate query prep
