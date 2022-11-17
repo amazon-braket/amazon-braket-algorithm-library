@@ -18,7 +18,7 @@ from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
-from braket.circuits import Circuit
+from braket.circuits import Circuit, circuit
 from braket.devices.device import Device
 from braket.tasks.gate_model_quantum_task_result import GateModelQuantumTaskResult
 
@@ -32,7 +32,7 @@ def quantum_fourier_transform(qubits: List[int]) -> Circuit:
         qubits (List[int]): The list of qubits labels on which to apply the QFT
 
     Returns:
-        Circuit: inverse qft circuit
+        Circuit: qft circuit
     """
 
     qft_circ = Circuit()
@@ -56,6 +56,19 @@ def quantum_fourier_transform(qubits: List[int]) -> Circuit:
         qft_circ.swap(qubits[i], qubits[-i - 1])
 
     return qft_circ
+
+
+@circuit.subroutine(register=True)
+def qft(qubits: List[int]) -> Circuit:
+    """qft circuit.
+
+    Args:
+        qubits (List[int]): The list of qubits labels on which to apply the QFT
+
+    Returns:
+        Circuit: qft circuit
+    """
+    return quantum_fourier_transform(qubits)
 
 
 def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
@@ -96,8 +109,21 @@ def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
     return qft_circ
 
 
+@circuit.subroutine(register=True)
+def iqft(qubits: List[int]) -> Circuit:
+    """Inverse qft circuit.
+
+    Args:
+        qubits (List[int]): The list of qubits labels on which to apply the IQFT
+
+    Returns:
+        Circuit: inverse qft circuit
+    """
+    return inverse_quantum_fourier_transform(qubits)
+
+
 def run_quantum_fourier_transform(
-    n_qubits: int,
+    qubits: List[int],
     n_shots: int,
     device: Device,
     state_prep_circ: Circuit = Circuit(),
@@ -107,7 +133,7 @@ def run_quantum_fourier_transform(
     """Execute QFT algorithm and returns results.
 
     Args:
-        n_qubits (int): number of qubits
+        qubits (List[int]): qubit indices
         n_shots (int): number of shots
         device (Device): The requested device (default: LocalSimulator)
         state_prep_circ (Circuit): circuit to be run before qft
@@ -119,19 +145,21 @@ def run_quantum_fourier_transform(
 
     """
     circuit = state_prep_circ
-    qubits = list(range(n_qubits))
 
     if inverse:
-        circuit = circuit + inverse_quantum_fourier_transform(qubits)
+        circuit = circuit.iqft(qubits)
     else:
-        circuit = circuit + quantum_fourier_transform(qubits)
+        circuit = circuit.qft(qubits)
 
     circuit = circuit + analysis_circ
     circuit.probability()
 
-    results = device.run(circuit, shots=n_shots).result()
+    task = device.run(circuit, shots=n_shots)
 
-    return results
+    return task
+
+
+# def
 
 
 def plot_bitstrings(probabilities: List[float]) -> None:
