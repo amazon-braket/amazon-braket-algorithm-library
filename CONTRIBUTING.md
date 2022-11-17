@@ -48,7 +48,7 @@ When you make a contribution please ensure that you
 2.  Provide the following files:
     1.  *src/braket/experimental/algorithms/<name_of_algo>/<name_of_algo>.py* - implements your example algorithm
     2.  *src/braket/experimental/algorithms/<name_of_algo>/\_\_init__\.py* - used for testing/packaging
-    3.  *examples/<Algorithm_Name>_Algorithm.ipynb* - provides a notebook the runs an example using your implementation
+    3.  *notebooks/textbook/<Algorithm_Name>_Algorithm.ipynb* - provides a notebook the runs an example using your implementation
     4.  (optional)*test/unit_tests/braket/experimental/algorithms/<name_of_algo>/test_<name_of_algo>.py* - unit tests for your python file
 3.  Only have Open Source licensed dependencies in your example.
 4.  Run your algorithm on a simulator and on a QPU in your notebook.
