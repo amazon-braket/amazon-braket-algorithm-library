@@ -24,14 +24,12 @@ def quantum_partition_function(
     qubits: List[int],
 ) -> Circuit:
     """Creates two kinds of circuits for quantum partition function:
-      1) The shor's algorithm for ICCC-check
+      1) The shor's algorithm for irreducible cyclic cocycle code (ICCC)-check
       2) The quantum fourier transformation circuit for checking gamma values
 
     Args:
-        precision_qubits (List[int]): Qubits defining the precision register
-        query_qubits (List[int]) : Qubits defining the query register
-        unitary_apply_func (Callable): Function that applies the desired controlled unitary to a
-            provided circuit using provided control and target qubits
+        function (str): Define the function of this circuit, it can be 'shor' or 'qft'
+        qubits (List[int]) : Qubits defining the circuit
 
     Returns:
         Circuit: Circuit object that implements the Quantum Parition Estimation algorithm
@@ -40,7 +38,7 @@ def quantum_partition_function(
     circuit = None
 
     if function == "shor":
-        print("shor's algorithm for iccc-check hasn't implemented!")
+        print("shor's algorithm for iccc-check hasn't been implemented!")
     elif function == "qft":
         print("qft circuit for checking gamma values")
         circuit = _quantum_fourier_transform(qubits)
@@ -94,17 +92,19 @@ def run_quantum_partition_function(
     """Function to run Quantum partition function algorithm and return measurement counts.
 
     Args:
-        circuit (Circuit): Quantum partition function circuit
-        precision_qubits (List[int]): Qubits defining the precision register
-        query_qubits (List[int]) : Qubits defining the query register
-        device (Device): Braket device backend
-        items_to_keep (int) : Number of items to return, topmost measurement counts for precision
-            register (default to None which means all)
-        shots (int) : Number of measurement shots (default is 1000).
-            0 shots results in no measurement.
+        potts_model (dict): Dictionary to save the results of Potts model:
+            'graph-model': networkx graph to save the definition of potts model
+            'q-state': q-state of potts model
+            'qft-func': dictionary to save information for quantum fourier transform function
+                'task': braket task for quantum fourier transform
+                'circuit': circuit for quantum fourier transform
+                'param': dictionary for running circuit
+                    'shots': shots for running device
+                    'device': device for running device
+        step (str): Qubits defining the precision register
 
     Returns:
-        Dict[str, Any]: measurements and results from running Quantum partition function
+        Dict[str, Any]: results from running Quantum partition function
     """
 
     out = {}
@@ -184,8 +184,19 @@ def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
         print results.
 
     Args:
+        potts_model (dict): Dictionary to save the results of Potts model:
+            'graph-model': networkx graph to save the definition of potts model
+            'q-state': q-state of potts model
+            'qft-func': dictionary to save information for quantum fourier transform function
+                'task': braket task for quantum fourier transform
+                'circuit': circuit for quantum fourier transform
+                'param': dictionary for running circuit
+                    'shots': shots for running device
+                    'device': device for running device
+
+    Returns:
         results (Dict[str, Any]): Results associated with quantum partition function run as produced
-        by run_quantum_partition_function
+        by get_quantum_partition_function_results
     """
     task = potts_model["qft-func"]["task"]
     print(task)
