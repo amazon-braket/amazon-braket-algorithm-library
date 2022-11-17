@@ -15,5 +15,5 @@ from braket.experimental.algorithms.bells_inequality.bells_inequality import (  
     bell_singlet,
     bell_singlet_rotated,
     get_bell_inequality_results,
-    run_bell_inequality_tasks,
+    run_bell_inequality,
 )

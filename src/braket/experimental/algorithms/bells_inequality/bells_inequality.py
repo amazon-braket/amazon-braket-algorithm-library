@@ -10,33 +10,50 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-
 from collections import Counter
 from typing import List, Tuple
 
 import numpy as np
-from braket.circuits import Circuit, Qubit
+from braket.circuits import Circuit, Qubit, circuit
+from braket.circuits.noise_model import NoiseModel
 from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-def run_bell_inequality_tasks(
-    device: Device, shots: int = 1_000, qubit0: Qubit = 0, qubit1: Qubit = 1
+def run_bell_inequality(
+    device: Device,
+    shots: int = 1_000,
+    qubit0: Qubit = 0,
+    qubit1: Qubit = 1,
+    angle_A: float = 0,
+    angle_B: float = np.pi / 3,
+    angle_C: float = 2 * np.pi / 3,
+    noise_model: NoiseModel = None,
 ) -> List[QuantumTask]:
-    """Submit three Bell circuits to a device.
+    """Submit three Bell circuits to a device. Angles default to maximum violation of Bell's
+        inequality.
 
     Args:
         device (Device): Quantum device or simulator.
         shots (int): Number of shots. Defaults to 1_000.
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
+        angle_A (float): Angle for the first measurement basis A. Defaults to 0.
+        angle_B (float): Angle for the second measurement basis B. Defaults to np.pi/3.
+        angle_C (float): Angle for the third measurement basis C. Defaults to 2*np.pi/3 to give
+            maximum violation of Bell's inequality.
+        noise_model (NoiseModel): Noise model to apply to all circuits. Defaults to None.
 
     Returns:
         List[QuantumTask]: List of quantum tasks.
     """
-    circAB = bell_singlet_rotated(qubit0, qubit1, 0, np.pi / 3.0)
-    circAC = bell_singlet_rotated(qubit0, qubit1, 0, 2 * np.pi / 3.0)
-    circBC = bell_singlet_rotated(qubit0, qubit1, np.pi / 3.0, 2 * np.pi / 3.0)
+    circAB = bell_singlet_rotated_basis(qubit0, qubit1, angle_A, angle_B)
+    circAC = bell_singlet_rotated_basis(qubit0, qubit1, angle_A, angle_C)
+    circBC = bell_singlet_rotated_basis(qubit0, qubit1, angle_B, angle_C)
+
+    if noise_model:  # optionally apply a noise model to circuits
+        circAB, circAC, circBC = [noise_model.apply(circ) for circ in [circAB, circAC, circBC]]
+
     tasks = [device.run(circ, shots=shots) for circ in [circAB, circAC, circBC]]
     return tasks
 
@@ -64,14 +81,12 @@ def get_bell_inequality_results(
         print(f"Bell's' inequality: {bell_ineqality_lhs} ≤ 1")
         if bell_ineqality_lhs > 1:
             print("Bell's inequality is violated!")
-            print("Notice that the quantity is not exactly 1.5 as predicted by theory.")
-            print("This is may be due to less number shots or the effects of noise on the QPU.")
         else:
             print("Bell's inequality is not violated due to noise.")
     return results, pAB, pAC, pBC
 
 
-def bell_singlet_rotated(
+def bell_singlet_rotated_basis(
     qubit0: Qubit, qubit1: Qubit, rotation0: float, rotation1: float
 ) -> Circuit:
     """Prepare a Bell singlet state in a Rx-rotated meaurement basis.
@@ -85,7 +100,7 @@ def bell_singlet_rotated(
     Returns:
         Circuit: the Braket circuit that prepares the Bell circuit.
     """
-    circ = bell_singlet(qubit0, qubit1)
+    circ = Circuit().bell_singlet(qubit0, qubit1)
     if rotation0 != 0:
         circ.rx(qubit0, rotation0)
     if rotation1 != 0:
@@ -94,6 +109,7 @@ def bell_singlet_rotated(
     return circ
 
 
+@circuit.subroutine(register=True)
 def bell_singlet(qubit0: Qubit, qubit1: Qubit) -> Circuit:
     """Prepare a Bell singlet state.
 
