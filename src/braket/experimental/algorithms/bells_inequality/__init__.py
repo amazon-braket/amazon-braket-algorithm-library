@@ -13,7 +13,7 @@
 
 from braket.experimental.algorithms.bells_inequality.bells_inequality import (  # noqa: F401
     bell_singlet,
-    bell_singlet_rotated,
+    bell_singlet_rotated_basis,
     get_bell_inequality_results,
     run_bell_inequality,
 )
