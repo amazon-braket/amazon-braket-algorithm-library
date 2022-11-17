@@ -7,7 +7,7 @@ import pkg_resources
 project = "amazon-braket-algorithm-library"
 version = pkg_resources.require(project)[0].version
 release = version
-copyright = "{}, Amazon.com".format(datetime.datetime.now().year)
+copyright = f"{datetime.datetime.now().year}, Amazon.com"
 
 extensions = [
     "sphinxcontrib.apidoc",
@@ -26,7 +26,7 @@ autodoc_member_order = "bysource"
 default_role = "py:obj"
 
 html_theme = "sphinx_rtd_theme"
-htmlhelp_basename = "{}doc".format(project)
+htmlhelp_basename = f"{project}doc"
 
 napoleon_use_rtype = False
 

@@ -24,8 +24,7 @@ from braket.tasks.gate_model_quantum_task_result import GateModelQuantumTaskResu
 
 
 def quantum_fourier_transform(qubits: List[int]) -> Circuit:
-    """
-    Construct a circuit object corresponding to the Quantum Fourier Transform (QFT)
+    """ Construct a circuit object corresponding to the Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the QFT.
 
     Args:
@@ -72,8 +71,7 @@ def qft(qubits: List[int]) -> Circuit:
 
 
 def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
-    """
-    Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
+    """ Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the circuit.
 
     Args:
@@ -153,17 +151,15 @@ def run_quantum_fourier_transform(
 
     circuit = circuit + analysis_circ
     circuit.probability()
-
     task = device.run(circuit, shots=n_shots)
-
+    
     return task
 
-
-# def
 
 
 def plot_bitstrings(probabilities: List[float]) -> None:
     """Plot the measure results.
+
     Args:
         probabilities (List[float]): Probabilities of measuring each bitstring.
     """
