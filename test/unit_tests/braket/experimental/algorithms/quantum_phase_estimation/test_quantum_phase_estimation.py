@@ -41,12 +41,12 @@ def test_cnot_qpe_run_2_precision_qubits():
     assert qpe_circ.instructions[3].ascii_symbols == ("C", "X")
 
     # run QPE
-    result = qpe.run_quantum_phase_estimation(
+    task = qpe.run_quantum_phase_estimation(
         qpe_circ, precision_qubits, query_qubits, LocalSimulator()
     )
 
     agg_result = qpe.get_quantum_phase_estimation_results(
-        result, precision_qubits, query_qubits, verbose=True
+        task, precision_qubits, query_qubits, verbose=True
     )
 
     # validate excepted QPE output
@@ -77,12 +77,12 @@ def test_0_shots():
     assert qpe_circ.instructions[3].ascii_symbols == ("C", "X")
 
     # run QPE
-    result = qpe.run_quantum_phase_estimation(
+    task = qpe.run_quantum_phase_estimation(
         qpe_circ, precision_qubits, query_qubits, LocalSimulator(), shots=0
     )
 
     agg_result = qpe.get_quantum_phase_estimation_results(
-        result, precision_qubits, query_qubits, verbose=True
+        task, precision_qubits, query_qubits, verbose=True
     )
 
     # validate excepted QPE output
@@ -106,12 +106,12 @@ def test_cnot_qpe_run_3_precision_qubits():
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    result = qpe.run_quantum_phase_estimation(
+    task = qpe.run_quantum_phase_estimation(
         qpe_circ, precision_qubits, query_qubits, LocalSimulator()
     )
 
     agg_result = qpe.get_quantum_phase_estimation_results(
-        result, precision_qubits, query_qubits, verbose=True
+        task, precision_qubits, query_qubits, verbose=True
     )
 
     # validate excepted QPE output
@@ -138,12 +138,12 @@ def test_cnot_qpe_run_HX_eigenstate():
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    result = qpe.run_quantum_phase_estimation(
+    task = qpe.run_quantum_phase_estimation(
         qpe_circ, precision_qubits, query_qubits, LocalSimulator()
     )
 
     agg_result = qpe.get_quantum_phase_estimation_results(
-        result, precision_qubits, query_qubits, verbose=True
+        task, precision_qubits, query_qubits, verbose=True
     )
 
     # validate excepted QPE output
@@ -170,12 +170,12 @@ def test_cnot_qpe_run_X_eigenstate():
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    result = qpe.run_quantum_phase_estimation(
+    task = qpe.run_quantum_phase_estimation(
         qpe_circ, precision_qubits, query_qubits, LocalSimulator()
     )
 
     agg_result = qpe.get_quantum_phase_estimation_results(
-        result, precision_qubits, query_qubits, verbose=True
+        task, precision_qubits, query_qubits, verbose=True
     )
 
     # validate excepted QPE output
