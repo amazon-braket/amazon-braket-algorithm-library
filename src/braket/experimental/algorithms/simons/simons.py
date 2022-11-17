@@ -16,12 +16,11 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 from sympy import Matrix
-from braket.circuits import Circuit, circuit
+from braket.circuits import Circuit
 from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-@circuit.subroutine(register=True)
 def simons_oracle(secret_string: str) -> Circuit:
     """Quantum circuit implementing a particular oracle for Simon's problem.
 
