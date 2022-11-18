@@ -16,5 +16,4 @@ from braket.experimental.algorithms.deutsch_jozsa.deutsch_jozsa import (  # noqa
     constant_oracle,
     deutsch_jozsa_circuit,
     get_deutsch_jozsa_results,
-    plot_bitstrings,
 )

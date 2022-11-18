@@ -14,10 +14,7 @@
 # Quantum Fourier Transform: Amazon Braket Algorithm Library
 
 import math
-from typing import List
 
-import matplotlib.pyplot as plt
-import numpy as np
 from braket.circuits import Circuit, circuit
 from braket.circuits.qubit_set import QubitSetInput
 from braket.devices.device import Device
@@ -157,20 +154,3 @@ def run_quantum_fourier_transform(
     task = device.run(circuit, shots=n_shots)
 
     return task
-
-
-def plot_bitstrings(probabilities: List[float]) -> None:
-    """Plot the measure results.
-
-    Args:
-        probabilities (List[float]): Probabilities of measuring each bitstring.
-    """
-    num_qubits = int(np.log2(len(probabilities)))
-    format_bitstring = "{0:0" + str(num_qubits) + "b}"
-    bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
-
-    plt.bar(bitstring_keys, probabilities)
-    plt.xlabel("bitstrings")
-    plt.ylabel("probability")
-    plt.xticks(rotation=90)
-    plt.ylim([0, 1])

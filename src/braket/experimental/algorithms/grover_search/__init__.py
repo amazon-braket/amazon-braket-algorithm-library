@@ -14,5 +14,4 @@
 from braket.experimental.algorithms.grover_search.grover_search import (  # noqa: F401
     build_oracle,
     grover_search,
-    plot_bitstrings,
 )

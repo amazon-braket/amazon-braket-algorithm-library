@@ -12,7 +12,6 @@
 # language governing permissions and limitations under the License.
 from typing import Dict
 
-import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit
 from braket.devices import Device
@@ -97,17 +96,3 @@ def run_bernstein_vazirani(
     task = device.run(circuit, shots=shots)
 
     return task
-
-
-def plot_bitstrings(probabilities: Dict[str, float], title: str = None) -> None:
-    """Plot the measure results.
-
-    Args:
-        probabilities (Dict[str, float]): Measurement probabilities.
-        title (str): Title for the plot.
-    """
-    plt.bar(probabilities.keys(), probabilities.values())
-    plt.xlabel("bitstrings")
-    plt.ylabel("probabilities")
-    plt.title(title)
-    plt.xticks(rotation=90)
