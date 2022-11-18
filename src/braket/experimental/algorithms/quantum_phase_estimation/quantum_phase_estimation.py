@@ -113,7 +113,7 @@ def run_quantum_phase_estimation(
         precision_qubits (QubitSetInput): Qubits defining the precision register
         query_qubits (QubitSetInput) : Qubits defining the query register
         device (Device): Braket device backend
-        shots (int) : Number of measurement shots, must be greater than 0 (default is 1000).
+        shots (int) : Number of measurement shots (default is 1000).
 
     Returns:
         QuantumTask: Task from running Quantum Phase Estimation
