@@ -15,46 +15,54 @@ from typing import List, Tuple
 
 import numpy as np
 from braket.circuits import Circuit, Qubit, circuit
-from braket.circuits.noise_model import NoiseModel
 from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-def run_bell_inequality(
-    device: Device,
-    shots: int = 1_000,
+def create_bell_inequality_circuits(
     qubit0: Qubit = 0,
     qubit1: Qubit = 1,
     angle_A: float = 0,
     angle_B: float = np.pi / 3,
     angle_C: float = 2 * np.pi / 3,
-    noise_model: NoiseModel = None,
-) -> List[QuantumTask]:
-    """Submit three Bell circuits to a device. Angles default to maximum violation of Bell's
-        inequality.
+) -> List[Circuit]:
+    """Create the three circuits for Bell's inequality. Default angles will give maximum violation
+        of Bell's inequality.
 
     Args:
-        device (Device): Quantum device or simulator.
-        shots (int): Number of shots. Defaults to 1_000.
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
         angle_A (float): Angle for the first measurement basis A. Defaults to 0.
         angle_B (float): Angle for the second measurement basis B. Defaults to np.pi/3.
         angle_C (float): Angle for the third measurement basis C. Defaults to 2*np.pi/3 to give
             maximum violation of Bell's inequality.
-        noise_model (NoiseModel): Noise model to apply to all circuits. Defaults to None.
 
     Returns:
-        List[QuantumTask]: List of quantum tasks.
+        List[Circuit]: Three circuits circAB, circAC, circBC.
     """
     circAB = bell_singlet_rotated_basis(qubit0, qubit1, angle_A, angle_B)
     circAC = bell_singlet_rotated_basis(qubit0, qubit1, angle_A, angle_C)
     circBC = bell_singlet_rotated_basis(qubit0, qubit1, angle_B, angle_C)
+    return [circAB, circAC, circBC]
 
-    if noise_model:  # optionally apply a noise model to circuits
-        circAB, circAC, circBC = [noise_model.apply(circ) for circ in [circAB, circAC, circBC]]
 
-    tasks = [device.run(circ, shots=shots) for circ in [circAB, circAC, circBC]]
+def run_bell_inequality(
+    circuits: List[Circuit],
+    device: Device,
+    shots: int = 1_000,
+) -> List[QuantumTask]:
+
+    """Submit three Bell circuits to a device.
+
+    Args:
+        circuits (List[Circuit]): Three Bell inequality circuits in order circAB, circAC, circBC.
+        device (Device): Quantum device or simulator.
+        shots (int): Number of shots. Defaults to 1_000.
+
+    Returns:
+        List[QuantumTask]: List of quantum tasks.
+    """
+    tasks = [device.run(circ, shots=shots) for circ in circuits]
     return tasks
 
 

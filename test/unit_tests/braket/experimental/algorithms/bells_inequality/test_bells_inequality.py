@@ -20,6 +20,7 @@ from braket.devices import LocalSimulator
 from braket.experimental.algorithms.bells_inequality import bell_singlet  # noqa:F401
 from braket.experimental.algorithms.bells_inequality import (
     bell_singlet_rotated_basis,
+    create_bell_inequality_circuits,
     get_bell_inequality_results,
     run_bell_inequality,
 )
@@ -44,11 +45,10 @@ def test_singlet_rotated():
 
 
 def test_bell_inequality_shots_0():
-    local_simulator = LocalSimulator()
-    local_tasks = run_bell_inequality(local_simulator, shots=0)
-    assert len(local_tasks) == 3
-
-    results, pAB, pAC, pBC = get_bell_inequality_results(local_tasks)
+    circs = create_bell_inequality_circuits(0, 1)
+    assert len(circs) == 3
+    tasks = run_bell_inequality(circs, LocalSimulator(), shots=0)
+    results, pAB, pAC, pBC = get_bell_inequality_results(tasks)
     assert math.isclose(pAB, -0.5)
     assert math.isclose(pBC, -0.5)
     assert math.isclose(pAC, 0.5)
@@ -56,8 +56,10 @@ def test_bell_inequality_shots_0():
 
 
 def test_bell_inequality():
-    local_simulator = LocalSimulator()
-    local_tasks = run_bell_inequality(local_simulator, shots=10)
-    assert len(local_tasks) == 3
-    results, pAB, pAC, pBC = get_bell_inequality_results(local_tasks)
+    circs = create_bell_inequality_circuits(0, 1)
+    assert len(circs) == 3
+    tasks = run_bell_inequality(circs, LocalSimulator(), shots=10)
+    results, pAB, pAC, pBC = get_bell_inequality_results(tasks)
+    assert len(tasks) == 3
+    results, pAB, pAC, pBC = get_bell_inequality_results(tasks)
     assert len(results) == 3
