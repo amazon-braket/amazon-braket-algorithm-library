@@ -12,7 +12,6 @@
 # language governing permissions and limitations under the License.
 from typing import Dict
 
-import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit, circuit
 from braket.tasks import QuantumTask
@@ -123,17 +122,3 @@ def get_deutsch_jozsa_results(task: QuantumTask) -> Dict[str, float]:
     num_qubits = int(np.log2(len(probabilities)))
     binary_strings = [format(i, "b").zfill(num_qubits) for i in range(2**num_qubits)]
     return dict(zip(binary_strings, probabilities))
-
-
-def plot_bitstrings(probabilities: Dict[str, float], title: str = None) -> None:
-    """Plot the measurement results.
-
-    Args:
-        probabilities (Dict[str, float]): Measurement probabilities.
-        title (str): Title for the plot.
-    """
-    plt.bar(probabilities.keys(), probabilities.values())
-    plt.xlabel("bitstrings")
-    plt.ylabel("probabilities")
-    plt.title(title)
-    plt.xticks(rotation=90)

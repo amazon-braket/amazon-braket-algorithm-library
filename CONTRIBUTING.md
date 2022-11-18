@@ -51,7 +51,7 @@ When you make a contribution please ensure that you
     3.  *notebooks/textbook/<Algorithm_Name>_Algorithm.ipynb* - provides a notebook the runs an example using your implementation
     4.  (optional)*test/unit_tests/braket/experimental/algorithms/<name_of_algo>/test_<name_of_algo>.py* - unit tests for your python file
 3.  Only have Open Source licensed dependencies in your example.
-4.  Run your algorithm on a simulator and on a QPU in your notebook.
+4.  Run your algorithm on a simulator and optionally on a QPU in your notebook.
 5.  Ensure that your example runs without issues on both a recent Braket Notebook Instance (create a new Braket Notebook Instance or restart one from Amazon Braket [in the console](https://docs.aws.amazon.com/braket/latest/developerguide/braket-get-started-create-notebook.html)) and locally, using our most [recently released Amazon Braket SDK version](https://github.com/aws/amazon-braket-sdk-python/blob/main/README.md#installing-the-amazon-braket-python-sdk). Run the entire notebook by clicking `Cells > Run All`, either in the console or locally, and confirm that every cell completes without error.
 
 In addition we encourage re-use of existing examples but it is not required. If you see an opportunity to make use of existing modules,

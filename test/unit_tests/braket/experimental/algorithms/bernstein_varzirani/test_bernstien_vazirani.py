@@ -19,7 +19,6 @@ from braket.devices import LocalSimulator
 from braket.experimental.algorithms.bernstein_vazirani.bernstein_vazirani import (
     bernstein_vazirani_circuit,
     get_bernstein_vazirani_results,
-    plot_bitstrings,
     run_bernstein_vazirani,
 )
 
@@ -40,7 +39,3 @@ def test_get_bernstein_vazirani_results(hidden_string: str, shots: int):
     task = run_bernstein_vazirani(bv_circuit, local_simulator, shots=shots)
     bv_result = get_bernstein_vazirani_results(task)
     assert np.isclose(bv_result[hidden_string], 1.0)
-
-
-def test_plot_bitstrings():
-    plot_bitstrings({"0": 1})
