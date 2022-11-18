@@ -23,21 +23,19 @@ from braket.devices.device import Device
 from braket.tasks.gate_model_quantum_task_result import GateModelQuantumTaskResult
 
 
-def quantum_fourier_transform(qubits: List[int]) -> Circuit:
+def quantum_fourier_transform(num_qubits: int) -> Circuit:
     """Construct a circuit object corresponding to the Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the QFT.
 
     Args:
-        qubits (List[int]): The list of qubits labels on which to apply the QFT
+        num_qubits (int): number of qubits on which to apply the QFT
 
     Returns:
         Circuit: qft circuit
     """
 
     qft_circ = Circuit()
-
-    # get number of qubits
-    num_qubits = len(qubits)
+    qubits = list(range(num_qubits))
 
     for k in range(num_qubits):
         # First add a Hadamard gate
@@ -54,6 +52,9 @@ def quantum_fourier_transform(qubits: List[int]) -> Circuit:
     for i in range(math.floor(num_qubits / 2)):
         qft_circ.swap(qubits[i], qubits[-i - 1])
 
+    # add result type to measure probability
+    # qft_circ.probability()
+
     return qft_circ
 
 
@@ -67,24 +68,25 @@ def qft(qubits: List[int]) -> Circuit:
     Returns:
         Circuit: qft circuit
     """
-    return quantum_fourier_transform(qubits)
+    qubit_mapping = {i: q for i, q in enumerate(qubits)}
+    return Circuit().add_circuit(
+        quantum_fourier_transform(len(qubits)), target_mapping=qubit_mapping
+    )
 
 
-def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
+def inverse_quantum_fourier_transform(num_qubits: int) -> Circuit:
     """Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the circuit.
 
     Args:
-        qubits (List[int]): The list of qubits on which to apply the inverse QFT
+        num_qubits (int): number of qubits on which to apply the inverse QFT
 
     Returns:
         Circuit: inverse qft circuit
     """
     # instantiate circuit object
     qft_circ = Circuit()
-
-    # get number of qubits
-    num_qubits = len(qubits)
+    qubits = list(range(num_qubits))
 
     # First add SWAP gates to reverse the order of the qubits:
     for i in range(math.floor(num_qubits / 2)):
@@ -104,6 +106,9 @@ def inverse_quantum_fourier_transform(qubits: List[int]) -> Circuit:
         # Then add a Hadamard gate
         qft_circ.h(qubits[k])
 
+    # add result type to measure probability
+    # qft_circ.probability()
+
     return qft_circ
 
 
@@ -117,7 +122,10 @@ def iqft(qubits: List[int]) -> Circuit:
     Returns:
         Circuit: inverse qft circuit
     """
-    return inverse_quantum_fourier_transform(qubits)
+    qubit_mapping = {i: q for i, q in enumerate(qubits)}
+    return Circuit().add_circuit(
+        inverse_quantum_fourier_transform(len(qubits)), target_mapping=qubit_mapping
+    )
 
 
 def run_quantum_fourier_transform(
@@ -142,7 +150,7 @@ def run_quantum_fourier_transform(
         GateModelQuantumTaskResult: circuit execution result
 
     """
-    circuit = state_prep_circ
+    circuit = Circuit() + state_prep_circ
 
     if inverse:
         circuit = circuit.iqft(qubits)
