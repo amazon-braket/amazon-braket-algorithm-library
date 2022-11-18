@@ -15,13 +15,12 @@ from collections import Counter
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
-from braket.circuits import Circuit, circuit
+from sympy import Matrix
+from braket.circuits import Circuit
 from braket.devices import Device
 from braket.tasks import QuantumTask
-from sympy import Matrix
 
 
-@circuit.subroutine(register=True)
 def simons_oracle(secret_string: str) -> Circuit:
     """Quantum circuit implementing a particular oracle for Simon's problem.
 
@@ -92,15 +91,20 @@ def run_simons_algorithm(
         device (Device): Braket device backend
         shots (Optional[int]) : Number of measurement shots (default is None).
             The default number of shots is set to twice the arity of the oracle.
-            0 shots results in no measurement.
+            shots must be a strictly positive integer.
 
     Returns:
         QuantumTask: Task for Simon's algorithm.
     """
+    if shots is None:
+        shots = 2 * oracle.qubit_count
+    if shots <= 0:
+        raise ValueError("shots must be a strictly positive integer.")
+
     circ = simons_algorithm(oracle)
     circ.probability()
 
-    task = device.run(circ, shots=2 * oracle.qubit_count if shots is None else shots)
+    task = device.run(circ, shots=shots)
 
     return task
 

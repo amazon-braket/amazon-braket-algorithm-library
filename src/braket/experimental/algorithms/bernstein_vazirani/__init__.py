@@ -15,4 +15,5 @@ from braket.experimental.algorithms.bernstein_vazirani.bernstein_vazirani import
     bernstein_vazirani_circuit,
     get_bernstein_vazirani_results,
     plot_bitstrings,
+    run_bernstein_vazirani,
 )
