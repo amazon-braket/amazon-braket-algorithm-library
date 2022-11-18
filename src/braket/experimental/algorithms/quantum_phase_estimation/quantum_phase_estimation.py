@@ -22,6 +22,30 @@ from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
+def quantum_phase_estimation_circuit(
+    quantum_phase_estimation_circ: Circuit,
+    precision_qubits: QubitSetInput,
+    query_qubits: QubitSetInput,
+    unitary_apply_func: Callable,
+) -> Circuit:
+    """Adds result type to quantum phase estimation
+
+    Args:
+        quantum_phase_estimation_circ (Circuit): Circuit with query bits prepared
+        precision_qubits (QubitSetInput): Qubits defining the precision register
+        query_qubits (QubitSetInput) : Qubits defining the query register
+        unitary_apply_func (Callable): Function that applies the desired controlled unitary to a
+            provided circuit using provided control and target qubits
+
+    Returns:
+        Circuit: Implements the Quantum Phase Estimation algorithm with result type
+    """
+
+    return quantum_phase_estimation_circ.quantum_phase_estimation(
+        precision_qubits, query_qubits, unitary_apply_func
+    ).probability()
+
+
 @circuit.subroutine(register=True)
 def quantum_phase_estimation(
     precision_qubits: QubitSetInput,
@@ -60,19 +84,19 @@ def quantum_phase_estimation(
     Returns:
         Circuit: Circuit object that implements the Quantum Phase Estimation algorithm
     """
-    quantum_phase_estimation_circuit = Circuit()
+    quantum_phase_estimation_circ = Circuit()
 
-    quantum_phase_estimation_circuit.h(precision_qubits)
+    quantum_phase_estimation_circ.h(precision_qubits)
 
     # Apply controlled unitaries C-U(2^k). Start with the last precision_qubit, end with the first
     for ii, qubit in enumerate(reversed(precision_qubits)):
         if qubit:
             for _ in range(2**ii):
-                unitary_apply_func(quantum_phase_estimation_circuit, qubit, query_qubits)
+                unitary_apply_func(quantum_phase_estimation_circ, qubit, query_qubits)
 
-    quantum_phase_estimation_circuit.inverse_qft(precision_qubits)
+    quantum_phase_estimation_circ.inverse_qft(precision_qubits)
 
-    return quantum_phase_estimation_circuit
+    return quantum_phase_estimation_circ
 
 
 def run_quantum_phase_estimation(
@@ -94,11 +118,6 @@ def run_quantum_phase_estimation(
     Returns:
         QuantumTask: Task from running Quantum Phase Estimation
     """
-    if shots <= 0:
-        raise ValueError("shots must be a strictly positive integer.")
-
-    # Add desired results_types
-    circuit.probability()
 
     task = device.run(circuit, shots=shots)
 
@@ -136,10 +155,14 @@ def get_quantum_phase_estimation_results(
     format_bitstring = "{0:0" + str(num_qubits) + "b}"
     bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
 
-    # quantum phase estimation postprocessing
-    phases_decimal, precision_results_dict = _get_quantum_phase_estimation_phases(
-        measurement_counts, precision_qubits
-    )
+    if not measurement_counts:
+        phases_decimal = result.result_types[0].value
+        precision_results_dict = None
+    else:
+        # quantum phase estimation postprocessing
+        phases_decimal, precision_results_dict = _get_quantum_phase_estimation_phases(
+            measurement_counts, precision_qubits
+        )
 
     eigenvalues = [np.exp(2 * np.pi * 1j * phase) for phase in phases_decimal]
     eigenvalue_estimates = np.round(eigenvalues, 5)
@@ -204,9 +227,8 @@ def _get_quantum_phase_estimation_phases(
     Returns:
         Tuple[List[float], Dict[str, int]]: decimal phase estimates, precision results
     """
+
     # Aggregate the results (i.e., ignore/trace out the query register qubits):
-    if not measurement_counts:
-        return None, None
     # First get bitstrings with corresponding counts for precision qubits only
     bitstrings_precision_register = [
         key[: len(precision_qubits)] for key in measurement_counts.keys()
