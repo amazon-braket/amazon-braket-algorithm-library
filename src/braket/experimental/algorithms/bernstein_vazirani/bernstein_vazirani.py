@@ -15,11 +15,26 @@ from typing import Dict
 import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit
+from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
 def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
-    """Bernstein–Vazirani circuit on a hidden string.
+    """Bernstein–Vazirani circuit on a hidden string. Creates a circuit that finds the hidden
+    string in a single iteration, using number of qubits equal to the string length.
+
+    Example:
+        >>> circ = bernstein_vazirani_circuit("011")
+        >>> print(circ)
+        T  : |0|1| 2 |3|4|Result Types|
+        q0 : -H---C---H---Probability--
+                  |       |
+        q1 : -H---|---C-H-Probability--
+                  |   |   |
+        q2 : -H-I-|-H-|---Probability--
+                  |   |
+        q3 : -H-Z-X---X----------------
+        T  : |0|1| 2 |3|4|Result Types|
 
     Args:
         hidden_string (str): Hidden bitstring. Defaults to "011".
@@ -61,6 +76,27 @@ def get_bernstein_vazirani_results(task: QuantumTask) -> Dict[str, float]:
     num_qubits = int(np.log2(len(probabilities)))
     binary_strings = [format(i, "b").zfill(num_qubits) for i in range(2**num_qubits)]
     return dict(zip(binary_strings, probabilities))
+
+
+def run_bernstein_vazirani(
+    circuit: Circuit,
+    device: Device,
+    shots: int = 1000,
+) -> QuantumTask:
+    """Function to run Bernstein Vazirani algorithm on a device.
+
+    Args:
+        circuit (Circuit): Bernstein Vazirani circuit
+        device (Device): Braket device backend
+        shots (int) : Number of measurement shots (default is 1000).
+
+    Returns:
+        QuantumTask: Task from running Quantum Phase Estimation
+    """
+
+    task = device.run(circuit, shots=shots)
+
+    return task
 
 
 def plot_bitstrings(probabilities: Dict[str, float], title: str = None) -> None:

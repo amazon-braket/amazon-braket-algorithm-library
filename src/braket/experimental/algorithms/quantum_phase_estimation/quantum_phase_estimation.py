@@ -19,7 +19,7 @@ import numpy as np
 from braket.circuits import Circuit, circuit
 from braket.circuits.qubit_set import QubitSetInput
 from braket.devices import Device
-from braket.tasks import GateModelQuantumTaskResult
+from braket.tasks import QuantumTask
 
 
 @circuit.subroutine(register=True)
@@ -81,7 +81,7 @@ def run_quantum_phase_estimation(
     query_qubits: QubitSetInput,
     device: Device,
     shots: int = 1000,
-) -> GateModelQuantumTaskResult:
+) -> QuantumTask:
     """Function to run Quantum Phase Estimation algorithm and return measurement counts.
 
     Args:
@@ -89,25 +89,24 @@ def run_quantum_phase_estimation(
         precision_qubits (QubitSetInput): Qubits defining the precision register
         query_qubits (QubitSetInput) : Qubits defining the query register
         device (Device): Braket device backend
-        shots (int) : Number of measurement shots (default is 1000).
-            0 shots results in no measurement.
+        shots (int) : Number of measurement shots, must be greater than 0 (default is 1000).
 
     Returns:
-        GateModelQuantumTaskResult: measurements and results from running Quantum Phase Estimation
+        QuantumTask: Task from running Quantum Phase Estimation
     """
+    if shots <= 0:
+        raise ValueError("shots must be a strictly positive integer.")
 
     # Add desired results_types
     circuit.probability()
 
     task = device.run(circuit, shots=shots)
 
-    result = task.result()
-
-    return result
+    return task
 
 
 def get_quantum_phase_estimation_results(
-    result: GateModelQuantumTaskResult,
+    task: QuantumTask,
     precision_qubits: QubitSetInput,
     query_qubits: QubitSetInput,
     verbose: bool = False,
@@ -116,8 +115,7 @@ def get_quantum_phase_estimation_results(
     results.
 
     Args:
-        result (GateModelQuantumTaskResult): Results associated with quantum phase estimation run
-            as produced by run_quantum_phase_estimation
+        task (QuantumTask): The task which holds the results for the quantum phase estimation run
         precision_qubits (QubitSetInput): Qubits defining the precision register
         query_qubits (QubitSetInput) : Qubits defining the query register
         verbose (bool) : If True, prints aggregate results (default is False)
@@ -126,6 +124,7 @@ def get_quantum_phase_estimation_results(
         Dict[str, Any]: aggregate measurement results
     """
 
+    result = task.result()
     metadata = result.task_metadata
     probs_values = result.values[0]
     measurements = result.measurements
@@ -142,12 +141,8 @@ def get_quantum_phase_estimation_results(
         measurement_counts, precision_qubits
     )
 
-    if not phases_decimal and not precision_results_dict:
-        eigenvalues = None
-        eigenvalue_estimates = None
-    else:
-        eigenvalues = [np.exp(2 * np.pi * 1j * phase) for phase in phases_decimal]
-        eigenvalue_estimates = np.round(eigenvalues, 5)
+    eigenvalues = [np.exp(2 * np.pi * 1j * phase) for phase in phases_decimal]
+    eigenvalue_estimates = np.round(eigenvalues, 5)
 
     # aggregate results
     aggregate_results = {

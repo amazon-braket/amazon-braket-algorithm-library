@@ -44,3 +44,10 @@ def test_low_shot_number():
 def test_bad_string():
     bad_string = "a0110"
     simons_oracle(bad_string)
+
+
+@pytest.mark.xfail(raises=ValueError)
+def test_zero_shot_number():
+    secret_5_qubit = "10110"
+    oracle = simons_oracle(secret_5_qubit)
+    run_simons_algorithm(oracle=oracle, device=local_simulator, shots=0)
