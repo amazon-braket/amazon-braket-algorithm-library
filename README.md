@@ -17,7 +17,7 @@ Currently, braket algorithms are tested on Linux and Mac. We recommend using Lin
     The Bernstein-Vazirani algorithm finds the hidden string in an oracle with just a single application
     of the oracle. The algorithm was one of the first examples to demonstrate quasi-polynomial speed-up over a probabilistic classical computer.
 
-Running notebooks locally requires additional dependencies located in notebooks/textbook/requirements.txt.
+Running notebooks locally requires additional dependencies located in notebooks/textbook/requirements.txt. See notebooks/textbook/README.md for more information.
 
 ---
 ## <a name="conda">Creating a conda environment</a>
