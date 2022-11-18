@@ -27,14 +27,14 @@ setup(
     packages=find_namespace_packages(where="src", exclude=("test",)),
     package_dir={"": "src"},
     install_requires=[
-        "amazon-braket-sdk", 
-        "matplotlib<3.6", 
-        "sympy", 
-        "scipy>=1.5.3", 
-        "pyscf>=2.1.1", 
+        "amazon-braket-sdk",
+        "matplotlib<3.6",
+        "sympy",
+        "scipy>=1.5.3",
+        "pyscf>=2.1.1",
         "pennylane",
         "openfermion==1.0.0",
-        ],
+    ],
     extras_require={
         "test": [
             "black>=22.3.0",
