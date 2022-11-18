@@ -3,7 +3,7 @@ import pennylane as qml
 from pyscf import fci, gto
 
 from braket.experimental.algorithms.afqmc.classical_afqmc import chemistry_preparation
-from braket.experimental.algorithms.afqmc.quantum_afqmc import quantum_afqmc
+from braket.experimental.algorithms.afqmc.qc_qmc import quantum_afqmc
 
 np.set_printoptions(precision=4, edgeitems=10, linewidth=150, suppress=True)
 

@@ -1,3 +1,0 @@
-pennylane==0.23.1
-pennylane-lightning==0.23.0
-openfermionpyscf>=0.5
