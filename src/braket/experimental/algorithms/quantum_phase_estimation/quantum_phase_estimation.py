@@ -89,12 +89,13 @@ def run_quantum_phase_estimation(
         precision_qubits (QubitSetInput): Qubits defining the precision register
         query_qubits (QubitSetInput) : Qubits defining the query register
         device (Device): Braket device backend
-        shots (int) : Number of measurement shots (default is 1000).
-            0 shots results in no measurement.
+        shots (int) : Number of measurement shots, must be greater than 0 (default is 1000).
 
     Returns:
         QuantumTask: Task from running Quantum Phase Estimation
     """
+    if shots <= 0:
+        raise ValueError("shots must be a strictly positive integer.")
 
     # Add desired results_types
     circuit.probability()
@@ -140,12 +141,8 @@ def get_quantum_phase_estimation_results(
         measurement_counts, precision_qubits
     )
 
-    if not phases_decimal and not precision_results_dict:
-        eigenvalues = None
-        eigenvalue_estimates = None
-    else:
-        eigenvalues = [np.exp(2 * np.pi * 1j * phase) for phase in phases_decimal]
-        eigenvalue_estimates = np.round(eigenvalues, 5)
+    eigenvalues = [np.exp(2 * np.pi * 1j * phase) for phase in phases_decimal]
+    eigenvalue_estimates = np.round(eigenvalues, 5)
 
     # aggregate results
     aggregate_results = {

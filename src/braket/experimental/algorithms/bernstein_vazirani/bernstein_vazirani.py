@@ -25,15 +25,15 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
     Example:
         >>> circ = bernstein_vazirani_circuit("011")
         >>> print(circ)
-        T  : |0|1| 2 |3|Result Types|
-        q0 : -H---C---H-Probability--
-                  |     |
-        q1 : -H-I-|-H---Probability--
-                  |     |
-        q2 : -H-I-|-H---Probability--
-                  |
-        q3 : -H-Z-X------------------
-        T  : |0|1| 2 |3|Result Types|
+        T  : |0|1| 2 |3|4|Result Types|
+        q0 : -H---C---H---Probability--
+                  |       |
+        q1 : -H---|---C-H-Probability--
+                  |   |   |
+        q2 : -H-I-|-H-|---Probability--
+                  |   |
+        q3 : -H-Z-X---X----------------
+        T  : |0|1| 2 |3|4|Result Types|
 
     Args:
         hidden_string (str): Hidden bitstring. Defaults to "011".
