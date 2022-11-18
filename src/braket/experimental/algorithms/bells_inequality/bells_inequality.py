@@ -27,7 +27,7 @@ def create_bell_inequality_circuits(
     angle_C: float = 2 * np.pi / 3,
 ) -> List[Circuit]:
     """Create the three circuits for Bell's inequality. Default angles will give maximum violation
-        of Bell's inequality.
+    of Bell's inequality.
 
     Args:
         qubit0 (Qubit): First qubit.
