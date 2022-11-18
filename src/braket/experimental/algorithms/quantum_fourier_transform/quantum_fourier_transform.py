@@ -14,7 +14,6 @@
 # Quantum Fourier Transform: Amazon Braket Algorithm Library
 
 import math
-from typing import List
 
 from braket.circuits import Circuit, circuit
 from braket.circuits.qubit_set import QubitSetInput
