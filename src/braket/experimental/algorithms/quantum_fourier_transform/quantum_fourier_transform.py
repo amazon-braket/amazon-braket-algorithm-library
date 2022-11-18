@@ -19,6 +19,7 @@ from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit, circuit
+from braket.circuits.qubit_set import QubitSetInput
 from braket.devices.device import Device
 from braket.tasks.gate_model_quantum_task_result import GateModelQuantumTaskResult
 
@@ -59,11 +60,11 @@ def quantum_fourier_transform(num_qubits: int) -> Circuit:
 
 
 @circuit.subroutine(register=True)
-def qft(qubits: List[int]) -> Circuit:
+def qft(qubits: QubitSetInput) -> Circuit:
     """qft circuit.
 
     Args:
-        qubits (List[int]): The list of qubits labels on which to apply the QFT
+        qubits (QubitSetInput): The list of qubits labels on which to apply the QFT
 
     Returns:
         Circuit: qft circuit
@@ -113,11 +114,11 @@ def inverse_quantum_fourier_transform(num_qubits: int) -> Circuit:
 
 
 @circuit.subroutine(register=True)
-def iqft(qubits: List[int]) -> Circuit:
+def iqft(qubits: QubitSetInput) -> Circuit:
     """Inverse qft circuit.
 
     Args:
-        qubits (List[int]): The list of qubits labels on which to apply the IQFT
+        qubits (QubitSetInput): The list of qubits labels on which to apply the IQFT
 
     Returns:
         Circuit: inverse qft circuit
@@ -129,7 +130,7 @@ def iqft(qubits: List[int]) -> Circuit:
 
 
 def run_quantum_fourier_transform(
-    qubits: List[int],
+    qubits: QubitSetInput,
     n_shots: int,
     device: Device,
     state_prep_circ: Circuit = Circuit(),
@@ -139,7 +140,7 @@ def run_quantum_fourier_transform(
     """Execute QFT algorithm and returns results.
 
     Args:
-        qubits (List[int]): qubit indices
+        qubits (QubitSetInput): qubit indices
         n_shots (int): number of shots
         device (Device): The requested device (default: LocalSimulator)
         state_prep_circ (Circuit): circuit to be run before qft
