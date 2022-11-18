@@ -53,9 +53,6 @@ def quantum_fourier_transform(num_qubits: int) -> Circuit:
     for i in range(math.floor(num_qubits / 2)):
         qft_circ.swap(qubits[i], qubits[-i - 1])
 
-    # add result type to measure probability
-    # qft_circ.probability()
-
     return qft_circ
 
 
@@ -106,9 +103,6 @@ def inverse_quantum_fourier_transform(num_qubits: int) -> Circuit:
 
         # Then add a Hadamard gate
         qft_circ.h(qubits[k])
-
-    # add result type to measure probability
-    # qft_circ.probability()
 
     return qft_circ
 
