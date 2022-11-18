@@ -2,13 +2,13 @@ import numpy as np
 import pennylane as qml
 from pyscf import fci, gto
 
-from braket.experimental.algorithms.afqmc.classical_afqmc import chemistry_preparation
-from braket.experimental.algorithms.afqmc.qc_qmc import quantum_afqmc
+from braket.experimental.algorithms.qc_qmc.classical_afqmc import chemistry_preparation
+from braket.experimental.algorithms.qc_qmc.qc_qmc import qc_qmc
 
 np.set_printoptions(precision=4, edgeitems=10, linewidth=150, suppress=True)
 
 
-def test_quantum_afqmc():
+def test_qc_qmc():
 
     mol = gto.M(atom="H 0. 0. 0.; H 0. 0. 0.75", basis="sto-3g")
     hf = mol.RHF()
@@ -22,8 +22,8 @@ def test_quantum_afqmc():
     num_steps = 4
     qe_step_size = 2
 
-    # Start QC-QFQMC computation
-    quantum_energies, energies = quantum_afqmc(
+    # Start QC-QMC computation
+    quantum_energies, energies = qc_qmc(
         num_walkers=15,
         num_steps=num_steps,
         dtau=1,
