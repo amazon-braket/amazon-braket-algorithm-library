@@ -3,7 +3,7 @@ from typing import Tuple
 from braket.circuits import Circuit, circuit
 
 
-def grover_search(
+def grovers_search(
     oracle: Circuit, n_qubits: int, n_reps: int = 1, decompose_ccnot: bool = False
 ) -> Circuit:
     """Generate Grover's circuit for a target solution and oracle.
