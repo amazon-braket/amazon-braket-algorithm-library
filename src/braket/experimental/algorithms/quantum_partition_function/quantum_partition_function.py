@@ -161,9 +161,7 @@ def run_quantum_partition_function(
         task = qft_device.run(qft_circuit, shots=qft_shots)
 
         circ_result = {
-            "qft-func": {
-                "task": task,
-            }
+            "task": task,
         }
 
         out.update(circ_result)
