@@ -12,7 +12,6 @@
 # language governing permissions and limitations under the License.
 from typing import Dict
 
-import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit
 from braket.devices import Device
@@ -26,15 +25,15 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
     Example:
         >>> circ = bernstein_vazirani_circuit("011")
         >>> print(circ)
-        T  : |0|1| 2 |3|Result Types|
-        q0 : -H---C---H-Probability--
-                  |     |
-        q1 : -H-I-|-H---Probability--
-                  |     |
-        q2 : -H-I-|-H---Probability--
-                  |
-        q3 : -H-Z-X------------------
-        T  : |0|1| 2 |3|Result Types|
+        T  : |0|1| 2 |3|4|Result Types|
+        q0 : -H---C---H---Probability--
+                  |       |
+        q1 : -H---|---C-H-Probability--
+                  |   |   |
+        q2 : -H-I-|-H-|---Probability--
+                  |   |
+        q3 : -H-Z-X---X----------------
+        T  : |0|1| 2 |3|4|Result Types|
 
     Args:
         hidden_string (str): Hidden bitstring. Defaults to "011".
@@ -97,17 +96,3 @@ def run_bernstein_vazirani(
     task = device.run(circuit, shots=shots)
 
     return task
-
-
-def plot_bitstrings(probabilities: Dict[str, float], title: str = None) -> None:
-    """Plot the measure results.
-
-    Args:
-        probabilities (Dict[str, float]): Measurement probabilities.
-        title (str): Title for the plot.
-    """
-    plt.bar(probabilities.keys(), probabilities.values())
-    plt.xlabel("bitstrings")
-    plt.ylabel("probabilities")
-    plt.title(title)
-    plt.xticks(rotation=90)

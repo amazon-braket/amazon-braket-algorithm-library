@@ -1,7 +1,5 @@
-import math
-from typing import List, Tuple
+from typing import Tuple
 
-import matplotlib.pyplot as plt
 from braket.circuits import Circuit, circuit
 
 
@@ -63,22 +61,6 @@ def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
     circ.add_circuit(oracle)
     circ.h(range(n_qubits))
     return circ
-
-
-def plot_bitstrings(probabilities: List[float]) -> None:
-    """Plot the measure results.
-
-    Args:
-        probabilities (List[float]): Probabilities of measuring each bitstring.
-    """
-    num_qubits = int(math.log2(len(probabilities)))
-    format_bitstring = "{0:0" + str(num_qubits) + "b}"
-    bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
-
-    plt.bar(bitstring_keys, probabilities)
-    plt.xlabel("bitstrings")
-    plt.ylabel("probability")
-    plt.xticks(rotation=90)
 
 
 @circuit.subroutine(register=True)

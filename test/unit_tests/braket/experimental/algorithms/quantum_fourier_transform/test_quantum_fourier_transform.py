@@ -23,22 +23,18 @@ from braket.experimental.algorithms.quantum_fourier_transform import (
 
 
 def test_qft():
-    result = qft.run_quantum_fourier_transform(
-        n_qubits=2, n_shots=100, state_prep_circ=Circuit().h(0).h(1), device=LocalSimulator()
+    task = qft.run_quantum_fourier_transform(
+        qubits=[0, 1], n_shots=100, state_prep_circ=Circuit().h(0).h(1), device=LocalSimulator()
     )
-    assert np.allclose(result.values[0], [1.0, 0.0, 0.0, 0.0])
+    assert np.allclose(task.result().values[0], [1.0, 0.0, 0.0, 0.0])
 
 
 def test_inverse_qft():
-    result = qft.run_quantum_fourier_transform(
-        n_qubits=2,
+    task = qft.run_quantum_fourier_transform(
+        qubits=[0, 1],
         n_shots=100,
         state_prep_circ=Circuit().h(0).h(1),
         device=LocalSimulator(),
         inverse=True,
     )
-    assert np.allclose(result.values[0], [1.0, 0.0, 0.0, 0.0])
-
-
-def test_plot_bitstrings():
-    qft.plot_bitstrings([0.5, 0.5])
+    assert np.allclose(task.result().values[0], [1.0, 0.0, 0.0, 0.0])
