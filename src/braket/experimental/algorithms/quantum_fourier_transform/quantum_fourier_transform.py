@@ -21,7 +21,7 @@ from braket.devices.device import Device
 from braket.tasks.gate_model_quantum_task_result import GateModelQuantumTaskResult
 
 
-def quantum_fourier_transform(num_qubits: int) -> Circuit:
+def quantum_fourier_transform_circuit(num_qubits: int) -> Circuit:
     """Construct a circuit object corresponding to the Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the QFT.
 
@@ -55,7 +55,7 @@ def quantum_fourier_transform(num_qubits: int) -> Circuit:
 
 @circuit.subroutine(register=True)
 def qft(qubits: QubitSetInput) -> Circuit:
-    """qft circuit.
+    """Add qft circuit to an existing circuit.
 
     Args:
         qubits (QubitSetInput): The list of qubits labels on which to apply the QFT
@@ -65,11 +65,11 @@ def qft(qubits: QubitSetInput) -> Circuit:
     """
     qubit_mapping = {i: q for i, q in enumerate(qubits)}
     return Circuit().add_circuit(
-        quantum_fourier_transform(len(qubits)), target_mapping=qubit_mapping
+        quantum_fourier_transform_circuit(len(qubits)), target_mapping=qubit_mapping
     )
 
 
-def inverse_quantum_fourier_transform(num_qubits: int) -> Circuit:
+def inverse_quantum_fourier_transform_circuit(num_qubits: int) -> Circuit:
     """Construct a circuit object corresponding to the inverse Quantum Fourier Transform (QFT)
     algorithm, applied to the argument qubits.  Does not use recursion to generate the circuit.
 
@@ -106,7 +106,7 @@ def inverse_quantum_fourier_transform(num_qubits: int) -> Circuit:
 
 @circuit.subroutine(register=True)
 def iqft(qubits: QubitSetInput) -> Circuit:
-    """Inverse qft circuit.
+    """Add inverse qft circuit to an existing circuit.
 
     Args:
         qubits (QubitSetInput): The list of qubits labels on which to apply the IQFT
@@ -116,7 +116,7 @@ def iqft(qubits: QubitSetInput) -> Circuit:
     """
     qubit_mapping = {i: q for i, q in enumerate(qubits)}
     return Circuit().add_circuit(
-        inverse_quantum_fourier_transform(len(qubits)), target_mapping=qubit_mapping
+        inverse_quantum_fourier_transform_circuit(len(qubits)), target_mapping=qubit_mapping
     )
 
 
