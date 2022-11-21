@@ -13,6 +13,5 @@
 
 from braket.experimental.algorithms.bernstein_vazirani.bernstein_vazirani import (  # noqa: F401
     bernstein_vazirani_circuit,
-    bernstein_vazirani_oracle,
     get_bernstein_vazirani_results,
 )

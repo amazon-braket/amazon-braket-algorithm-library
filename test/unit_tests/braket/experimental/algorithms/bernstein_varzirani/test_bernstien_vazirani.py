@@ -22,11 +22,6 @@ from braket.experimental.algorithms.bernstein_vazirani.bernstein_vazirani import
 )
 
 
-def test_oracle():
-    circ = Circuit().bernstein_vazirani_oracle("001")
-    assert len(circ) > 0
-
-
 def test_get_bernstein_vazirani():
     bv_circuit = bernstein_vazirani_circuit("0")
     expected = Circuit().h(1).z(1).h(0).i(0).h(0).probability(0)
