@@ -19,8 +19,12 @@ from braket.devices import LocalSimulator
 from braket.experimental.algorithms.bernstein_vazirani.bernstein_vazirani import (
     bernstein_vazirani_circuit,
     get_bernstein_vazirani_results,
-    run_bernstein_vazirani,
 )
+
+
+def test_oracle():
+    circ = Circuit().bernstein_vazirani_oracle("001")
+    assert len(circ) > 0
 
 
 def test_get_bernstein_vazirani():
@@ -36,6 +40,6 @@ def test_get_bernstein_vazirani():
 def test_get_bernstein_vazirani_results(hidden_string: str, shots: int):
     local_simulator = LocalSimulator()
     bv_circuit = bernstein_vazirani_circuit(hidden_string)
-    task = run_bernstein_vazirani(bv_circuit, local_simulator, shots=shots)
+    task = local_simulator.run(bv_circuit, shots=shots)
     bv_result = get_bernstein_vazirani_results(task)
     assert np.isclose(bv_result[hidden_string], 1.0)
