@@ -33,7 +33,7 @@ def constant_oracle(n_qubits: int) -> Circuit:
     rand_output = np.random.randint(0, 2)
     if rand_output == 0:
         circ.i(n_qubits)
-    elif rand_output == 1:
+    else:
         circ.x(n_qubits)
     return circ
 

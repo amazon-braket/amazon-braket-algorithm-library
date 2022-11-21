@@ -100,7 +100,7 @@ def test_cnot_qpe_run_3_precision_qubits():
     task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
-        task, precision_qubits, query_qubits, verbose=True
+        task, precision_qubits, query_qubits, verbose=False
     )
 
     # validate excepted QPE output
