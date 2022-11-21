@@ -13,5 +13,6 @@
 
 from braket.experimental.algorithms.quantum_phase_estimation.quantum_phase_estimation import (  # noqa: F401,E501
     get_quantum_phase_estimation_results,
+    quantum_phase_estimation_circuit,
     run_quantum_phase_estimation,
 )
