@@ -228,14 +228,9 @@ def _get_quantum_phase_estimation_phases(
         key[: len(precision_qubits)] for key in measurement_counts.keys()
     ]
 
-    # Then keep only the unique strings
-    bitstrings_precision_register_set = set(bitstrings_precision_register)
-    # Cast as a list for later use
-    bitstrings_precision_register_list = list(bitstrings_precision_register_set)
-
     # Now create a new dict to collect measurement results on the precision_qubits. Keys are given
     # by the measurement count substrings on the register qubits. Initialize the counts to zero.
-    precision_results_dict = {key: 0 for key in bitstrings_precision_register_list}
+    precision_results_dict = {key: 0 for key in set(bitstrings_precision_register)}
 
     # Loop over all measurement outcomes
     for key in measurement_counts.keys():
@@ -246,11 +241,8 @@ def _get_quantum_phase_estimation_phases(
         # Add these measurement counts to the corresponding key in our new dict
         precision_results_dict[count_key] += counts
 
-    # Get topmost values only
-    c = Counter(precision_results_dict)
-    topmost = c.most_common(None)
-    # get decimal phases from bitstrings for topmost bitstrings
-    phases_decimal = [_binary_to_decimal(item[0]) for item in topmost]
+    # get decimal phases from bitstrings
+    phases_decimal = [_binary_to_decimal(item[0]) for item in precision_results_dict]
 
     return phases_decimal, precision_results_dict
 
