@@ -16,7 +16,7 @@ import pytest
 # from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.shors_algorithm.shors_algorithm import (
+from braket.experimental.algorithms.shors.shors import (
     get_factors_from_results,
     run_shors_algorithm,
     shors_algorithm,

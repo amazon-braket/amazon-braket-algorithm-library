@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from braket.experimental.algorithms.shors_algorithm.shors_algorithm import (  # noqa: F401,E501
+from braket.experimental.algorithms.shors.shors import (  # noqa: F401
     get_factors_from_results,
     run_shors_algorithm,
     shors_algorithm,
