@@ -15,7 +15,11 @@ import numpy as np
 from braket.circuits import Circuit, FreeParameter
 from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.qaoa import cost_function, qaoa, run_qaoa_circuit
+from braket.experimental.algorithms.quantum_approximate_optimization import (
+    cost_function,
+    qaoa,
+    run_qaoa_circuit,
+)
 
 
 def test_qaoa():
