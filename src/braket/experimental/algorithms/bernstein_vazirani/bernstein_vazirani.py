@@ -13,12 +13,12 @@
 from typing import Dict
 
 import numpy as np
-from braket.circuits import Circuit
+from braket.circuits import Circuit, circuit
 from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
+def bernstein_vazirani_circuit(hidden_string: str) -> Circuit:
     """Bernstein–Vazirani circuit on a hidden string. Creates a circuit that finds the hidden
     string in a single iteration, using number of qubits equal to the string length.
 
@@ -36,7 +36,7 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
         T  : |0|1| 2 |3|4|Result Types|
 
     Args:
-        hidden_string (str): Hidden bitstring. Defaults to "011".
+        hidden_string (str): Hidden bitstring.
 
     Returns:
         Circuit: Bernstein–Vazirani circuit
@@ -48,15 +48,32 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
     bv_circuit.z(num_qubits)
     bv_circuit.h(range(num_qubits))
 
+    # add black box "oracle" function
+    bv_circuit.bernstein_vazirani_oracle(hidden_string)
+
+    bv_circuit.h(range(num_qubits))
+
+    bv_circuit.probability(range(num_qubits))
+    return bv_circuit
+
+
+@circuit.subroutine(register=True)
+def bernstein_vazirani_oracle(hidden_string: str) -> Circuit:
+    """The circuit that encodes the oracle function for Bernstein–Vazirani problems.
+
+    Args:
+        hidden_string (str): Hidden bitstring. Defaults to "011".
+
+    Returns:
+        Circuit: Oracle circuit.
+    """
+    num_qubits = len(hidden_string)
+    bv_circuit = Circuit()
     for q in range(num_qubits):
         if hidden_string[q] == "0":
             bv_circuit.i(q)
         else:
             bv_circuit.cnot(q, num_qubits)
-
-    bv_circuit.h(range(num_qubits))
-
-    bv_circuit.probability(range(num_qubits))
     return bv_circuit
 
 
