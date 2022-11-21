@@ -101,8 +101,6 @@ def quantum_phase_estimation(
 
 def run_quantum_phase_estimation(
     circuit: Circuit,
-    precision_qubits: QubitSetInput,
-    query_qubits: QubitSetInput,
     device: Device,
     shots: int = 1000,
 ) -> QuantumTask:
@@ -110,8 +108,6 @@ def run_quantum_phase_estimation(
 
     Args:
         circuit (Circuit): Quantum Phase Estimation circuit
-        precision_qubits (QubitSetInput): Qubits defining the precision register
-        query_qubits (QubitSetInput) : Qubits defining the query register
         device (Device): Braket device backend
         shots (int) : Number of measurement shots (default is 1000).
 
@@ -159,7 +155,6 @@ def get_quantum_phase_estimation_results(
         phases_decimal = result.result_types[0].value
         precision_results_dict = None
     else:
-        # quantum phase estimation postprocessing
         phases_decimal, precision_results_dict = _get_quantum_phase_estimation_phases(
             measurement_counts, precision_qubits
         )
@@ -167,7 +162,6 @@ def get_quantum_phase_estimation_results(
     eigenvalues = [np.exp(2 * np.pi * 1j * phase) for phase in phases_decimal]
     eigenvalue_estimates = np.round(eigenvalues, 5)
 
-    # aggregate results
     aggregate_results = {
         "task_metadata": metadata,
         "measurements": measurements,

@@ -42,9 +42,7 @@ def test_cnot_qpe_run_2_precision_qubits():
     # assert qpe_circ.instructions[3].ascii_symbols == ("C", "X")
 
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator()
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
         task, precision_qubits, query_qubits, verbose=True
@@ -73,9 +71,7 @@ def test_0_shots():
     )
 
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator(), shots=0
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator(), shots=0)
 
     agg_result = qpe.get_quantum_phase_estimation_results(
         task, precision_qubits, query_qubits, verbose=True
@@ -101,9 +97,7 @@ def test_cnot_qpe_run_3_precision_qubits():
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator()
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
         task, precision_qubits, query_qubits, verbose=True
@@ -133,9 +127,7 @@ def test_cnot_qpe_run_HX_eigenstate():
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator()
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
         task, precision_qubits, query_qubits, verbose=True
@@ -165,9 +157,7 @@ def test_cnot_qpe_run_X_eigenstate():
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator()
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
         task, precision_qubits, query_qubits, verbose=True
