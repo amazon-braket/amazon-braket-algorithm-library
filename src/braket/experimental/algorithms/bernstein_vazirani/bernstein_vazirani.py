@@ -17,22 +17,9 @@ from braket.circuits import Circuit, circuit
 from braket.tasks import QuantumTask
 
 
-def bernstein_vazirani_circuit(hidden_string: str) -> Circuit:
+def bernstein_vazirani_circuit(oracle: Circuit) -> Circuit:
     """Bernstein–Vazirani circuit on a hidden string. Creates a circuit that finds the hidden
     string in a single iteration, using number of qubits equal to the string length.
-
-    Example:
-        >>> circ = bernstein_vazirani_circuit("011")
-        >>> print(circ)
-        T  : |0|1| 2 |3|4|Result Types|
-        q0 : -H---C---H---Probability--
-                  |       |
-        q1 : -H---|---C-H-Probability--
-                  |   |   |
-        q2 : -H-I-|-H-|---Probability--
-                  |   |
-        q3 : -H-Z-X---X----------------
-        T  : |0|1| 2 |3|4|Result Types|
 
     Args:
         hidden_string (str): Hidden bitstring.
@@ -40,7 +27,7 @@ def bernstein_vazirani_circuit(hidden_string: str) -> Circuit:
     Returns:
         Circuit: Bernstein–Vazirani circuit
     """
-    num_qubits = len(hidden_string)
+    num_qubits = oracle.qubit_count
 
     bv_circuit = Circuit()
     bv_circuit.h(num_qubits)
@@ -48,7 +35,7 @@ def bernstein_vazirani_circuit(hidden_string: str) -> Circuit:
     bv_circuit.h(range(num_qubits))
 
     # add black box "oracle" function
-    bv_circuit.bernstein_vazirani_oracle(hidden_string)
+    bv_circuit.add(oracle)
 
     bv_circuit.h(range(num_qubits))
 
