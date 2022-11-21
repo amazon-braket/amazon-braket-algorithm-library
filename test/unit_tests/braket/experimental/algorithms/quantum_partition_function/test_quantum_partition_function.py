@@ -60,7 +60,7 @@ def test_qpf_qft_run_2_qubits():
     # )
 
     # validate excepted qpf output
-    counts_result = result_dict["qft-func"]["task"].result().measurement_counts
+    counts_result = result_dict["task"].result().measurement_counts
 
     assert counts_result["11"] > 300
     assert counts_result["01"] > 300
