@@ -18,7 +18,7 @@ from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
+def bernstein_vazirani_circuit(hidden_string: str) -> Circuit:
     """Bernstein–Vazirani circuit on a hidden string. Creates a circuit that finds the hidden
     string in a single iteration, using number of qubits equal to the string length.
 
@@ -36,7 +36,7 @@ def bernstein_vazirani_circuit(hidden_string: str = "011") -> Circuit:
         T  : |0|1| 2 |3|4|Result Types|
 
     Args:
-        hidden_string (str): Hidden bitstring. Defaults to "011".
+        hidden_string (str): Hidden bitstring.
 
     Returns:
         Circuit: Bernstein–Vazirani circuit
@@ -83,16 +83,12 @@ def run_bernstein_vazirani(
     shots: int = 1000,
 ) -> QuantumTask:
     """Function to run Bernstein Vazirani algorithm on a device.
-
     Args:
         circuit (Circuit): Bernstein Vazirani circuit
         device (Device): Braket device backend
         shots (int) : Number of measurement shots (default is 1000).
-
     Returns:
         QuantumTask: Task from running Quantum Phase Estimation
     """
 
-    task = device.run(circuit, shots=shots)
-
-    return task
+    return device.run(circuit, shots=shots)
