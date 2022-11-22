@@ -14,6 +14,7 @@ from typing import Dict
 
 import numpy as np
 from braket.circuits import Circuit
+from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
