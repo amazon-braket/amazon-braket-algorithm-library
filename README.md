@@ -2,20 +2,7 @@
 The Braket Algorithm Library provides Amazon Braket customers with 20 pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
 
 ---
-Currently, braket algorithms are tested on Linux and Mac. We recommend using Linux or Mac because the certain electronic structure packages are only compatible on these platforms.
-
-  * [**Grover's search algorithm**]
-
-    Grover's algorithm is arguably one of the canonical quantum algorithms that kick-started the field of quantum computing. In the future, it could possibly serve as a hallmark application of quantum computing. Grover's algorithm allows us to find a particular register in an unordered database with $N$ entries with computational complexity $O(\\sqrt{N})$.
-
-  * [**Violation of Bell's Inequality**]
-
-    Bell’s Inequality shows that certain predictions of quantum mechanics cannot be explained by local interactions and inherent physical properties. Instead, we must give up the assumption of either (1) some pre-existing physical property that the measurement “uncovers” or (2) that the measurements are not causally related.
-
-  * [**Bernstein–Vazirani algorithm**]
-
-    The Bernstein-Vazirani algorithm finds the hidden string in an oracle with just a single application
-    of the oracle. The algorithm was one of the first examples to demonstrate quasi-polynomial speed-up over a probabilistic classical computer.
+Currently, Braket algorithms are tested on Linux, Windows, and Mac.
 
 Running notebooks locally requires additional dependencies located in notebooks/textbook/requirements.txt. See notebooks/textbook/README.md for more information.
 
