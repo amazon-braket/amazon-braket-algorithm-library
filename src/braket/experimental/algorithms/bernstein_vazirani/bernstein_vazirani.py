@@ -74,3 +74,20 @@ def get_bernstein_vazirani_results(task: QuantumTask) -> Dict[str, float]:
     num_qubits = int(np.log2(len(probabilities)))
     binary_strings = [format(i, "b").zfill(num_qubits) for i in range(2**num_qubits)]
     return dict(zip(binary_strings, probabilities))
+
+
+def run_bernstein_vazirani(
+    circuit: Circuit,
+    device: Device,
+    shots: int = 1000,
+) -> QuantumTask:
+    """Function to run Bernstein Vazirani algorithm on a device.
+    Args:
+        circuit (Circuit): Bernstein Vazirani circuit
+        device (Device): Braket device backend
+        shots (int) : Number of measurement shots (default is 1000).
+    Returns:
+        QuantumTask: Task from running Quantum Phase Estimation
+    """
+
+    return device.run(circuit, shots=shots)
