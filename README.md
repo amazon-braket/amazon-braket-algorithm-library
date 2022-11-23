@@ -7,6 +7,9 @@ Currently, Braket algorithms are tested on Linux, Windows, and Mac.
 Running notebooks locally requires additional dependencies located in [notebooks/textbook/requirements.txt](https://github.com/aws-samples/amazon-braket-algorithm-library/blob/main/notebooks/textbook/requirements.txt). See notebooks/textbook/README.md for more information.
 
 ---
+
+
+
 ## Installing the Amazon Braket Algorithm Library
 The Amazon Braket Algorithm Library can be installed from source by cloning this repository and running a pip install command in the root directory of the repository:
 
