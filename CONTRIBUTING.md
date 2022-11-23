@@ -50,7 +50,7 @@ When you make a contribution please ensure that you:
     2.  *src/braket/experimental/algorithms/<name_of_algo>/\_\_init__\.py* - used for testing/packaging
     3.  *notebooks/textbook/<Algorithm_Name>_Algorithm.ipynb* - provides a notebook that runs an example using your implementation
     4.  (optional)*test/unit_tests/braket/experimental/algorithms/<name_of_algo>/test_<name_of_algo>.py* - unit tests for your python file
-    4.  (optional)*src/braket/experimental/algorithms/<name_of_algo>/<name_of_algo>.md* - Markdown file describing your algorithm in the following format:
+    4.  (optional)*src/braket/experimental/algorithms/<name_of_algo>/<name_of_algo>.md* - Markdown file describing your algorithm in the following format. Tags indicate the type of algorithm, for instance "Notebook" or "Advanced":
 
            *\<Algorithm description>*
            
@@ -58,7 +58,7 @@ When you make a contribution please ensure that you:
             
            \[metadata-name]: *\<Algorithm Name>*
             
-           \[metadata-tags]: Textbook
+           \[metadata-tags]: *\<tag1,tag2>*
            
            \[metadata-url]: *\<Algorithm folder URL>*
             
