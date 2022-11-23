@@ -7,24 +7,14 @@ Currently, Braket algorithms are tested on Linux, Windows, and Mac.
 Running notebooks locally requires additional dependencies located in [notebooks/textbook/requirements.txt](https://github.com/aws-samples/amazon-braket-algorithm-library/blob/main/notebooks/textbook/requirements.txt). See notebooks/textbook/README.md for more information.
 
 ---
-## <a name="conda">Creating a conda environment</a>
-To install the dependencies required for running the notebook examples in this repository you can create a conda environment with below commands.
+## <a name="install">Installing the Amazon Braket Algorithm Library</a>
+The Amazon Braket Algorithm Library can be installed from source by cloning this repository and running a pip install command in the root directory of the repository.
 
 ```bash
-conda env create -n <your_env_name> -f environment.yml
+git clone https://github.com/aws-samples/amazon-braket-algorithm-library.git
+cd amazon-braket-algorithm-library
+pip install .
 ```
-
-Activate the conda environment using:
-```bash
-conda activate <your_env_name>
-```
-
-To remove the conda environment use:
-```bash
-conda deactivate
-```
-
-For more information, please see [conda usage](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
 
 To run the notebook examples locally on your IDE, first, configure a profile to use your account to interact with AWS. To learn more, see [Configure AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
 

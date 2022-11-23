@@ -30,7 +30,7 @@ setup(
     extras_require={
         "test": [
             "black>=22.3.0",
-            "flake8",
+            "flake8<=5.0.4",
             "isort",
             "pytest",
             "pytest-cov",
