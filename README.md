@@ -8,7 +8,7 @@ Running notebooks locally requires additional dependencies located in [notebooks
 
 ---
 ## <a name="install">Installing the Amazon Braket Algorithm Library</a>
-The Amazon Braket Algorithm Library can be installed from source by cloning this repository and running a pip install command in the root directory of the repository:
+The Amazon Braket Algorithm Library can be installed from source by cloning this repository and running a pip install command in the root directory of the repository.
 
 ```bash
 git clone https://github.com/aws-samples/amazon-braket-algorithm-library.git
