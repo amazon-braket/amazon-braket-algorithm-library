@@ -100,7 +100,7 @@ def multi_control_not_constructor(
     decompose_ccnot: bool,
     is_outermost_call: bool = True,
 ) -> Tuple[Circuit, int]:
-    """Recusive constructor of a multi-contol Not circuit (generalized Toffoli gate).
+    """Recursive constructor of a multi-contol Not circuit (generalized Toffoli gate).
     Ref: https://arxiv.org/abs/1904.01671
 
     Args:
