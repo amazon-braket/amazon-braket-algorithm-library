@@ -3,6 +3,6 @@ The Quantum Approximate Optimization Algorithm (QAOA) belongs to the class of hy
 <!--
 [metadata-name]: Quantum Approximate Optimization Algorithm
 [metadata-tags]: Textbook
-[metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/qaoa
+[metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/quantum_approximate_optimization
 -->
 
