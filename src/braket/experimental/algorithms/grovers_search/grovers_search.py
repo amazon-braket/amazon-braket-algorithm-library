@@ -1,11 +1,9 @@
-import math
-from typing import List, Tuple
+from typing import Tuple
 
-import matplotlib.pyplot as plt
 from braket.circuits import Circuit, circuit
 
 
-def grover_search(
+def grovers_search(
     oracle: Circuit, n_qubits: int, n_reps: int = 1, decompose_ccnot: bool = False
 ) -> Circuit:
     """Generate Grover's circuit for a target solution and oracle.
@@ -65,22 +63,6 @@ def amplify(n_qubits: int, decompose_ccnot: bool) -> Circuit:
     return circ
 
 
-def plot_bitstrings(probabilities: List[float]) -> None:
-    """Plot the measure results.
-
-    Args:
-        probabilities (List[float]): Probabilities of measuring each bitstring.
-    """
-    num_qubits = int(math.log2(len(probabilities)))
-    format_bitstring = "{0:0" + str(num_qubits) + "b}"
-    bitstring_keys = [format_bitstring.format(ii) for ii in range(2**num_qubits)]
-
-    plt.bar(bitstring_keys, probabilities)
-    plt.xlabel("bitstrings")
-    plt.ylabel("probability")
-    plt.xticks(rotation=90)
-
-
 @circuit.subroutine(register=True)
 def ccnot_decomposed(control_1: int, control_2: int, target: int) -> Circuit:
     """Build CCNOT (Toffoli gate) from H, CNOT, T, Ti.
@@ -118,7 +100,7 @@ def multi_control_not_constructor(
     decompose_ccnot: bool,
     is_outermost_call: bool = True,
 ) -> Tuple[Circuit, int]:
-    """Recusive constructor of a multi-contol Not circuit (generalized Toffoli gate).
+    """Recursive constructor of a multi-contol Not circuit (generalized Toffoli gate).
     Ref: https://arxiv.org/abs/1904.01671
 
     Args:

@@ -12,7 +12,6 @@
 # language governing permissions and limitations under the License.
 from typing import Dict
 
-import matplotlib.pyplot as plt
 import numpy as np
 from braket.circuits import Circuit, circuit
 from braket.tasks import QuantumTask
@@ -28,13 +27,13 @@ def constant_oracle(n_qubits: int) -> Circuit:
         Circuit: Constant oracle circuit
     """
     if n_qubits < 1:
-        raise ValueError(f"Number of qubits must be greater than 0. Recieved {n_qubits}")
+        raise ValueError(f"Number of qubits must be greater than 0. Received {n_qubits}")
 
     circ = Circuit().i(range(n_qubits))
     rand_output = np.random.randint(0, 2)
     if rand_output == 0:
         circ.i(n_qubits)
-    elif rand_output == 1:
+    else:
         circ.x(n_qubits)
     return circ
 
@@ -49,7 +48,7 @@ def balanced_oracle(n_qubits: int) -> Circuit:
         Circuit: Balanced oracle circuit
     """
     if n_qubits < 1:
-        raise ValueError(f"Number of qubits must be greater than 0. Recieved {n_qubits}")
+        raise ValueError(f"Number of qubits must be greater than 0. Received {n_qubits}")
 
     # generate a random array of 0s and 1s to figure out where to place x gates
     random_num = np.random.randint(2, size=n_qubits)
@@ -123,17 +122,3 @@ def get_deutsch_jozsa_results(task: QuantumTask) -> Dict[str, float]:
     num_qubits = int(np.log2(len(probabilities)))
     binary_strings = [format(i, "b").zfill(num_qubits) for i in range(2**num_qubits)]
     return dict(zip(binary_strings, probabilities))
-
-
-def plot_bitstrings(probabilities: Dict[str, float], title: str = None) -> None:
-    """Plot the measurement results.
-
-    Args:
-        probabilities (Dict[str, float]): Measurement probabilities.
-        title (str): Title for the plot.
-    """
-    plt.bar(probabilities.keys(), probabilities.values())
-    plt.xlabel("bitstrings")
-    plt.ylabel("probabilities")
-    plt.title(title)
-    plt.xticks(rotation=90)

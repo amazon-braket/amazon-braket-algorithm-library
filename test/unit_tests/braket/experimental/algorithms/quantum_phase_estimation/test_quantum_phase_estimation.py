@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-import pytest
+import numpy as np
 from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
@@ -33,18 +33,16 @@ def test_cnot_qpe_run_2_precision_qubits():
     qpe_circ = Circuit().h(query_qubits)
 
     # apply qpe
-    qpe_circ.quantum_phase_estimation(
-        precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
+    qpe_circ = qpe.quantum_phase_estimation_circuit(
+        qpe_circ, precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
     )
 
     assert len(qpe_circ.instructions) == 8
     assert qpe_circ.depth == 6
-    assert qpe_circ.instructions[3].ascii_symbols == ("C", "X")
+    # assert qpe_circ.instructions[3].ascii_symbols == ("C", "X")
 
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator()
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
         task, precision_qubits, query_qubits, verbose=True
@@ -58,8 +56,7 @@ def test_cnot_qpe_run_2_precision_qubits():
     assert set(agg_result["eigenvalue_estimates"]) == {1.0 + 0.0j}
 
 
-# 0 shots should result in no measurement
-@pytest.mark.xfail(raises=ValueError)
+# 0 shots results in no measurement counts but valid phase estimates
 def test_0_shots():
     # prep
     precision_qubits = [0, 1]
@@ -69,14 +66,19 @@ def test_0_shots():
     qpe_circ = Circuit().h(query_qubits)
 
     # apply qpe
-    qpe_circ.quantum_phase_estimation(
-        precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
+    qpe_circ = qpe.quantum_phase_estimation_circuit(
+        qpe_circ, precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
     )
 
     # run QPE
-    qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator(), shots=0
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator(), shots=0)
+
+    agg_result = qpe.get_quantum_phase_estimation_results(
+        task, precision_qubits, query_qubits, verbose=True
     )
+
+    assert agg_result["measurement_counts"] is None
+    assert np.isclose(agg_result["phases_decimal"][0], 0.5)
 
 
 # CNOT controlled unitary with 3 precision qubits, and H gate query prep
@@ -89,18 +91,16 @@ def test_cnot_qpe_run_3_precision_qubits():
     qpe_circ = Circuit().h(query_qubits)
 
     # apply qpe
-    qpe_circ.quantum_phase_estimation(
-        precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
+    qpe_circ = qpe.quantum_phase_estimation_circuit(
+        qpe_circ, precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
     )
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator()
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
-        task, precision_qubits, query_qubits, verbose=True
+        task, precision_qubits, query_qubits, verbose=False
     )
 
     # validate excepted QPE output
@@ -121,15 +121,13 @@ def test_cnot_qpe_run_HX_eigenstate():
     qpe_circ = Circuit().x(query_qubits).h(query_qubits)
 
     # apply qpe
-    qpe_circ.quantum_phase_estimation(
-        precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
+    qpe_circ = qpe.quantum_phase_estimation_circuit(
+        qpe_circ, precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
     )
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator()
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
         task, precision_qubits, query_qubits, verbose=True
@@ -153,15 +151,13 @@ def test_cnot_qpe_run_X_eigenstate():
     qpe_circ = Circuit().x(query_qubits)
 
     # apply qpe
-    qpe_circ.quantum_phase_estimation(
-        precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
+    qpe_circ = qpe.quantum_phase_estimation_circuit(
+        qpe_circ, precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
     )
 
     print("Circuit: ", qpe_circ)
     # run QPE
-    task = qpe.run_quantum_phase_estimation(
-        qpe_circ, precision_qubits, query_qubits, LocalSimulator()
-    )
+    task = qpe.run_quantum_phase_estimation(qpe_circ, LocalSimulator())
 
     agg_result = qpe.get_quantum_phase_estimation_results(
         task, precision_qubits, query_qubits, verbose=True

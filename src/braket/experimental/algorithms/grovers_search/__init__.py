@@ -11,8 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from braket.experimental.algorithms.grover_search.grover_search import (  # noqa: F401
+from braket.experimental.algorithms.grovers_search.grovers_search import (  # noqa: F401
     build_oracle,
-    grover_search,
-    plot_bitstrings,
+    grovers_search,
 )

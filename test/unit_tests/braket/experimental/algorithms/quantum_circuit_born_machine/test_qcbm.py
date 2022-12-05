@@ -12,7 +12,9 @@
 # language governing permissions and limitations under the License.
 
 import numpy as np
+import pytest
 from braket.devices import LocalSimulator
+from scipy.optimize import minimize
 
 from braket.experimental.algorithms.quantum_circuit_born_machine import QCBM, mmd_loss
 
@@ -24,7 +26,7 @@ def test_mmd_loss():
 
 def test_qcbm():
     n_qubits = 2
-    n_layers = 1
+    n_layers = 2
     data = np.ones(3 * n_layers * n_qubits)
     device = LocalSimulator()
     qcbm = QCBM(device, n_qubits, n_layers, data)
@@ -32,3 +34,35 @@ def test_qcbm():
     probs = qcbm.get_probabilities(init_params)
     expected = np.array([1, 0, 0, 0])
     assert np.isclose(probs, expected).all()
+
+
+@pytest.mark.xfail(raises=ValueError)
+def test_qcbm_no_qubits():
+    n_qubits = 0
+    n_layers = 1
+    data = np.ones(3 * n_layers * n_qubits)
+    device = LocalSimulator()
+    QCBM(device, n_qubits, n_layers, data)
+
+
+def test_qcbm_gradient():
+    n_layers = 1
+    n_qubits = 2
+    n_iterations = 1
+    data = np.ones(3 * n_layers * n_qubits)
+    device = LocalSimulator()
+
+    init_params = np.random.rand(3 * n_layers * n_qubits)
+    qcbm = QCBM(device, n_qubits, n_layers, data)
+
+    result = minimize(
+        lambda x: mmd_loss(qcbm.get_probabilities(x), data),
+        x0=init_params,
+        method="L-BFGS-B",
+        jac=lambda x: qcbm.gradient(x),
+        options={"maxiter": n_iterations},
+    )
+
+    assert result.njev < 4
+    assert result.nit == 1
+    assert result.status == 1

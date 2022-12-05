@@ -9,7 +9,7 @@ information to effectively respond to your bug report or contribution.
 
 ## Reporting Bugs/Feature Requests
 
-We welcome you to use the GitHub issue tracker to report bugs or suggest features.
+We welcome you to use the [GitHub issue tracker](https://github.com/aws-samples/amazon-braket-algorithm-library/issues) to report bugs or suggest features.
 
 When filing an issue, please check existing open, or recently closed, issues to make sure somebody else hasn't already
 reported the issue. Please try to include as much information as you can. Details like these are incredibly useful:
@@ -36,22 +36,35 @@ To send us a pull request, please:
 5. Send us a pull request, answering any default questions in the pull request interface.
 6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
-GitHub provides additional document on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
+GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
 
 ### Making your changes
 
-When you make a contribution please ensure that you
+When you make a contribution please ensure that you:
 
 1.  Follow the existing flow of an example algorithm. This should include providing a circuit definition function a run_<name_of_algo>() function, and a get_<name_of_algo>_results() function
 2.  Provide the following files:
     1.  *src/braket/experimental/algorithms/<name_of_algo>/<name_of_algo>.py* - implements your example algorithm
     2.  *src/braket/experimental/algorithms/<name_of_algo>/\_\_init__\.py* - used for testing/packaging
-    3.  *notebooks/textbook/<Algorithm_Name>_Algorithm.ipynb* - provides a notebook the runs an example using your implementation
+    3.  *notebooks/textbook/<Algorithm_Name>_Algorithm.ipynb* - provides a notebook that runs an example using your implementation
     4.  (optional)*test/unit_tests/braket/experimental/algorithms/<name_of_algo>/test_<name_of_algo>.py* - unit tests for your python file
+    4.  (optional)*src/braket/experimental/algorithms/<name_of_algo>/<name_of_algo>.md* - Markdown file describing your algorithm in the following format. Tags indicate the type of algorithm, for instance "Notebook" or "Advanced":
+
+           *\<Algorithm description>*
+           
+           \<!--
+            
+           \[metadata-name]: *\<Algorithm Name>*
+            
+           \[metadata-tags]: *\<tag1,tag2>*
+           
+           \[metadata-url]: *\<Algorithm folder URL>*
+            
+           -->
 3.  Only have Open Source licensed dependencies in your example.
-4.  Run your algorithm on a simulator and on a QPU in your notebook.
+4.  Run your algorithm on a simulator and optionally on a QPU in your notebook.
 5.  Ensure that your example runs without issues on both a recent Braket Notebook Instance (create a new Braket Notebook Instance or restart one from Amazon Braket [in the console](https://docs.aws.amazon.com/braket/latest/developerguide/braket-get-started-create-notebook.html)) and locally, using our most [recently released Amazon Braket SDK version](https://github.com/aws/amazon-braket-sdk-python/blob/main/README.md#installing-the-amazon-braket-python-sdk). Run the entire notebook by clicking `Cells > Run All`, either in the console or locally, and confirm that every cell completes without error.
 
 In addition we encourage re-use of existing examples but it is not required. If you see an opportunity to make use of existing modules,

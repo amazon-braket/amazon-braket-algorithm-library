@@ -1,41 +1,20 @@
 # Amazon Braket Algorithm Library
-The Braket Algorithm Library provides Amazon Braket customers with 20 pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
+The Braket Algorithm Library provides Amazon Braket customers with pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
 
 ---
-Currently, braket algorithms are tested on Linux and Mac. We recommend using Linux or Mac because the certain electronic structure packages are only compatible on these platforms.
+Currently, Braket algorithms are tested on Linux, Windows, and Mac.
 
-  * [**Grover's search algorithm**]
-
-    Grover's algorithm is arguably one of the canonical quantum algorithms that kick-started the field of quantum computing. In the future, it could possibly serve as a hallmark application of quantum computing. Grover's algorithm allows us to find a particular register in an unordered database with $N$ entries with computational complexity $O(\\sqrt{N})$.
-
-  * [**Violation of Bell's Inequality**]
-
-    Bell’s Inequality shows that certain predictions of quantum mechanics cannot be explained by local interactions and inherent physical properties. Instead, we must give up the assumption of either (1) some pre-existing physical property that the measurement “uncovers” or (2) that the measurements are not causally related.
-
-  * [**Bernstein–Vazirani algorithm**]
-
-    The Bernstein-Vazirani algorithm finds the hidden string in an oracle with just a single application
-    of the oracle. The algorithm was one of the first examples to demonstrate quasi-polynomial speed-up over a probabilistic classical computer.
+Running notebooks locally requires additional dependencies located in [notebooks/textbook/requirements.txt](https://github.com/aws-samples/amazon-braket-algorithm-library/blob/main/notebooks/textbook/requirements.txt). See notebooks/textbook/README.md for more information.
 
 ---
-## <a name="conda">Creating a conda environment</a>
-To install the dependencies required for running the notebook examples in this repository you can create a conda environment with below commands.
+## <a name="install">Installing the Amazon Braket Algorithm Library</a>
+The Amazon Braket Algorithm Library can be installed from source by cloning this repository and running a pip install command in the root directory of the repository.
 
 ```bash
-conda env create -n <your_env_name> -f environment.yml
+git clone https://github.com/aws-samples/amazon-braket-algorithm-library.git
+cd amazon-braket-algorithm-library
+pip install .
 ```
-
-Activate the conda environment using:
-```bash
-conda activate <your_env_name>
-```
-
-To remove the conda environment use:
-```bash
-conda deactivate
-```
-
-For more information, please see [conda usage](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
 
 To run the notebook examples locally on your IDE, first, configure a profile to use your account to interact with AWS. To learn more, see [Configure AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
 
@@ -44,6 +23,10 @@ After you create a profile, use the following command to set the `AWS_PROFILE` s
 ```bash
 export AWS_PROFILE=YOUR_PROFILE_NAME
 ```
+
+### Configure your AWS account with the resources necessary for Amazon Braket
+If you are new to Amazon Braket, onboard to the service and create the resources necessary to use Amazon Braket using the [AWS console](https://console.aws.amazon.com/braket/home ).
+
 
 
 ## License

@@ -38,7 +38,3 @@ def test_inverse_qft():
         inverse=True,
     )
     assert np.allclose(task.result().values[0], [1.0, 0.0, 0.0, 0.0])
-
-
-def test_plot_bitstrings():
-    qft.plot_bitstrings([0.5, 0.5])
