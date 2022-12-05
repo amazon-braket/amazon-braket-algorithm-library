@@ -16,6 +16,7 @@ def submit_cshs_tasks(
     a_: float = 2 * np.pi / 8,
     b: float = np.pi / 8,
     b_: float = 3 * np.pi / 8,
+    verbose: bool = False,
 ) -> List[QuantumTask]:
     """Submit four CSHS circuits to a device.
 
@@ -24,24 +25,30 @@ def submit_cshs_tasks(
         shots (int): Number of shots. Defaults to 1_000.
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
+        a (Float): First basis rotation angle for first qubit
+        a_ (Float): Second basis rotation angle for first qubit
+        a (Float): First basis rotation angle for second qubit
+        a_ (Float): Second basis rotation angle for second qubit
+        verbose (bool): Controls printing of the circuit and other info. Defaults to True.
 
     Returns:
         List[QuantumTask]: List of quantum tasks.
     """
-
-    print("a:", a)
-    print("a_:", a_)
-    print("b:", b)
-    print("b_:", b_)
+    if verbose:
+        print("a:", a)
+        print("a_:", a_)
+        print("b:", b)
+        print("b_:", b_)
 
     circ_ab = bell_singlet_rotated_basis(qubit0, qubit1, a, b)
     circ_ab_ = bell_singlet_rotated_basis(qubit0, qubit1, a, b_).h(qubit1)
     circ_a_b = bell_singlet_rotated_basis(qubit0, qubit1, a_, b).h(qubit0)
     circ_a_b_ = bell_singlet_rotated_basis(qubit0, qubit1, a_, b_).h(qubit0).h(qubit1)
-    print("circ_ab\n:", circ_ab)
-    print("circ_ab_\n:", circ_ab_)
-    print("circ_a_b\n:", circ_a_b)
-    print("circ_a_b_\n:", circ_a_b_)
+    if verbose:
+        print("circ_ab\n:", circ_ab)
+        print("circ_ab_\n:", circ_ab_)
+        print("circ_a_b\n:", circ_a_b)
+        print("circ_a_b_\n:", circ_a_b_)
 
     tasks = [device.run(circ, shots=shots) for circ in [circ_ab, circ_ab_, circ_a_b, circ_a_b_]]
     return tasks
@@ -61,31 +68,33 @@ def get_cshs_results(
     """
     results = [task.result().measurement_probabilities for task in tasks]
     # prob_same = [d["00"] + d["11"] for d in results]
-    print("measurement_probabilities:", results)
+    # if verbose:
+    # print("measurement_probabilities:", results)
     prob_same = [(d["00"] if "00" in d else 0) + (d["11"] if "11" in d else 0) for d in results]
-
     prob_different = [
         (d["01"] if "01" in d else 0) + (d["10"] if "10" in d else 0) for d in results
     ]
-    print("prob_same:", prob_same)
-    print("prob_different:", prob_different)
+    # if verbose:
+    # print("prob_same:", prob_same)
+    # print("prob_different:", prob_different)
     # Bell probabilities
     E_ab, E_ab_, E_a_b, E_a_b_ = np.array(prob_same) - np.array(prob_different)
     cshs_value = E_ab - E_ab_ + E_a_b + E_a_b_
-    print("cshs_value:", cshs_value)
+    if verbose:
+        print("cshs_value:", cshs_value)
     cshs_ineqality_lhs = np.abs(cshs_value)
     if verbose:
         print(
-            f"E(a,b) = {E_ab},E(a,b') = {E_ab_}, E(a',b) = {E_a_b}, E(a',b') = {E_a_b_}\nBell's' inequality: {cshs_ineqality_lhs} ≤ 2"
+            f"E(a,b) = {E_ab},E(a,b') = {E_ab_}, E(a',b) = {E_a_b}, E(a',b') = {E_a_b_}\nCSHS inequality: {cshs_ineqality_lhs} ≤ 2"
         )
         if cshs_ineqality_lhs > 1:
             print("CSHS inequality is violated!")
             print(
-                "Notice that the quantity is not exactly 2.82 as predicted by theory."
+                "Notice that the quantity may not be exactly as predicted by Quantum theory."
                 "This is may be due to less number shots or the effects of noise on the QPU."
             )
         else:
-            print("CSHS inequality is not violated due to noise.")
+            print("CSHS inequality is not violated.")
     return cshs_value, cshs_ineqality_lhs, results, E_ab, E_ab_, E_a_b, E_a_b_
 
 
