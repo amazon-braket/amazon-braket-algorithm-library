@@ -172,8 +172,8 @@ def imag_time_propogator(
 
 
 def local_energy(h1e: np.ndarray, eri: np.ndarray, G: np.ndarray, enuc: float) -> float:
-    r"""Calculate local energy for generic two-body Hamiltonian using the full (spatial) form for the
-    two-electron integrals.
+    r"""Calculate local energy for generic two-body Hamiltonian using the full (spatial)
+    form for the two-electron integrals.
 
     Args:
         h1e (ndarray): one-body term.
