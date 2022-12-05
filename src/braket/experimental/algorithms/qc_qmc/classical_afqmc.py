@@ -4,10 +4,9 @@ import os
 from dataclasses import dataclass
 from typing import Callable, List, Tuple
 
-import numpy as np
+import pennylane as qml
 from openfermion.circuits.low_rank import low_rank_two_body_decomposition
-from pyscf.gto.mole import Mole
-from pyscf.scf.hf import RHF
+from pennylane import numpy as np
 from scipy.linalg import det, expm, qr
 
 
@@ -33,13 +32,13 @@ def classical_afqmc(
     prop: ChemicalProperties,
     max_pool: int = 8,
 ) -> Tuple[float, float]:
-    """Classical Auxiliary-Field Quantum Monte Carlo
+    """Classical Auxiliary-Field Quantum Monte Carlo.
 
     Args:
         num_walkers (int): Number of walkers.
         num_steps (int): Number of (imaginary) time steps
         dtau (float): Increment of each time step
-        trial (np.ndarray): Trial wavefunction.
+        trial (ndarray): Trial wavefunction.
         prop (ChemicalProperties): Chemical properties.
         max_pool (int): Max workers. Defaults to 8.
 
@@ -66,10 +65,10 @@ def classical_afqmc(
 
 
 def hartree_fock_energy(trial: np.ndarray, prop: ChemicalProperties) -> float:
-    """Compute Hatree Fock energy
+    """Compute Hatree Fock energy.
 
     Args:
-        trial (np.ndarray): Trial wavefunction.
+        trial (ndarray): Trial wavefunction.
         prop (ChemicalProperties): Chemical properties.
 
     Returns:
@@ -96,15 +95,16 @@ def full_imag_time_evolution(
     walker: np.ndarray,
     weight: float,
 ) -> Tuple[List[float], float]:
-    """Imaginary time evolution of a single walker
+    """Imaginary time evolution of a single walker.
+
     Args:
         num_steps (int): number of time steps
         dtau (float): imaginary time step size
-        trial (np.ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is
+        trial (ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is
             np.array([[1,0], [0,1], [0,0], [0,0]])
         prop (ChemicalProperties): Chemical properties.
         E_shift (float): Reference energy, i.e. Hartree-Fock energy
-        walker (np.ndarray): normalized walker state as np.ndarray, others are the same as trial
+        walker (ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
 
     Returns:
@@ -129,13 +129,13 @@ def imag_time_propogator(
     prop: ChemicalProperties,
     E_shift: float,
 ) -> Tuple[float, np.ndarray, float]:
-    """Propagate a walker by one time step
+    """Propagate a walker by one time step.
 
     Args:
         dtau (float): imaginary time step size
-        trial (np.ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is
+        trial (ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is
             np.array([[1,0], [0,1], [0,0], [0,0]])
-        walker (np.ndarray): normalized walker state as np.ndarray, others are the same as trial
+        walker (ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
         prop (ChemicalProperties): Chemical properties.
         E_shift (float): Reference energy, i.e. Hartree-Fock energy
@@ -172,14 +172,14 @@ def imag_time_propogator(
 
 
 def local_energy(h1e: np.ndarray, eri: np.ndarray, G: np.ndarray, enuc: float) -> float:
-    r"""Calculate local for generic two-body hamiltonian.
-    This uses the full (spatial) form for the two-electron integrals.
+    r"""Calculate local energy for generic two-body Hamiltonian using the full (spatial) form for the
+    two-electron integrals.
 
     Args:
-        h1e (np.ndarray): one-body term
-        eri (np.ndarray): two-body term
-        G (np.ndarray): Walker's "green's function"
-        enuc (float): Nuclear repulsion energy
+        h1e (ndarray): one-body term.
+        eri (ndarray): two-body term.
+        G (ndarray): Walker's "green's function".
+        enuc (float): Nuclear repulsion energy.
 
     Returns:
         float: kinetic, potential energies and nuclear repulsion energy.
@@ -200,17 +200,16 @@ def local_energy(h1e: np.ndarray, eri: np.ndarray, G: np.ndarray, enuc: float) -
 
 
 def reortho(A: np.ndarray) -> Tuple[np.ndarray, float]:
-    """Reorthogonalise a MxN matrix A.
-    Performs a QR decomposition of A. Note that for consistency elsewhere we
-    want to preserve detR > 0 which is not guaranteed. We thus factor the signs
-    of the diagonal of R into Q.
+    """Reorthogonalise a MxN matrix A. Performs a QR decomposition of A. Note that for consistency
+    elsewhere we want to preserve detR > 0 which is not guaranteed. We thus factor the signs of the
+    diagonal of R into Q.
 
     Args:
-        A (np.ndarray): MxN matrix.
+        A (ndarray): MxN matrix.
 
     Returns:
         Tuple[ndarray, float]: (Q, detR)
-        Q (np.ndarray): Orthogonal matrix. A = QR.
+        Q (ndarray): Orthogonal matrix. A = QR.
         detR (float): Determinant of upper triangular matrix (R) from QR decomposition.
     """
     (Q, R) = qr(A, mode="economic")
@@ -221,11 +220,11 @@ def reortho(A: np.ndarray) -> Tuple[np.ndarray, float]:
 
 
 def greens_pq(psi: np.ndarray, phi: np.ndarray) -> np.ndarray:
-    """This function computes the one-body Green's function
+    """This function computes the one-body Green's function.
 
     Args:
-        psi (np.ndarray): wavefunction
-        phi (np.ndarray): wavefunction
+        psi (ndarray): wavefunction
+        phi (ndarray): wavefunction
 
     Returns:
         ndarray: one-body Green's function
@@ -235,14 +234,15 @@ def greens_pq(psi: np.ndarray, phi: np.ndarray) -> np.ndarray:
     return G
 
 
-def chemistry_preparation(mol: Mole, hf: RHF, trial: np.ndarray) -> ChemicalProperties:
-    """
-    This function returns one- and two-electron integrals from PySCF.
+def chemistry_preparation(
+    mol: qml.qchem.molecule.Molecule, geometry: np.ndarray, trial: np.ndarray
+) -> ChemicalProperties:
+    """Return the one- and two-electron integrals from Pennylane.
 
     Args:
-        mol (pyscf.gto.mole.Mole): PySCF molecular structure
-        hf (pyscf.scf.hf.RHF): PySCF non-relativistic RHF
-        trial (np.ndarray): trial wavefunction
+        mol (Molecule): Pennylane molecular structure.
+        geometry (ndarray): Atomic coordiantes for the molecule.
+        trial (ndarray): Trial wavefunction.
 
     Returns:
         ChemicalProperties: chemical properties
@@ -254,17 +254,14 @@ def chemistry_preparation(mol: Mole, hf: RHF, trial: np.ndarray) -> ChemicalProp
         nuclear_repulsion: nuclear repulsion constant
     """
 
-    h1e = mol.intor("int1e_kin") + mol.intor("int1e_nuc")
-    h2e = mol.intor("int2e")
-    scf_c = hf.mo_coeff
-    nuclear_repulsion = mol.energy_nuc()
-
+    # h1e = qml.qchem.core_matrix(mol.basis_set, mol.nuclear_charges, mol.coordinates)(geometry)
+    h2e = qml.qchem.repulsion_tensor(mol.basis_set)(geometry)
+    nuclear_repulsion = qml.qchem.nuclear_energy(mol.nuclear_charges, mol.coordinates)(geometry)[0]
     # Get the one and two electron integral in the Hatree Fock basis
-    h1e = scf_c.T @ h1e @ scf_c
-
+    h1e = qml.qchem.electron_integrals(mol)(geometry)[1]
     # For the modified physics notation adapted to quantum computing convention.
     for _ in range(4):
-        h2e = np.tensordot(h2e, scf_c, axes=1).transpose(3, 0, 1, 2)
+        h2e = np.tensordot(h2e, mol.mo_coefficients, axes=1).transpose(3, 0, 1, 2)
     eri = h2e.transpose(0, 2, 3, 1)
 
     lamb, g, one_body_correction, residue = low_rank_two_body_decomposition(eri, spin_basis=False)
@@ -272,11 +269,8 @@ def chemistry_preparation(mol: Mole, hf: RHF, trial: np.ndarray) -> ChemicalProp
     h_chem = copy.deepcopy(v_0)
     num_spin_orbitals = int(h_chem.shape[0])
 
-    L_gamma = []
-    v_gamma = []
-    for i in range(len(lamb)):
-        L_gamma.append(np.sqrt(lamb[i]) * g[i])
-        v_gamma.append(1.0j * np.sqrt(lamb[i]) * g[i])
+    L_gamma = [np.sqrt(i) * j for i, j in zip(lamb, g)]
+    v_gamma = [1.0j * np.sqrt(i) * j for i, j in zip(lamb, g)]
 
     trial_up = trial[::2, ::2]
     trial_down = trial[1::2, 1::2]
@@ -290,8 +284,8 @@ def chemistry_preparation(mol: Mole, hf: RHF, trial: np.ndarray) -> ChemicalProp
         mf_shift = np.append(mf_shift, value)
 
     # Note that we neglect the prime symbol for simplicity.
-    for i in range(len(v_gamma)):
-        v_0 -= mf_shift[i] * v_gamma[i]
+    for s, v in zip(mf_shift, v_gamma):
+        v_0 -= s * v
 
     lambda_l = []
     U_l = []
@@ -319,19 +313,19 @@ def propagate_walker(
     walker: np.ndarray,
     G: List[np.ndarray],
 ) -> np.ndarray:
-    r"""This function updates the walker from imaginary time propagation.
+    r"""Update the walker forward in imaginary time.
 
     Args:
-        x (np.ndarray): auxiliary fields
+        x (ndarray): auxiliary fields
         v_0 (List[ndarray]): modified one-body term from reordering the two-body
             operator + mean-field subtraction.
         v_gamma (List[ndarray]): Cholesky vectors stored in list (L, num_spin_orbitals,
             num_spin_orbitals), without mf_shift.
-        mf_shift (np.ndarray): mean-field shift \Bar{v}_{\gamma} stored in np.array format
+        mf_shift (ndarray): mean-field shift \Bar{v}_{\gamma} stored in np.array format
         dtau (float): imaginary time step size
-        trial (np.ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state,
+        trial (ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state,
             it is np.array([[1,0], [0,1], [0,0], [0,0]])
-        walker (np.ndarray): walker state as np.ndarray, others are the same as trial
+        walker (ndarray): walker state as np.ndarray, others are the same as trial
         G (List[ndarray]): one-body Green's function
 
     Returns:
