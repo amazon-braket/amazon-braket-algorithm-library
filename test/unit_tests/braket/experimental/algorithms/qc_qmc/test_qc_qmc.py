@@ -7,9 +7,9 @@ from braket.experimental.algorithms.qc_qmc.classical_afqmc import (
     chemistry_preparation,
     hartree_fock_energy,
     classical_afqmc,
-    full_imag_time_evolution,
+    full_imag_time_evolution_wrapper,
 )
-from braket.experimental.algorithms.qc_qmc.qc_qmc import qc_qmc, q_full_imag_time_evolution
+from braket.experimental.algorithms.qc_qmc.qc_qmc import qc_qmc, q_full_imag_time_evolution_wrapper
 
 np.set_printoptions(precision=4, edgeitems=10, linewidth=150, suppress=True)
 
@@ -87,7 +87,7 @@ def test_q_full_imag_time_evolution(qmc_data):
         for walker, weight in zip(walkers, weights)
     ]
 
-    results = [q_full_imag_time_evolution(*input_arg) for input_arg in inputs]
+    results = [q_full_imag_time_evolution_wrapper(input_arg) for input_arg in inputs]
     assert len(results) == num_walkers
     assert len(results[0][0]) == num_steps
 
@@ -126,6 +126,6 @@ def test_full_imag_time_evolution(qmc_data):
         for walker, weight in zip(walkers, weights)
     ]
 
-    energy_list, weights = [full_imag_time_evolution(*input_arg) for input_arg in inputs]
+    energy_list, weights = [full_imag_time_evolution_wrapper(input_arg) for input_arg in inputs]
     assert len(energy_list) == num_walkers
     assert len(weights) == num_walkers

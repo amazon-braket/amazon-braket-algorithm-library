@@ -56,7 +56,7 @@ def qc_qmc(
 
     # parallelize with multiprocessing
     with mp.Pool(max_pool) as pool:
-        results = list(pool.map(__q_full_imag_time_evolution_wrapper, inputs))
+        results = list(pool.map(q_full_imag_time_evolution_wrapper, inputs))
 
     local_energies, weights, nums, denoms = map(np.array, zip(*results))
 
@@ -71,7 +71,7 @@ def qc_qmc(
     return quantum_energies, energies
 
 
-def __q_full_imag_time_evolution_wrapper(args: Tuple) -> Callable:
+def q_full_imag_time_evolution_wrapper(args: Tuple) -> Callable:
     return q_full_imag_time_evolution(*args)
 
 
@@ -525,103 +525,105 @@ def V_T() -> None:
         qml.Hadamard(wires=i)
 
 
-def q_propogate_walker(
-    x: np.ndarray,
-    v_0: List[np.ndarray],
-    v_gamma: List[np.ndarray],
-    mf_shift: np.ndarray,
-    dtau: float,
-    walker: np.ndarray,
-    V_T: Callable,
-    ovlp: float,
-    dev: qml.device,
-) -> np.ndarray:
-    r"""This function updates the walker from imaginary time propagation.
+# def q_propogate_walker(
+#     x: np.ndarray,
+#     v_0: List[np.ndarray],
+#     v_gamma: List[np.ndarray],
+#     mf_shift: np.ndarray,
+#     dtau: float,
+#     walker: np.ndarray,
+#     V_T: Callable,
+#     ovlp: float,
+#     dev: qml.device,
+# ) -> np.ndarray:
+#     r"""This function updates the walker from imaginary time propagation.
 
-    Args:
-        x (ndarray): auxiliary fields
-        v_0 (List[ndarray]): modified one-body term from reordering the two-body
-            operator + mean-field subtraction.
-        v_gamma (List[ndarray]): Cholesky vectors stored in list (L, num_spin_orbitals,
-            num_spin_orbitals), without mf_shift.
-        mf_shift (ndarray): mean-field shift \Bar{v}_{\gamma} stored in np.array format
-        dtau (float): imaginary time step size
-        walker (ndarray): walker Slater determinant
-        V_T (Callable): quantum trial state
-        ovlp (float): amplitude between walker and the quantum trial state
-        dev (qml.device): `qml.device('lightning.qubit', wires=wires)` for simulator;
-            or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
-            for quantum device;
-    Returns:
-        ndarray: new walker for the next time step
-    """
-    num_spin_orbitals, num_electrons = walker.shape
-    num_fields = len(v_gamma)
+#     Args:
+#         x (ndarray): auxiliary fields
+#         v_0 (List[ndarray]): modified one-body term from reordering the two-body
+#             operator + mean-field subtraction.
+#         v_gamma (List[ndarray]): Cholesky vectors stored in list (L, num_spin_orbitals,
+#             num_spin_orbitals), without mf_shift.
+#         mf_shift (ndarray): mean-field shift \Bar{v}_{\gamma} stored in np.array format
+#         dtau (float): imaginary time step size
+#         walker (ndarray): walker Slater determinant
+#         V_T (Callable): quantum trial state
+#         ovlp (float): amplitude between walker and the quantum trial state
+#         dev (qml.device): `qml.device('lightning.qubit', wires=wires)` for simulator;
+#             or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
+#             for quantum device;
+#     Returns:
+#         ndarray: new walker for the next time step
+#     """
+#     num_spin_orbitals, num_electrons = walker.shape
+#     num_fields = len(v_gamma)
 
-    v_expectation = one_body_expectation(walker, v_gamma, ovlp, V_T, dev)
+#     v_expectation = one_body_expectation(walker, v_gamma, ovlp, V_T, dev)
 
-    xbar = -np.sqrt(dtau) * (v_expectation - mf_shift)
-    # Sampling the auxiliary fields
-    xshifted = x - xbar
+#     xbar = -np.sqrt(dtau) * (v_expectation - mf_shift)
+#     # Sampling the auxiliary fields
+#     xshifted = x - xbar
 
-    # Define the B operator B(x - \bar{x})
-    exp_v0 = expm(-dtau / 2 * v_0)
+#     # Define the B operator B(x - \bar{x})
+#     exp_v0 = expm(-dtau / 2 * v_0)
 
-    V = np.zeros((num_spin_orbitals, num_spin_orbitals), dtype=np.complex128)
-    for i in range(num_fields):
-        V += np.sqrt(dtau) * xshifted[i] * v_gamma[i]
-    exp_V = expm(V)
+#     V = np.zeros((num_spin_orbitals, num_spin_orbitals), dtype=np.complex128)
+#     for i in range(num_fields):
+#         V += np.sqrt(dtau) * xshifted[i] * v_gamma[i]
+#     exp_V = expm(V)
 
-    # Note that v_gamma doesn't include the mf_shift, there is an additional term coming from
-    # -(x - xbar)*mf_shift, this term is also a complex value.
-    # cmf = -np.sqrt(dtau)*np.dot(xshifted, mf_shift)
-    # prefactor = np.exp(-dtau*(H_0 - E_0) + cmf)
-    B = exp_v0 @ exp_V @ exp_v0
+#     # Note that v_gamma doesn't include the mf_shift, there is an additional term coming from
+#     # -(x - xbar)*mf_shift, this term is also a complex value.
+#     # cmf = -np.sqrt(dtau)*np.dot(xshifted, mf_shift)
+#     # prefactor = np.exp(-dtau*(H_0 - E_0) + cmf)
+#     B = exp_v0 @ exp_V @ exp_v0
 
-    # Find the new walker state
-    new_walker, _ = reortho(B @ walker)
+#     # Find the new walker state
+#     new_walker, _ = reortho(B @ walker)
 
-    return new_walker
+#     return new_walker
 
 
-def one_body_expectation(
-    walker: np.ndarray, one_bodies: List[np.ndarray], ovlp: float, V_T: Callable, dev: qml.device
-) -> np.ndarray:
-    """Compute the expectation value of one-body operator between quantum trial
-        state and walker.
+# def one_body_expectation(
+#     walker: np.ndarray, one_bodies: List[np.ndarray], ovlp: float, V_T: Callable, dev: qml.device
+# ) -> np.ndarray:
+#     """Compute the expectation value of one-body operator between quantum trial
+#         state and walker.
 
-    Args:
-        walker (ndarray): walker Slater determinant
-        one_bodies (List[ndarray]): list of one_body operators whose expectation value is
-            to be computed.
-        ovlp (float): amplitude between walker and the quantum trial state
-        V_T (Callable): quantum trial state
-        dev (qml.device): `qml.device('lightning.qubit', wires=wires)` for simulator;
-            or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
-            for quantum device;
+#     Args:
+#         walker (ndarray): walker Slater determinant
+#         one_bodies (List[ndarray]): list of one_body operators whose expectation value is
+#             to be computed.
+#         ovlp (float): amplitude between walker and the quantum trial state
+#         V_T (Callable): quantum trial state
+#         dev (qml.device): `qml.device('lightning.qubit', wires=wires)` for simulator;
+#             or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
+#             for quantum device;
 
-    Returns:
-        ndarray: expectation values
-    """
-    num_qubits, num_particles = walker.shape
-    Id = np.identity(num_qubits)
+#     Returns:
+#         ndarray: expectation values
+#     """
+#     num_qubits, num_particles = walker.shape
+#     Id = np.identity(num_qubits)
 
-    expectation = np.array([])
-    pauli_dict = {i: pauli_estimate(walker, V_T, Id, [i], dev) for i in range(num_qubits)}
-    for one_body in one_bodies:
-        value = 0.0 + 0.0j
-        # check if the one-body term is already diagonal or not
-        if np.count_nonzero(np.round(one_body - np.diag(np.diagonal(one_body)), 7)) != 0:
-            lamb, U = np.linalg.eigh(one_body)
-            pauli_dict_2 = {i: pauli_estimate(walker, V_T, U, [i], dev) for i in range(num_qubits)}
+#     expectation = np.array([])
+#     pauli_dict = {i: pauli_estimate(walker, V_T, Id, [i], dev) for i in range(num_qubits)}
+#     for one_body in one_bodies:
+#         value = 0.0 + 0.0j
+#         # check if the one-body term is already diagonal or not
+#         if np.count_nonzero(np.round(one_body - np.diag(np.diagonal(one_body)), 7)) != 0:
+#             lamb, U = np.linalg.eigh(one_body)
+#             pauli_dict_2 = {
+#               i: pauli_estimate(walker, V_T, U, [i], dev) for i in range(num_qubits)
+#             }
 
-            for i in range(num_qubits):
-                expectation_value = 0.5 * (ovlp - pauli_dict_2.get(i))
-                value += lamb[i] * expectation_value
+#             for i in range(num_qubits):
+#                 expectation_value = 0.5 * (ovlp - pauli_dict_2.get(i))
+#                 value += lamb[i] * expectation_value
 
-        else:
-            for i in range(num_qubits):
-                expectation_value = 0.5 * (ovlp - pauli_dict.get(i))
-                value += one_body[i, i] * expectation_value
-        expectation = np.append(expectation, value)
-    return expectation
+#         else:
+#             for i in range(num_qubits):
+#                 expectation_value = 0.5 * (ovlp - pauli_dict.get(i))
+#                 value += one_body[i, i] * expectation_value
+#         expectation = np.append(expectation, value)
+#     return expectation
