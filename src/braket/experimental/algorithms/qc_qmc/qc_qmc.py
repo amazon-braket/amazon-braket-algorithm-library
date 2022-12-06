@@ -56,7 +56,7 @@ def qc_qmc(
 
     # parallelize with multiprocessing
     with mp.Pool(max_pool) as pool:
-        results = list(pool.map(q_full_imag_time_evolution_wrapper, inputs))
+        results = list(pool.map(__q_full_imag_time_evolution_wrapper, inputs))
 
     local_energies, weights, nums, denoms = map(np.array, zip(*results))
 
@@ -71,7 +71,7 @@ def qc_qmc(
     return quantum_energies, energies
 
 
-def q_full_imag_time_evolution_wrapper(args: Tuple) -> Callable:
+def __q_full_imag_time_evolution_wrapper(args: Tuple) -> Callable:
     return q_full_imag_time_evolution(*args)
 
 
