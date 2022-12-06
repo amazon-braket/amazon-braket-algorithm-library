@@ -5,7 +5,8 @@ from typing import Callable, List, Tuple
 import numpy as np
 import pennylane as qml
 from openfermion.linalg.givens_rotations import givens_decomposition_square
-from scipy.linalg import expm
+
+# from scipy.linalg import expm
 
 from braket.experimental.algorithms.qc_qmc.classical_afqmc import (
     ChemicalProperties,
