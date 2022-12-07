@@ -62,7 +62,7 @@ def run_chsh_inequality(
 
 def get_chsh_results(
     tasks: List[QuantumTask], verbose: bool = True
-) -> Tuple[List[Counter[float]], float, float, float]:
+) -> Tuple[float, List[Counter[float]], float, float, float]:
     """Return CHSH task results after post-processing.
 
     Args:
