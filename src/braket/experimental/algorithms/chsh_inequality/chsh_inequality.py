@@ -25,13 +25,13 @@ def create_chsh_inequality_circuits(
     Args:
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
-        a (Float): First basis rotation angle for first qubit
-        b (Float): Second basis rotation angle for first qubit
-        c (Float): First basis rotation angle for second qubit
-        d (Float): Second basis rotation angle for second qubit
+        a (float): First basis rotation angle for first qubit
+        b (float): Second basis rotation angle for first qubit
+        c (float): First basis rotation angle for second qubit
+        d (float): Second basis rotation angle for second qubit
 
     Returns:
-        List[QuantumTask]: List of quantum tasks.
+        List[Circuit]: List of quantum circuits.
     """
     circ_ab = bell_singlet_rotated_basis(qubit0, qubit1, a, b)
     circ_ac = bell_singlet_rotated_basis(qubit0, qubit1, a, c)
@@ -70,7 +70,8 @@ def get_chsh_results(
         verbose (bool): Controls printing of the inequality result. Defaults to True.
 
     Returns:
-        Tuple[List[Counter[float]], float, float, float]: results, pAB, pAC, pBC
+        Tuple[float, List[Counter[float]], float, float, float]: The chsh_value, list of results,
+        and the four probabilities: pAB, pAC, pDB, pDC.
     """
     results = [task.result().result_types[0].value for task in tasks]
     prob_same = np.array([d[0] + d[3] for d in results])  # 00 and 11 states
