@@ -11,9 +11,8 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from braket.experimental.algorithms.cshs_inequality.cshs_inequality import (  # noqa: F401
-    bell_singlet,
-    bell_singlet_rotated_basis,
-    get_cshs_results,
-    submit_cshs_tasks,
+from braket.experimental.algorithms.chsh_inequality.chsh_inequality import (  # noqa: F401
+    create_chsh_inequality_circuits,
+    get_chsh_results,
+    run_chsh_inequality,
 )
