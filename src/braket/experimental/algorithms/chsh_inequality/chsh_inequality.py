@@ -62,7 +62,7 @@ def run_chsh_inequality(
 
 def get_chsh_results(
     tasks: List[QuantumTask], verbose: bool = True
-) -> Tuple[float, List[Counter[float]], float, float, float]:
+) -> Tuple[float, List[Counter], float, float, float]:
     """Return CHSH task results after post-processing.
 
     Args:
@@ -70,7 +70,7 @@ def get_chsh_results(
         verbose (bool): Controls printing of the inequality result. Defaults to True.
 
     Returns:
-        Tuple[float, List[Counter[float]], float, float, float]: The chsh_value, list of results,
+        Tuple[float, List[Counter], float, float, float]: The chsh_value, list of results,
         and the four probabilities: pAB, pAC, pDB, pDC.
     """
     results = [task.result().result_types[0].value for task in tasks]
