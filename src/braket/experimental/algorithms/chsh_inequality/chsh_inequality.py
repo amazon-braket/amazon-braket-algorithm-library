@@ -39,9 +39,9 @@ def create_chsh_inequality_circuits(
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
         a (float): First basis rotation angle for first qubit
-        b (float): Second basis rotation angle for first qubit
-        c (float): First basis rotation angle for second qubit
-        d (float): Second basis rotation angle for second qubit
+        b (float): First basis rotation angle for second qubit 
+        c (float): Second basis rotation angle for second qubit
+        d (float): Second basis rotation angle for first qubit
 
     Returns:
         List[Circuit]: List of quantum circuits.
@@ -90,7 +90,7 @@ def get_chsh_results(
     prob_same = np.array([d[0] + d[3] for d in results])  # 00 and 11 states
     prob_different = np.array([d[1] + d[2] for d in results])  # 01 and 10 states
     pAB, pAC, pDB, pDC = np.array(prob_same) - np.array(prob_different)
-    chsh_value = np.abs(pAB - pAC) + np.abs(pDB + pDC)
+    chsh_value = np.abs(pAB - pAC + pDB + pDC)
 
     if verbose:
         print(f"P(a,b) = {pAB}, P(a,c) = {pAC}, P(d,b) = {pDB}, P(d,c) = {pDC}")
