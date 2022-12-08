@@ -255,10 +255,10 @@ def chemistry_preparation(
     """
 
     # h1e = qml.qchem.core_matrix(mol.basis_set, mol.nuclear_charges, mol.coordinates)(geometry)
-    h2e = qml.qchem.repulsion_tensor(mol.basis_set)(geometry)
-    nuclear_repulsion = qml.qchem.nuclear_energy(mol.nuclear_charges, mol.coordinates)(geometry)[0]
+    h2e = qml.qchem.repulsion_tensor(mol.basis_set)()
+    nuclear_repulsion = qml.qchem.nuclear_energy(mol.nuclear_charges, mol.coordinates)()[0]
     # Get the one and two electron integral in the Hatree Fock basis
-    h1e = qml.qchem.electron_integrals(mol)(geometry)[1]
+    h1e = qml.qchem.electron_integrals(mol)()[1]
     # For the modified physics notation adapted to quantum computing convention.
     for _ in range(4):
         h2e = np.tensordot(h2e, mol.mo_coefficients, axes=1).transpose(3, 0, 1, 2)
