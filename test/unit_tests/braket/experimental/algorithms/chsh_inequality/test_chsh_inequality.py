@@ -23,24 +23,24 @@ from braket.experimental.algorithms.chsh_inequality import (
 
 
 def test_chsh_reduces_to_bell():
-    circuits = create_chsh_inequality_circuits(0, 1, 0, np.pi / 3, 2 * np.pi / 3, np.pi / 3)
+    circuits = create_chsh_inequality_circuits(0, 1, 0, 0, np.pi / 3, 2* np.pi / 3)
     local_tasks = run_chsh_inequality(circuits, LocalSimulator(), shots=0)
-    chsh_value, results, pAB, pAC, pDB, pDC = get_chsh_results(local_tasks)
-    assert np.isclose(pAB, -0.5)
-    assert np.isclose(pAC, 0.5)
-    assert np.isclose(pDB, -1)
-    assert np.isclose(pDC, -0.5)
-    assert np.isclose(chsh_value, 2.5)
+    chsh_value, results, E_a1b1, E_a1b2, E_a2b1, E_a2b2 = get_chsh_results(local_tasks)
+    assert np.isclose(E_a1b1, -0.5)
+    assert np.isclose(E_a1b2, -0.5)
+    assert np.isclose(E_a2b1, -1)
+    assert np.isclose(E_a2b2, 0.5)
+    assert np.isclose(chsh_value, -2.5)
     assert len(results) == 4
 
 
 def test_max_chsh_violation():
-    circuits = create_chsh_inequality_circuits(0, 1, 0, np.pi / 4, 3 * np.pi / 4, np.pi / 2)
+    circuits = create_chsh_inequality_circuits(0, 1, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4)
     local_tasks = run_chsh_inequality(circuits, LocalSimulator(), shots=0)
-    chsh_value, results, pAB, pAC, pDB, pDC = get_chsh_results(local_tasks)
-    assert np.isclose(pAB, -np.sqrt(2) / 2)
-    assert np.isclose(pAC, np.sqrt(2) / 2)
-    assert np.isclose(pDB, -np.sqrt(2) / 2)
-    assert np.isclose(pDC, -np.sqrt(2) / 2)
-    assert np.isclose(chsh_value, 2 * np.sqrt(2))
+    chsh_value, results, E_a1b1, E_a1b2, E_a2b1, E_a2b2 = get_chsh_results(local_tasks)
+    assert np.isclose(E_a1b1, -np.sqrt(2) / 2)
+    assert np.isclose(E_a1b2, -np.sqrt(2) / 2)
+    assert np.isclose(E_a2b1, -np.sqrt(2) / 2)
+    assert np.isclose(E_a2b2, np.sqrt(2) / 2)
+    assert np.isclose(chsh_value, -2 * np.sqrt(2))
     assert len(results) == 4
