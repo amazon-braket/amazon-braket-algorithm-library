@@ -39,7 +39,7 @@ def create_chsh_inequality_circuits(
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
         a1 (float): First basis rotation angle for first qubit
-        b1 (float): First basis rotation angle for second qubit 
+        b1 (float): First basis rotation angle for second qubit
         b2 (float): Second basis rotation angle for second qubit
         a2 (float): Second basis rotation angle for first qubit
 
@@ -87,15 +87,16 @@ def get_chsh_results(
         and the four probabilities: E_a1b1, E_a1b2, E_a2b1, E_a2b2.
     """
     results = [task.result().result_types[0].value for task in tasks]
+
     prob_same = np.array([d[0] + d[3] for d in results])  # 00 and 11 states
     prob_different = np.array([d[1] + d[2] for d in results])  # 01 and 10 states
+
     E_a1b1, E_a1b2, E_a2b1, E_a2b2 = np.array(prob_same) - np.array(prob_different)
-    #chsh_value = np.abs(E_a1b1 + E_a1b2 + E_a2b1 - E_a2b2)
+
     chsh_value = E_a1b1 + E_a1b2 + E_a2b1 - E_a2b2
 
-
     if verbose:
-        print(f"P(a,b) = {E_a1b1}, P(a,c) = {E_a1b2}, P(d,b) = {E_a2b1}, P(d,c) = {E_a2b2}")
+        print(f"E_a1b1 = {E_a1b1}, E_a1b2 = {E_a1b2}, E_a2b1 = {E_a2b1}, E_a2b2 = {E_a2b2}")
         print(f"\nCHSH inequality: {np.abs(chsh_value)} ≤ 2")
 
         if np.abs(chsh_value) > 2:
