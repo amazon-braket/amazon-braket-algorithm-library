@@ -23,7 +23,7 @@ from braket.experimental.algorithms.chsh_inequality import (
 
 
 def test_chsh_reduces_to_bell():
-    circuits = create_chsh_inequality_circuits(0, 1, 0, 0, np.pi / 3, 2* np.pi / 3)
+    circuits = create_chsh_inequality_circuits(0, 1, 0, 0, np.pi / 3, 2 * np.pi / 3)
     local_tasks = run_chsh_inequality(circuits, LocalSimulator(), shots=0)
     chsh_value, results, E_a1b1, E_a1b2, E_a2b1, E_a2b2 = get_chsh_results(local_tasks)
     assert np.isclose(E_a1b1, -0.5)
