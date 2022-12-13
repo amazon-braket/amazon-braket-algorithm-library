@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.1 (2022-12-13)
+
+### Bug Fixes and Other Changes
+
+ * CSHS_Inequality
+
 ## v0.1.0 (2022-12-05)
 
 ### Features
@@ -159,4 +165,3 @@
  * notebook text cleanup and md file cleanup
  * fix shots comment
  * update contributing guidelines for new notebook location
-
