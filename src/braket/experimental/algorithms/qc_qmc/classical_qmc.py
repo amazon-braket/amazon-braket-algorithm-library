@@ -24,7 +24,7 @@ class ChemicalProperties:
     U_l: List[np.ndarray]  # eigenvectors of Cholesky vectors
 
 
-def classical_afqmc(
+def classical_qmc(
     num_walkers: int,
     num_steps: int,
     dtau: float,

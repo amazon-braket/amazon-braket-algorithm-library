@@ -3,10 +3,10 @@ import pytest
 import pennylane as qml
 from pennylane import numpy as np
 
-from braket.experimental.algorithms.qc_qmc.classical_afqmc import (
+from braket.experimental.algorithms.qc_qmc.classical_qmc import (
     chemistry_preparation,
     hartree_fock_energy,
-    classical_afqmc,
+    classical_qmc,
     full_imag_time_evolution_wrapper,
 )
 from braket.experimental.algorithms.qc_qmc.qc_qmc import qc_qmc, q_full_imag_time_evolution_wrapper
@@ -92,13 +92,13 @@ def test_q_full_imag_time_evolution(qmc_data):
     assert len(results[0][0]) == num_steps
 
 
-def test_classical_afqmc(qmc_data):
+def test_classical_qmc(qmc_data):
     trial, prop, dev, Ehf = qmc_data
     num_steps = 4
     num_walkers = 15
 
     # Start QMC computation
-    local_energies, energies = classical_afqmc(
+    local_energies, energies = classical_qmc(
         num_walkers=num_walkers,
         num_steps=num_steps,
         dtau=1,
