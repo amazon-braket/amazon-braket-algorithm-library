@@ -301,9 +301,8 @@ def circuit_first_half(Q: np.ndarray) -> None:
     num_qubits, num_particles = Q.shape
     qml.Hadamard(wires=0)
 
-    if num_particles > 1.0:
-        for i in range(1, num_particles):
-            qml.CNOT(wires=[0, i])
+    for i in range(1, num_particles):
+        qml.CNOT(wires=[0, i])
 
     complement = np.ones((num_qubits, num_qubits - num_particles))
     W, _ = reortho(np.hstack((Q, complement)))
@@ -326,9 +325,8 @@ def circuit_second_half_real(Q: np.ndarray, V_T: Callable) -> None:
     num_qubits, num_particles = Q.shape
     qml.adjoint(V_T)()
 
-    if num_particles > 1.0:
-        for i in range(1, num_particles)[::-1]:
-            qml.CNOT(wires=[0, i])
+    for i in range(1, num_particles)[::-1]:
+        qml.CNOT(wires=[0, i])
     qml.Hadamard(wires=0)
 
 
@@ -341,9 +339,8 @@ def circuit_second_half_imag(Q: np.ndarray, V_T: Callable) -> None:
     num_qubits, num_particles = Q.shape
     qml.adjoint(V_T)()
 
-    if num_particles > 1.0:
-        for i in range(1, num_particles)[::-1]:
-            qml.CNOT(wires=[0, i])
+    for i in range(1, num_particles)[::-1]:
+        qml.CNOT(wires=[0, i])
 
     qml.S(wires=0)
     qml.S(wires=0)
