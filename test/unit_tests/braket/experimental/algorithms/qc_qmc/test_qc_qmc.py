@@ -1,15 +1,16 @@
-import pytest
+from unittest.mock import patch
 
 import pennylane as qml
+import pytest
 from pennylane import numpy as np
 
 from braket.experimental.algorithms.qc_qmc.classical_qmc import (
     chemistry_preparation,
-    hartree_fock_energy,
     classical_qmc,
     full_imag_time_evolution_wrapper,
+    hartree_fock_energy,
 )
-from braket.experimental.algorithms.qc_qmc.qc_qmc import qc_qmc, q_full_imag_time_evolution_wrapper
+from braket.experimental.algorithms.qc_qmc.qc_qmc import q_full_imag_time_evolution_wrapper, qc_qmc
 
 np.set_printoptions(precision=4, edgeitems=10, linewidth=150, suppress=True)
 
@@ -55,20 +56,28 @@ def test_properties(qmc_data):
 
 def test_qc_qmc(qmc_data):
     trial, prop, dev, Ehf = qmc_data
-    num_steps = 4
+    num_steps = 5
+    num_walkers = 15
     qe_step_size = 2
 
-    # Start QC-QMC computation
-    quantum_energies, energies = qc_qmc(
-        num_walkers=15,
-        num_steps=num_steps,
-        dtau=1,
-        quantum_evaluations_every_n_steps=qe_step_size,
-        trial=trial,
-        prop=prop,
-        max_pool=2,
-        dev=dev,
-    )
+    with patch("multiprocessing.pool.Pool.map") as evolution_mock:
+        energy_data_mock = [1.0 for _ in range(num_steps)]
+        quantum_data_mock = [0.0 if i % qe_step_size == 0 else 1.0 for i in range(num_steps)]
+        evolution_mock.return_value = [
+            (energy_data_mock, energy_data_mock, quantum_data_mock, quantum_data_mock),
+        ] * num_walkers
+
+        # Start QC-QMC computation
+        quantum_energies, energies = qc_qmc(
+            num_walkers=num_walkers,
+            num_steps=num_steps,
+            dtau=1,
+            quantum_evaluations_every_n_steps=qe_step_size,
+            trial=trial,
+            prop=prop,
+            max_pool=2,
+            dev=dev,
+        )
     assert len(energies) == num_steps
     assert len(quantum_energies) == num_steps // qe_step_size
 
