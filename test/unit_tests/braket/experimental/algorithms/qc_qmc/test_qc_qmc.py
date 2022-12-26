@@ -27,6 +27,24 @@ def qmc_data():
     return (trial, prop, dev, Ehf)
 
 
+def V_T() -> None:
+    """Define V_T through UCCSD circuit."""
+    qml.RX(np.pi / 2.0, wires=0)
+    for i in range(1, 4):
+        qml.Hadamard(wires=i)
+
+    for i in range(3):
+        qml.CNOT(wires=[i, i + 1])
+
+    qml.RZ(0.12, wires=3)
+    for i in range(3)[::-1]:
+        qml.CNOT(wires=[i, i + 1])
+
+    qml.RX(-np.pi / 2.0, wires=0)
+    for i in range(1, 4):
+        qml.Hadamard(wires=i)
+
+
 def test_properties(qmc_data):
     trial, prop, dev, Ehf = qmc_data
     assert np.allclose(prop.h1e, np.array([[-1.2473, -0.0], [-0.0, -0.4813]]), atol=1e-4)
@@ -75,8 +93,9 @@ def test_qc_qmc(qmc_data):
             quantum_evaluations_every_n_steps=qe_step_size,
             trial=trial,
             prop=prop,
-            max_pool=2,
+            V_T=V_T,
             dev=dev,
+            max_pool=2,
         )
     assert len(energies) == num_steps
     assert len(quantum_energies) == num_steps // qe_step_size
@@ -92,7 +111,7 @@ def test_q_full_imag_time_evolution(qmc_data):
     walkers = [trial] * num_walkers
     weights = [1.0] * num_walkers
     inputs = [
-        (num_steps, qe_step_size, dtau, trial, prop, Ehf, walker, weight, dev)
+        (num_steps, qe_step_size, dtau, trial, prop, Ehf, walker, weight, V_T, dev)
         for walker, weight in zip(walkers, weights)
     ]
 

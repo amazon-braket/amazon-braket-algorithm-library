@@ -26,6 +26,7 @@ def qc_qmc(
     quantum_evaluations_every_n_steps: int,
     trial: np.ndarray,
     prop: ChemicalProperties,
+    V_T: Callable,
     dev: qml.Device,
     max_pool: int = 8,
 ) -> Tuple[List[float], List[float]]:
@@ -38,6 +39,7 @@ def qc_qmc(
         quantum_evaluations_every_n_steps (int): How often to evaluate the energy using quantum
         trial (ndarray): Trial wavefunction.
         prop (ChemicalProperties): Chemical properties.
+        V_T (Callable): quantum trial state
         dev (qml.Device): Pennylane device to run circuits on.
         max_pool (int): Max workers. Defaults to 8.
 
@@ -49,7 +51,18 @@ def qc_qmc(
     weights = [1.0] * num_walkers
 
     inputs = [
-        (num_steps, quantum_evaluations_every_n_steps, dtau, trial, prop, Ehf, walker, weight, dev)
+        (
+            num_steps,
+            quantum_evaluations_every_n_steps,
+            dtau,
+            trial,
+            prop,
+            Ehf,
+            walker,
+            weight,
+            V_T,
+            dev,
+        )
         for walker, weight in zip(walkers, weights)
     ]
 
@@ -83,6 +96,7 @@ def q_full_imag_time_evolution(
     E_shift: float,
     walker: np.ndarray,
     weight: float,
+    V_T: Callable,
     dev: qml.Device,
 ) -> Tuple[List[float], List[float], List[float], List[float]]:
     """Imaginary time evolution of a single walker.
@@ -97,6 +111,7 @@ def q_full_imag_time_evolution(
         E_shift (float): Reference energy, i.e. Hartree-Fock energy
         walker (ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
+        V_T (Callable): quantum trial state
         dev (qml.Device): `qml.device('lightning.qubit', wires=wires)` for simulator;
             or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
             for quantum device;
@@ -113,7 +128,7 @@ def q_full_imag_time_evolution(
         if time % quantum_evaluations_every_n_steps == 0:
             # if time * dtau in quantum_times:
             E_loc, num, denom, walker, weight = imag_time_propogator_qaee(
-                dtau, trial, walker, weight, prop, E_shift, dev
+                dtau, trial, walker, weight, prop, E_shift, V_T, dev
             )
         else:  # otherwise, do classical energy
             E_loc, walker, weight = imag_time_propogator(dtau, trial, walker, weight, prop, E_shift)
@@ -133,6 +148,7 @@ def imag_time_propogator_qaee(
     weight: float,
     prop: ChemicalProperties,
     E_shift: float,
+    V_T: Callable,
     dev: qml.Device,
 ) -> Tuple[float, float, float, np.ndarray, float]:
     """Imaginary time propogator with quantum energy evaluations.
@@ -145,6 +161,7 @@ def imag_time_propogator_qaee(
         weight (float): weight for sampling.
         prop (ChemicalProperties): Chemical properties.
         E_shift (float): Reference energy, i.e. Hartree-Fock energy
+        V_T (Callable): quantum trial state
         dev (qml.Device): Pennylane device
 
     Returns:
@@ -501,21 +518,3 @@ def pauli_estimate(
     imag = probs_values[0] - probs_values[int(2**num_qubits / 2)]
 
     return real + 1.0j * imag
-
-
-def V_T() -> None:
-    """Define V_T through UCCSD circuit."""
-    qml.RX(np.pi / 2.0, wires=0)
-    for i in range(1, 4):
-        qml.Hadamard(wires=i)
-
-    for i in range(3):
-        qml.CNOT(wires=[i, i + 1])
-
-    qml.RZ(0.12, wires=3)
-    for i in range(3)[::-1]:
-        qml.CNOT(wires=[i, i + 1])
-
-    qml.RX(-np.pi / 2.0, wires=0)
-    for i in range(1, 4):
-        qml.Hadamard(wires=i)
