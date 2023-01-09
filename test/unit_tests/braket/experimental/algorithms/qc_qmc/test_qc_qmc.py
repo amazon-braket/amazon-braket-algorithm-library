@@ -23,12 +23,12 @@ def qmc_data():
     trial = np.array([[1, 0], [0, 1], [0, 0], [0, 0]])
     prop = chemistry_preparation(mol, geometry, trial)
     dev = qml.device("lightning.qubit", wires=4)
-    Ehf = hartree_fock_energy(trial, prop)
-    return (trial, prop, dev, Ehf)
+    e_hf = hartree_fock_energy(trial, prop)
+    return (trial, prop, dev, e_hf)
 
 
-def V_T() -> None:
-    """Define V_T through UCCSD circuit."""
+def trial_state_circuit() -> None:
+    """Define trial_state_circuit through UCCSD circuit."""
     qml.RX(np.pi / 2.0, wires=0)
     for i in range(1, 4):
         qml.Hadamard(wires=i)
@@ -46,7 +46,7 @@ def V_T() -> None:
 
 
 def test_properties(qmc_data):
-    trial, prop, dev, Ehf = qmc_data
+    trial, prop, dev, e_hf = qmc_data
     assert np.allclose(prop.h1e, np.array([[-1.2473, -0.0], [-0.0, -0.4813]]), atol=1e-4)
     assert np.allclose(
         prop.eri,
@@ -73,7 +73,7 @@ def test_properties(qmc_data):
 
 
 def test_qc_qmc(qmc_data):
-    trial, prop, dev, Ehf = qmc_data
+    trial, prop, dev, e_hf = qmc_data
     num_steps = 5
     num_walkers = 15
     qe_step_size = 2
@@ -93,7 +93,7 @@ def test_qc_qmc(qmc_data):
             quantum_evaluations_every_n_steps=qe_step_size,
             trial=trial,
             prop=prop,
-            V_T=V_T,
+            trial_state_circuit=trial_state_circuit,
             dev=dev,
             max_pool=2,
         )
@@ -102,7 +102,7 @@ def test_qc_qmc(qmc_data):
 
 
 def test_q_full_imag_time_evolution(qmc_data):
-    trial, prop, dev, Ehf = qmc_data
+    trial, prop, dev, e_hf = qmc_data
     num_steps = 4
     qe_step_size = 2
     num_walkers = 2
@@ -111,7 +111,7 @@ def test_q_full_imag_time_evolution(qmc_data):
     walkers = [trial] * num_walkers
     weights = [1.0] * num_walkers
     inputs = [
-        (num_steps, qe_step_size, dtau, trial, prop, Ehf, walker, weight, V_T, dev)
+        (num_steps, qe_step_size, dtau, trial, prop, e_hf, walker, weight, trial_state_circuit, dev)
         for walker, weight in zip(walkers, weights)
     ]
 
@@ -121,7 +121,7 @@ def test_q_full_imag_time_evolution(qmc_data):
 
 
 def test_classical_qmc(qmc_data):
-    trial, prop, dev, Ehf = qmc_data
+    trial, prop, dev, e_hf = qmc_data
     num_steps = 4
     num_walkers = 15
 
@@ -140,7 +140,7 @@ def test_classical_qmc(qmc_data):
 
 
 def test_full_imag_time_evolution(qmc_data):
-    trial, prop, dev, Ehf = qmc_data
+    trial, prop, dev, e_hf = qmc_data
 
     num_steps = 4
     num_walkers = 2
@@ -150,7 +150,7 @@ def test_full_imag_time_evolution(qmc_data):
     weights = [1.0] * num_walkers
 
     inputs = [
-        (num_steps, dtau, trial, prop, Ehf, walker, weight)
+        (num_steps, dtau, trial, prop, e_hf, walker, weight)
         for walker, weight in zip(walkers, weights)
     ]
 

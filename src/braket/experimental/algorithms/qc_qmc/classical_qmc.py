@@ -21,7 +21,7 @@ class ChemicalProperties:
     L_gamma: List[np.ndarray]  # Cholesky vector decomposed from two-body terms
     mf_shift: np.ndarray  # mean-field shift
     lambda_l: List[np.ndarray]  # eigenvalues of Cholesky vectors
-    U_l: List[np.ndarray]  # eigenvectors of Cholesky vectors
+    u_l: List[np.ndarray]  # eigenvectors of Cholesky vectors
 
 
 def classical_qmc(
@@ -45,13 +45,13 @@ def classical_qmc(
     Returns:
         Tuple[float, float]: Energies
     """
-    Ehf = hartree_fock_energy(trial, prop)
+    e_hf = hartree_fock_energy(trial, prop)
 
     walkers = [trial] * num_walkers
     weights = [1.0] * num_walkers
 
     inputs = [
-        (num_steps, dtau, trial, prop, Ehf, walker, weight)
+        (num_steps, dtau, trial, prop, e_hf, walker, weight)
         for walker, weight in zip(walkers, weights)
     ]
 
@@ -77,9 +77,9 @@ def hartree_fock_energy(trial: np.ndarray, prop: ChemicalProperties) -> float:
     trial_up = trial[::2, ::2]
     trial_down = trial[1::2, 1::2]
     # compute  one particle Green's function
-    G = [greens_pq(trial_up, trial_up), greens_pq(trial_down, trial_down)]
-    Ehf = local_energy(prop.h1e, prop.eri, G, prop.nuclear_repulsion)
-    return Ehf
+    green_funcs = [greens_pq(trial_up, trial_up), greens_pq(trial_down, trial_down)]
+    e_hf = local_energy(prop.h1e, prop.eri, green_funcs, prop.nuclear_repulsion)
+    return e_hf
 
 
 def full_imag_time_evolution_wrapper(args: Tuple) -> Callable:
@@ -91,7 +91,7 @@ def full_imag_time_evolution(
     dtau: float,
     trial: np.ndarray,
     prop: ChemicalProperties,
-    E_shift: float,
+    e_shift: float,
     walker: np.ndarray,
     weight: float,
 ) -> Tuple[List[float], float]:
@@ -103,7 +103,7 @@ def full_imag_time_evolution(
         trial (ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is
             np.array([[1,0], [0,1], [0,0], [0,0]])
         prop (ChemicalProperties): Chemical properties.
-        E_shift (float): Reference energy, i.e. Hartree-Fock energy
+        e_shift (float): Reference energy, i.e. Hartree-Fock energy
         walker (ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
 
@@ -115,8 +115,8 @@ def full_imag_time_evolution(
 
     energy_list, weights = [], []
     for _ in range(num_steps):
-        E_loc, walker, weight = imag_time_propogator(dtau, trial, walker, weight, prop, E_shift)
-        energy_list.append(E_loc)
+        e_loc, walker, weight = imag_time_propogator(dtau, trial, walker, weight, prop, e_shift)
+        energy_list.append(e_loc)
         weights.append(weight)
     return energy_list, weights
 
@@ -127,7 +127,7 @@ def imag_time_propogator(
     walker: np.ndarray,
     weight: float,
     prop: ChemicalProperties,
-    E_shift: float,
+    e_shift: float,
 ) -> Tuple[float, np.ndarray, float]:
     """Propagate a walker by one time step.
 
@@ -138,10 +138,10 @@ def imag_time_propogator(
         walker (ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
         prop (ChemicalProperties): Chemical properties.
-        E_shift (float): Reference energy, i.e. Hartree-Fock energy
+        e_shift (float): Reference energy, i.e. Hartree-Fock energy
 
     Returns:
-        Tuple[float, ndarray, float]: E_loc, new_walker, new_weight
+        Tuple[float, ndarray, float]: e_loc, new_walker, new_weight
     """
     # First compute the bias force using the expectation value of L operators
     num_fields = len(prop.v_gamma)
@@ -153,47 +153,51 @@ def imag_time_propogator(
     trial_down = trial[1::2, 1::2]
     walker_up = walker[::2, ::2]
     walker_down = walker[1::2, 1::2]
-    G = [greens_pq(trial_up, walker_up), greens_pq(trial_down, walker_down)]
-    E_loc = local_energy(prop.h1e, prop.eri, G, prop.nuclear_repulsion)
+    green_funcs = [greens_pq(trial_up, walker_up), greens_pq(trial_down, walker_down)]
+    e_loc = local_energy(prop.h1e, prop.eri, green_funcs, prop.nuclear_repulsion)
 
     # sampling the auxiliary fields
     x = np.random.normal(0.0, 1.0, size=num_fields)
 
     # update the walker
-    new_walker = propagate_walker(x, prop.v_0, prop.v_gamma, prop.mf_shift, dtau, trial, walker, G)
+    new_walker = propagate_walker(
+        x, prop.v_0, prop.v_gamma, prop.mf_shift, dtau, trial, walker, green_funcs
+    )
 
     # Define the Id operator and find new weight
     new_ovlp = np.linalg.det(trial.transpose().conj() @ new_walker)
     arg = np.angle(new_ovlp / ovlp)
 
-    new_weight = weight * np.exp(-dtau * (np.real(E_loc) - E_shift)) * np.max([0.0, np.cos(arg)])
+    new_weight = weight * np.exp(-dtau * (np.real(e_loc) - e_shift)) * np.max([0.0, np.cos(arg)])
 
-    return E_loc, new_walker, new_weight
+    return e_loc, new_walker, new_weight
 
 
-def local_energy(h1e: np.ndarray, eri: np.ndarray, G: np.ndarray, enuc: float) -> float:
+def local_energy(h1e: np.ndarray, eri: np.ndarray, green_funcs: np.ndarray, enuc: float) -> float:
     r"""Calculate local energy for generic two-body Hamiltonian using the full (spatial)
     form for the two-electron integrals.
 
     Args:
         h1e (ndarray): one-body term.
         eri (ndarray): two-body term.
-        G (ndarray): Walker's "green's function".
+        green_funcs (ndarray): Walker's "green's function".
         enuc (float): Nuclear repulsion energy.
 
     Returns:
         float: kinetic, potential energies and nuclear repulsion energy.
     """
-    e1 = np.einsum("ij,ij->", h1e, G[0]) + np.einsum("ij,ij->", h1e, G[1])
+    e1 = np.einsum("ij,ij->", h1e, green_funcs[0]) + np.einsum("ij,ij->", h1e, green_funcs[1])
 
     euu = 0.5 * (
-        np.einsum("ijkl,il,jk->", eri, G[0], G[0]) - np.einsum("ijkl,ik,jl->", eri, G[0], G[0])
+        np.einsum("ijkl,il,jk->", eri, green_funcs[0], green_funcs[0])
+        - np.einsum("ijkl,ik,jl->", eri, green_funcs[0], green_funcs[0])
     )
     edd = 0.5 * (
-        np.einsum("ijkl,il,jk->", eri, G[1], G[1]) - np.einsum("ijkl,ik,jl->", eri, G[1], G[1])
+        np.einsum("ijkl,il,jk->", eri, green_funcs[1], green_funcs[1])
+        - np.einsum("ijkl,ik,jl->", eri, green_funcs[1], green_funcs[1])
     )
-    eud = 0.5 * np.einsum("ijkl,il,jk->", eri, G[0], G[1])
-    edu = 0.5 * np.einsum("ijkl,il,jk->", eri, G[1], G[0])
+    eud = 0.5 * np.einsum("ijkl,il,jk->", eri, green_funcs[0], green_funcs[1])
+    edu = 0.5 * np.einsum("ijkl,il,jk->", eri, green_funcs[1], green_funcs[0])
     e2 = euu + edd + eud + edu
 
     return e1 + e2 + enuc
@@ -230,8 +234,8 @@ def greens_pq(psi: np.ndarray, phi: np.ndarray) -> np.ndarray:
         ndarray: one-body Green's function
     """
     overlap_inverse = np.linalg.inv(psi.transpose() @ phi)
-    G = phi @ overlap_inverse @ psi.transpose()
-    return G
+    green_funcs = phi @ overlap_inverse @ psi.transpose()
+    return green_funcs
 
 
 def chemistry_preparation(
@@ -274,13 +278,13 @@ def chemistry_preparation(
 
     trial_up = trial[::2, ::2]
     trial_down = trial[1::2, 1::2]
-    G = [greens_pq(trial_up, trial_up), greens_pq(trial_down, trial_down)]
+    green_funcs = [greens_pq(trial_up, trial_up), greens_pq(trial_down, trial_down)]
 
     # compute mean-field shift as an imaginary value
     mf_shift = np.array([])
     for i in v_gamma:
-        value = np.einsum("ij,ij->", i[::2, ::2], G[0])
-        value += np.einsum("ij,ij->", i[1::2, 1::2], G[1])
+        value = np.einsum("ij,ij->", i[::2, ::2], green_funcs[0])
+        value += np.einsum("ij,ij->", i[1::2, 1::2], green_funcs[1])
         mf_shift = np.append(mf_shift, value)
 
     # Note that we neglect the prime symbol for simplicity.
@@ -288,18 +292,18 @@ def chemistry_preparation(
         v_0 -= s * v
 
     lambda_l = []
-    U_l = []
+    u_l = []
     for i in L_gamma:
         if np.count_nonzero(np.round(i - np.diag(np.diagonal(i)), 7)) != 0:
             eigval, eigvec = np.linalg.eigh(i)
             lambda_l.append(eigval)
-            U_l.append(eigvec)
+            u_l.append(eigvec)
         else:
             lambda_l.append(np.diagonal(i))
-            U_l.append(np.eye(num_spin_orbitals))
+            u_l.append(np.eye(num_spin_orbitals))
 
     return ChemicalProperties(
-        h1e, eri, nuclear_repulsion, v_0, h_chem, v_gamma, L_gamma, mf_shift, lambda_l, U_l
+        h1e, eri, nuclear_repulsion, v_0, h_chem, v_gamma, L_gamma, mf_shift, lambda_l, u_l
     )
 
 
@@ -311,7 +315,7 @@ def propagate_walker(
     dtau: float,
     trial: np.ndarray,
     walker: np.ndarray,
-    G: List[np.ndarray],
+    green_funcs: List[np.ndarray],
 ) -> np.ndarray:
     r"""Update the walker forward in imaginary time.
 
@@ -326,7 +330,7 @@ def propagate_walker(
         trial (ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state,
             it is np.array([[1,0], [0,1], [0,0], [0,0]])
         walker (ndarray): walker state as np.ndarray, others are the same as trial
-        G (List[ndarray]): one-body Green's function
+        green_funcs (List[ndarray]): one-body Green's function
 
     Returns:
         ndarray: new walker for next time step
@@ -336,8 +340,8 @@ def propagate_walker(
 
     v_expectation = np.array([])
     for i in v_gamma:
-        value = np.einsum("ij,ij->", i[::2, ::2], G[0])
-        value += np.einsum("ij,ij->", i[1::2, 1::2], G[1])
+        value = np.einsum("ij,ij->", i[::2, ::2], green_funcs[0])
+        value += np.einsum("ij,ij->", i[1::2, 1::2], green_funcs[1])
         v_expectation = np.append(v_expectation, value)
 
     xbar = -np.sqrt(dtau) * (v_expectation - mf_shift)

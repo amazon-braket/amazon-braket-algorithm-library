@@ -26,7 +26,7 @@ def qc_qmc(
     quantum_evaluations_every_n_steps: int,
     trial: np.ndarray,
     prop: ChemicalProperties,
-    V_T: Callable,
+    trial_state_circuit: Callable,
     dev: qml.Device,
     max_pool: int = 8,
 ) -> Tuple[List[float], List[float]]:
@@ -39,14 +39,14 @@ def qc_qmc(
         quantum_evaluations_every_n_steps (int): How often to evaluate the energy using quantum
         trial (ndarray): Trial wavefunction.
         prop (ChemicalProperties): Chemical properties.
-        V_T (Callable): quantum trial state
+        trial_state_circuit (Callable): quantum trial state as a pennylane quantum function
         dev (qml.Device): Pennylane device to run circuits on.
         max_pool (int): Max workers. Defaults to 8.
 
     Returns:
         Tuple[List[float], List[float]]: quantum and classical energies
     """
-    Ehf = hartree_fock_energy(trial, prop)
+    e_hf = hartree_fock_energy(trial, prop)
     walkers = [trial] * num_walkers
     weights = [1.0] * num_walkers
 
@@ -57,10 +57,10 @@ def qc_qmc(
             dtau,
             trial,
             prop,
-            Ehf,
+            e_hf,
             walker,
             weight,
-            V_T,
+            trial_state_circuit,
             dev,
         )
         for walker, weight in zip(walkers, weights)
@@ -93,10 +93,10 @@ def q_full_imag_time_evolution(
     dtau: float,
     trial: np.ndarray,
     prop: ChemicalProperties,
-    E_shift: float,
+    e_shift: float,
     walker: np.ndarray,
     weight: float,
-    V_T: Callable,
+    trial_state_circuit: Callable,
     dev: qml.Device,
 ) -> Tuple[List[float], List[float], List[float], List[float]]:
     """Imaginary time evolution of a single walker.
@@ -108,10 +108,10 @@ def q_full_imag_time_evolution(
         trial (ndarray): trial state as np.ndarray, e.g., for h2 HartreeFock state, it is
             np.array([[1,0], [0,1], [0,0], [0,0]])
         prop (ChemicalProperties): Chemical properties.
-        E_shift (float): Reference energy, i.e. Hartree-Fock energy
+        e_shift (float): Reference energy, i.e. Hartree-Fock energy
         walker (ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
-        V_T (Callable): quantum trial state
+        trial_state_circuit (Callable): quantum trial state
         dev (qml.Device): `qml.device('lightning.qubit', wires=wires)` for simulator;
             or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
             for quantum device;
@@ -127,14 +127,14 @@ def q_full_imag_time_evolution(
         # If the time step is in the quantum times, evaluate the energy with quantum
         if time % quantum_evaluations_every_n_steps == 0:
             # if time * dtau in quantum_times:
-            E_loc, num, denom, walker, weight = imag_time_propogator_qaee(
-                dtau, trial, walker, weight, prop, E_shift, V_T, dev
+            e_loc, num, denom, walker, weight = imag_time_propogator_qaee(
+                dtau, trial, walker, weight, prop, e_shift, trial_state_circuit, dev
             )
         else:  # otherwise, do classical energy
-            E_loc, walker, weight = imag_time_propogator(dtau, trial, walker, weight, prop, E_shift)
+            e_loc, walker, weight = imag_time_propogator(dtau, trial, walker, weight, prop, e_shift)
             num = 0
             denom = 0
-        energy_list.append(E_loc)
+        energy_list.append(e_loc)
         weights.append(weight)
         qs.append(num)
         cs.append(denom)
@@ -147,8 +147,8 @@ def imag_time_propogator_qaee(
     walker: np.ndarray,
     weight: float,
     prop: ChemicalProperties,
-    E_shift: float,
-    V_T: Callable,
+    e_shift: float,
+    trial_state_circuit: Callable,
     dev: qml.Device,
 ) -> Tuple[float, float, float, np.ndarray, float]:
     """Imaginary time propogator with quantum energy evaluations.
@@ -160,14 +160,14 @@ def imag_time_propogator_qaee(
         walker (ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
         prop (ChemicalProperties): Chemical properties.
-        E_shift (float): Reference energy, i.e. Hartree-Fock energy
-        V_T (Callable): quantum trial state
+        e_shift (float): Reference energy, i.e. Hartree-Fock energy
+        trial_state_circuit (Callable): quantum trial state
         dev (qml.Device): Pennylane device
 
     Returns:
         Tuple[float, float, float, ndarray, float]: propogatpr results
-        E_loc: local energy
-        E_loc_q / c_ovlp: numerator
+        e_loc: local energy
+        e_loc_q / c_ovlp: numerator
         q_ovlp / c_ovlp: denominator for evaluation of total energy
         new_walker: new walker for the next time step
         new_weight: new weight for the next time step
@@ -183,30 +183,34 @@ def imag_time_propogator_qaee(
     trial_down = trial[1::2, 1::2]
     walker_up = walker[::2, ::2]
     walker_down = walker[1::2, 1::2]
-    G = [greens_pq(trial_up, walker_up), greens_pq(trial_down, walker_down)]
-    E_loc = local_energy(prop.h1e, prop.eri, G, prop.nuclear_repulsion)
+    green_funcs = [greens_pq(trial_up, walker_up), greens_pq(trial_down, walker_down)]
+    e_loc = local_energy(prop.h1e, prop.eri, green_funcs, prop.nuclear_repulsion)
 
     # Quantum-assisted energy evaluation
     # compute the overlap between qtrial state and walker
     c_ovlp = np.linalg.det(trial.transpose().conj() @ walker)
-    q_ovlp = amplitude_estimate(walker, V_T, dev)
-    E_loc_q = (
-        local_energy_quantum(walker, q_ovlp, prop.h_chem, prop.lambda_l, prop.U_l, V_T, dev)
+    q_ovlp = amplitude_estimate(walker, trial_state_circuit, dev)
+    e_loc_q = (
+        local_energy_quantum(
+            walker, q_ovlp, prop.h_chem, prop.lambda_l, prop.u_l, trial_state_circuit, dev
+        )
         + q_ovlp * prop.nuclear_repulsion
     )
 
     # update the walker
     x = np.random.normal(0.0, 1.0, size=num_fields)
-    new_walker = propagate_walker(x, prop.v_0, prop.v_gamma, prop.mf_shift, dtau, trial, walker, G)
+    new_walker = propagate_walker(
+        x, prop.v_0, prop.v_gamma, prop.mf_shift, dtau, trial, walker, green_funcs
+    )
 
     # Define the I operator and find new weight
     new_ovlp = np.linalg.det(trial.transpose().conj() @ new_walker)
     arg = np.angle(new_ovlp / ovlp)
-    new_weight = weight * np.exp(-dtau * (np.real(E_loc) - E_shift)) * np.max([0.0, np.cos(arg)])
+    new_weight = weight * np.exp(-dtau * (np.real(e_loc) - e_shift)) * np.max([0.0, np.cos(arg)])
 
-    numerator = E_loc_q / c_ovlp
+    numerator = e_loc_q / c_ovlp
     denominator = q_ovlp / c_ovlp
-    return E_loc, numerator, denominator, new_walker, new_weight
+    return e_loc, numerator, denominator, new_walker, new_weight
 
 
 def local_energy_quantum(  # noqa: C901
@@ -214,8 +218,8 @@ def local_energy_quantum(  # noqa: C901
     ovlp: float,
     one_body: np.ndarray,
     lambda_l: np.ndarray,
-    U_l: np.ndarray,
-    V_T: Callable,
+    u_l: np.ndarray,
+    trial_state_circuit: Callable,
     dev: qml.device,
 ) -> complex:
     r"""This function estimates the integral $\\langle \\Psi_Q|H|\\phi_l\rangle$ with rotated basis.
@@ -228,8 +232,8 @@ def local_energy_quantum(  # noqa: C901
             written in chemist's notation. This term is assumed to be diagonal in the current
             implementation, but should be rather straight forward to generalize if it's not.
         lambda_l (ndarray): eigenvalues of Cholesky vectors
-        U_l (ndarray): eigenvectors of Cholesky vectors
-        V_T (Callable): quantum trial state
+        u_l (ndarray): eigenvectors of Cholesky vectors
+        trial_state_circuit (Callable): quantum trial state
         dev (qml.device): `qml.device('lightning.qubit', wires=wires)` for simulator;
             or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
             for quantum device;
@@ -244,25 +248,27 @@ def local_energy_quantum(  # noqa: C901
     Id = np.identity(num_qubits)
     dictionary = {}
     for i in range(num_qubits):
-        dictionary[i] = pauli_estimate(walker, V_T, Id, [i], dev)
+        dictionary[i] = pauli_estimate(walker, trial_state_circuit, Id, [i], dev)
         for j in range(i + 1, num_qubits):
-            dictionary[(i, j)] = pauli_estimate(walker, V_T, Id, [i, j], dev)
+            dictionary[(i, j)] = pauli_estimate(walker, trial_state_circuit, Id, [i, j], dev)
 
     for i in range(num_qubits):
         expectation_value = 0.5 * (ovlp - dictionary.get(i))
         energy += one_body[i, i] * expectation_value
 
     # Cholesky decomposed two-body term
-    for lamb, U in zip(lambda_l, U_l):
+    for lamb, u_matrix in zip(lambda_l, u_l):
         # define a dictionary to store all the expectation values
-        if np.count_nonzero(np.round(U - np.diag(np.diagonal(U)), 7)) == 0:
+        if np.count_nonzero(np.round(u_matrix - np.diag(np.diagonal(u_matrix)), 7)) == 0:
             new_dict = dictionary
         else:
             new_dict = {}
             for i in range(num_qubits):
-                new_dict[i] = pauli_estimate(walker, V_T, U, [i], dev)
+                new_dict[i] = pauli_estimate(walker, trial_state_circuit, u_matrix, [i], dev)
                 for j in range(i, num_qubits):
-                    new_dict[(i, j)] = pauli_estimate(walker, V_T, U, [i, j], dev)
+                    new_dict[(i, j)] = pauli_estimate(
+                        walker, trial_state_circuit, u_matrix, [i, j], dev
+                    )
 
         for i in range(num_qubits):
             for j in range(i, num_qubits):
@@ -309,21 +315,21 @@ def prepare_slater_circuit(circuit_description: List[Tuple]) -> None:
             qml.adjoint(givens_block_circuit)(givens)
 
 
-def circuit_first_half(Q: np.ndarray) -> None:
+def circuit_first_half(q_state: np.ndarray) -> None:
     """Construct the first half of the vacuum reference circuit.
 
     Args:
-        Q (ndarray): orthonormalized walker state
+        q_state (ndarray): orthonormalized walker state
     """
-    num_qubits, num_particles = Q.shape
+    num_qubits, num_particles = q_state.shape
     qml.Hadamard(wires=0)
 
     for i in range(1, num_particles):
         qml.CNOT(wires=[0, i])
 
     complement = np.ones((num_qubits, num_qubits - num_particles))
-    W, _ = reortho(np.hstack((Q, complement)))
-    decomposition, diagonal = givens_decomposition_square(W.T)
+    w_matrix, _ = reortho(np.hstack((q_state, complement)))
+    decomposition, diagonal = givens_decomposition_square(w_matrix.T)
     circuit_description = list(reversed(decomposition))
 
     for i in range(len(diagonal)):
@@ -332,29 +338,29 @@ def circuit_first_half(Q: np.ndarray) -> None:
     prepare_slater_circuit(circuit_description)
 
 
-def circuit_second_half_real(Q: np.ndarray, V_T: Callable) -> None:
+def circuit_second_half_real(q_state: np.ndarray, trial_state_circuit: Callable) -> None:
     """Construct the second half of the vacuum reference circuit (for real expectation values)
 
     Args:
-        Q (ndarray): orthonormalized walker state
-        V_T (Callable): quantum trial state
+        q_state (ndarray): orthonormalized walker state
+        trial_state_circuit (Callable): quantum trial state
     """
-    num_qubits, num_particles = Q.shape
-    qml.adjoint(V_T)()
+    num_qubits, num_particles = q_state.shape
+    qml.adjoint(trial_state_circuit)()
 
     for i in range(1, num_particles)[::-1]:
         qml.CNOT(wires=[0, i])
     qml.Hadamard(wires=0)
 
 
-def circuit_second_half_imag(Q: np.ndarray, V_T: Callable) -> None:
+def circuit_second_half_imag(q_state: np.ndarray, trial_state_circuit: Callable) -> None:
     """Construct the second half of the vacuum reference circuit (for imaginary expectation values)
     Args:
-        Q (ndarray): orthonormalized walker state
-        V_T (Callable): quantum trial state
+        q_state (ndarray): orthonormalized walker state
+        trial_state_circuit (Callable): quantum trial state
     """
-    num_qubits, num_particles = Q.shape
-    qml.adjoint(V_T)()
+    num_qubits, num_particles = q_state.shape
+    qml.adjoint(trial_state_circuit)()
 
     for i in range(1, num_particles)[::-1]:
         qml.CNOT(wires=[0, i])
@@ -365,67 +371,69 @@ def circuit_second_half_imag(Q: np.ndarray, V_T: Callable) -> None:
     qml.Hadamard(wires=0)
 
 
-def amplitude_real(Q: np.ndarray, V_T: Callable) -> None:
+def amplitude_real(q_state: np.ndarray, trial_state_circuit: Callable) -> None:
     """Construct the the vacuum reference circuit for measuring amplitude real part
     Args:
-        Q (ndarray): orthonormalized walker state
-        V_T (Callable): quantum trial state
+        q_state (ndarray): orthonormalized walker state
+        trial_state_circuit (Callable): quantum trial state
     """
-    circuit_first_half(Q)
-    circuit_second_half_real(Q, V_T)
+    circuit_first_half(q_state)
+    circuit_second_half_real(q_state, trial_state_circuit)
 
 
-def amplitude_imag(Q: np.ndarray, V_T: Callable) -> None:
+def amplitude_imag(q_state: np.ndarray, trial_state_circuit: Callable) -> None:
     """Construct the the vacuum reference circuit for measuring amplitude imaginary part
     Args:
-        Q (ndarray): orthonormalized walker state
-        V_T (Callable): quantum trial state
+        q_state (ndarray): orthonormalized walker state
+        trial_state_circuit (Callable): quantum trial state
     """
-    circuit_first_half(Q)
-    circuit_second_half_imag(Q, V_T)
+    circuit_first_half(q_state)
+    circuit_second_half_imag(q_state, trial_state_circuit)
 
 
-def amplitude_estimate(Q: np.ndarray, V_T: Callable, dev: qml.device) -> np.complex128:
+def amplitude_estimate(
+    q_state: np.ndarray, trial_state_circuit: Callable, dev: qml.device
+) -> np.complex128:
     """This function computes the amplitude between walker state and quantum trial state.
 
     Args:
-        Q (ndarray): orthonormalized walker state
-        V_T (Callable): quantum trial state
+        q_state (ndarray): orthonormalized walker state
+        trial_state_circuit (Callable): quantum trial state
         dev (qml.device): `qml.device('lightning.qubit', wires=wires)` for simulator;
             or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
             for quantum device;
     Returns:
         complex128: amplitude
     """
-    num_qubits, num_particles = Q.shape
+    num_qubits, num_particles = q_state.shape
 
     @qml.qnode(dev, interface=None, diff_method=None)
-    def __compute_real(Q, V_T):
-        amplitude_real(Q, V_T)
+    def __compute_real(q_state, trial_state_circuit):
+        amplitude_real(q_state, trial_state_circuit)
         return qml.probs(range(num_qubits))
 
-    probs_values = __compute_real(Q, V_T)
+    probs_values = __compute_real(q_state, trial_state_circuit)
     real = probs_values[0] - probs_values[int(2**num_qubits / 2)]
 
     @qml.qnode(dev, interface=None, diff_method=None)
-    def __compute_imag(Q, V_T):
-        amplitude_imag(Q, V_T)
+    def __compute_imag(q_state, trial_state_circuit):
+        amplitude_imag(q_state, trial_state_circuit)
         return qml.probs(range(num_qubits))
 
-    probs_values = __compute_imag(Q, V_T)
+    probs_values = __compute_imag(q_state, trial_state_circuit)
     imag = probs_values[0] - probs_values[int(2**num_qubits / 2)]
 
     return real + 1.0j * imag
 
 
-def U_circuit(U: np.ndarray) -> None:
+def u_circuit(u_matrix: np.ndarray) -> None:
     """Construct circuit to perform unitary transformation U.
 
     Args:
-        U (ndarray): unitary
+        u_matrix (ndarray): unitary
     """
 
-    decomposition, diagonal = givens_decomposition_square(U)
+    decomposition, diagonal = givens_decomposition_square(u_matrix)
     circuit_description = list(reversed(decomposition))
 
     for i in range(len(diagonal)):
@@ -435,61 +443,69 @@ def U_circuit(U: np.ndarray) -> None:
         prepare_slater_circuit(circuit_description)
 
 
-def pauli_real(Q: np.ndarray, V_T: Callable, U: np.ndarray, pauli: List[int]) -> Callable:
+def pauli_real(
+    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: List[int]
+) -> Callable:
     """Construct the the vacuum reference circuit for measuring expectation value
         of a pauli real part
     Args:
-        Q (ndarray): orthonormalized walker state
-        V_T (Callable): quantum trial state
-        U (ndarray): unitary transformation to change the Pauli into Z basis
+        q_state (ndarray): orthonormalized walker state
+        trial_state_circuit (Callable): quantum trial state
+        u_matrix (ndarray): unitary transformation to change the Pauli into Z basis
         pauli (List[int]): list that stores the position of the Z gate, e.g., [0,1]
             represents 'ZZII'.
 
     Returns:
         Callable: pennylane circuit
     """
-    circuit_first_half(Q)
+    circuit_first_half(q_state)
 
-    U_circuit(U)
+    u_circuit(u_matrix)
     for i in pauli:
         qml.PauliZ(wires=i)
 
-    qml.adjoint(U_circuit)(U)
-    circuit_second_half_real(Q, V_T)
+    qml.adjoint(u_circuit)(u_matrix)
+    circuit_second_half_real(q_state, trial_state_circuit)
 
 
-def pauli_imag(Q: np.ndarray, V_T: Callable, U: np.ndarray, pauli: List[int]) -> Callable:
+def pauli_imag(
+    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: List[int]
+) -> Callable:
     """Construct the the vacuum reference circuit for measuring expectation value
         of a pauli imaginary part
     Args:
-        Q (ndarray): orthonormalized walker state
-        V_T (Callable): quantum trial state
-        U (ndarray): unitary transformation to change the Pauli into Z basis
+        q_state (ndarray): orthonormalized walker state
+        trial_state_circuit (Callable): quantum trial state
+        u_matrix (ndarray): unitary transformation to change the Pauli into Z basis
         pauli (List[int]): list that stores the position of the Z gate, e.g., [0,1]
             represents 'ZZII'.
 
     Returns:
         Callable: pennylane circuit
     """
-    circuit_first_half(Q)
+    circuit_first_half(q_state)
 
-    U_circuit(U)
+    u_circuit(u_matrix)
     for i in pauli:
         qml.PauliZ(wires=i)
 
-    qml.adjoint(U_circuit)(U)
-    circuit_second_half_imag(Q, V_T)
+    qml.adjoint(u_circuit)(u_matrix)
+    circuit_second_half_imag(q_state, trial_state_circuit)
 
 
 def pauli_estimate(
-    Q: np.ndarray, V_T: Callable, U: np.ndarray, pauli: List[int], dev: qml.device
+    q_state: np.ndarray,
+    trial_state_circuit: Callable,
+    u_matrix: np.ndarray,
+    pauli: List[int],
+    dev: qml.device,
 ) -> float:
-    """This function returns the expectation value of $\\langle \\Psi_Q|pauli|\\phi_l\rangle$.
+    """This function returns the expectation value of $\\langle \\Psi_q_state|pauli|\\phi_l\rangle$.
     Args:
-        Q (ndarray): np.ndarray; matrix representation of the walker state, not necessarily
+        q_state (ndarray): np.ndarray; matrix representation of the walker state, not necessarily
             orthonormalized.
-        V_T (Callable): circuit unitary to prepare the quantum trial state
-        U (ndarray): eigenvector of Cholesky vectors, $L = U \\lambda U^{\\dagger}$
+        trial_state_circuit (Callable): circuit unitary to prepare the quantum trial state
+        u_matrix (ndarray): eigenvector of Cholesky vectors, $L = U \\lambda U^{\\dagger}$
         pauli (List[int]): list of 0 and 1 as the representation of a Pauli string,
             e.g., [0,1] represents 'ZZII'.
         dev (qml.device): `qml.device('lightning.qubit', wires=wires)` for simulator;
@@ -499,22 +515,22 @@ def pauli_estimate(
     Returns:
         float: expectation value
     """
-    num_qubits, num_particles = Q.shape
+    num_qubits, num_particles = q_state.shape
 
     @qml.qnode(dev, interface=None, diff_method=None)
-    def __compute_real(Q, V_T, U, pauli):
-        pauli_real(Q, V_T, U, pauli)
+    def __compute_real(q_state, trial_state_circuit, u_matrix, pauli):
+        pauli_real(q_state, trial_state_circuit, u_matrix, pauli)
         return qml.probs(range(num_qubits))
 
-    probs_values = __compute_real(Q, V_T, U, pauli)
+    probs_values = __compute_real(q_state, trial_state_circuit, u_matrix, pauli)
     real = probs_values[0] - probs_values[int(2**num_qubits / 2)]
 
     @qml.qnode(dev, interface=None, diff_method=None)
-    def __compute_real(Q, V_T, U, pauli):
-        pauli_imag(Q, V_T, U, pauli)
+    def __compute_real(q_state, trial_state_circuit, u_matrix, pauli):
+        pauli_imag(q_state, trial_state_circuit, u_matrix, pauli)
         return qml.probs(range(num_qubits))
 
-    probs_values = __compute_real(Q, V_T, U, pauli)
+    probs_values = __compute_real(q_state, trial_state_circuit, u_matrix, pauli)
     imag = probs_values[0] - probs_values[int(2**num_qubits / 2)]
 
     return real + 1.0j * imag
