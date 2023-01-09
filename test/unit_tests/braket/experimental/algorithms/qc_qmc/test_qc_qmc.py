@@ -123,7 +123,7 @@ def test_q_full_imag_time_evolution(qmc_data):
 def test_classical_qmc(qmc_data):
     trial, prop, dev, e_hf = qmc_data
     num_steps = 4
-    num_walkers = 15
+    num_walkers = 50
 
     # Start QMC computation
     local_energies, energies = classical_qmc(
