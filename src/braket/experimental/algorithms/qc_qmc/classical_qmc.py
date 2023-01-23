@@ -17,8 +17,8 @@ class ChemicalProperties:
     nuclear_repulsion: float  # nuclear repulsion energy
     v_0: np.ndarray  # one-body term stored as np.ndarray with mean-field subtraction
     h_chem: np.ndarray  # one-body term stored as np.ndarray, without mean-field subtraction
-    v_gamma: List[np.ndarray]  # 1j * L_gamma
-    L_gamma: List[np.ndarray]  # Cholesky vector decomposed from two-body terms
+    v_gamma: List[np.ndarray]  # 1j * l_gamma
+    l_gamma: List[np.ndarray]  # Cholesky vector decomposed from two-body terms
     mf_shift: np.ndarray  # mean-field shift
     lambda_l: List[np.ndarray]  # eigenvalues of Cholesky vectors
     u_l: List[np.ndarray]  # eigenvectors of Cholesky vectors
@@ -252,8 +252,8 @@ def chemistry_preparation(
         ChemicalProperties: chemical properties
         v_0: one-body term stored as np.ndarray, with mean-field subtraction
         h_chem: one-body term stored as np.ndarray, without mean-field subtraction
-        v_gamma: 1.j*L_gamma
-        L_gamma: Cholesky vector decomposed from two-body terms
+        v_gamma: 1.j*l_gamma
+        l_gamma: Cholesky vector decomposed from two-body terms
         mf_shift: mean-field shift
         nuclear_repulsion: nuclear repulsion constant
     """
@@ -273,7 +273,7 @@ def chemistry_preparation(
     h_chem = copy.deepcopy(v_0)
     num_spin_orbitals = int(h_chem.shape[0])
 
-    L_gamma = [np.sqrt(i) * j for i, j in zip(lamb, g)]
+    l_gamma = [np.sqrt(i) * j for i, j in zip(lamb, g)]
     v_gamma = [1.0j * np.sqrt(i) * j for i, j in zip(lamb, g)]
 
     trial_up = trial[::2, ::2]
@@ -293,7 +293,7 @@ def chemistry_preparation(
 
     lambda_l = []
     u_l = []
-    for i in L_gamma:
+    for i in l_gamma:
         if np.count_nonzero(np.round(i - np.diag(np.diagonal(i)), 7)) != 0:
             eigval, eigvec = np.linalg.eigh(i)
             lambda_l.append(eigval)
@@ -303,7 +303,7 @@ def chemistry_preparation(
             u_l.append(np.eye(num_spin_orbitals))
 
     return ChemicalProperties(
-        h1e, eri, nuclear_repulsion, v_0, h_chem, v_gamma, L_gamma, mf_shift, lambda_l, u_l
+        h1e, eri, nuclear_repulsion, v_0, h_chem, v_gamma, l_gamma, mf_shift, lambda_l, u_l
     )
 
 
