@@ -11,9 +11,8 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-"""Version information.
-
-Version number (major.minor.patch[-label])
-"""
-
-__version__ = "0.1.3.dev0"
+from braket.experimental.algorithms.chsh_inequality.chsh_inequality import (  # noqa: F401
+    create_chsh_inequality_circuits,
+    get_chsh_results,
+    run_chsh_inequality,
+)

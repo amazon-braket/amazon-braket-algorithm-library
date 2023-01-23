@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.2 (2023-01-18)
+
+### Bug Fixes and Other Changes
+
+ * update: updating for Aspen-M3
+ * update: change for Aspen M-3.
+
+## v0.1.1 (2022-12-13)
+
+### Bug Fixes and Other Changes
+
+ * CSHS_Inequality
+
 ## v0.1.0 (2022-12-05)
 
 ### Features
@@ -159,4 +172,3 @@
  * notebook text cleanup and md file cleanup
  * fix shots comment
  * update contributing guidelines for new notebook location
-
