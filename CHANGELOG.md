@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.3 (2023-01-24)
+
+### Bug Fixes and Other Changes
+
+ * QC-QMC chemistry
+
 ## v0.1.2 (2023-01-18)
 
 ### Bug Fixes and Other Changes
