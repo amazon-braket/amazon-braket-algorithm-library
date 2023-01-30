@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.2 (2023-01-30)
+
+### Bug Fixes and Other Changes
+
+ * chore: update GH actions for node v16
+ * chore: update GH actions for node v16
+
 ## v0.1.3 (2023-01-24)
 
 ### Bug Fixes and Other Changes
