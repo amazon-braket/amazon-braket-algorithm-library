@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.3 (2023-01-31)
+
+### Bug Fixes and Other Changes
+
+ * update dependencies for NBI Build
+ * update dependencies for NBI Build
+
 ## v1.1.2 (2023-01-30)
 
 ### Bug Fixes and Other Changes
