@@ -27,10 +27,9 @@ setup(
     packages=find_namespace_packages(where="src", exclude=("test",)),
     package_dir={"": "src"},
     install_requires=[
-        "amazon-braket-sdk",
-        "sympy",
-        "scipy>=1.5.3",
-        "pennylane<=0.27.0",
+        "amazon-braket-sdk>=1.35.1",
+        "scipy>=1.5.2",
+        "pennylane>=0.25.1,<=0.27.0",
         "openfermion==1.0.0",
     ],
     extras_require={
