@@ -27,9 +27,9 @@ from braket.experimental.algorithms.bells_inequality.bells_inequality import (
 def create_chsh_inequality_circuits(
     qubit0: Qubit = 0,
     qubit1: Qubit = 1,
+    a1: float = np.pi / 2,
     a2: float = 0,
     b1: float = np.pi / 4,
-    a1: float = np.pi / 2,
     b2: float = 3 * np.pi / 4,
 ) -> List[Circuit]:
     """Create the four circuits for CHSH inequality. Default angles will give maximum violation of
@@ -39,9 +39,9 @@ def create_chsh_inequality_circuits(
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
         a1 (float): First basis rotation angle for first qubit
+        a2 (float): Second basis rotation angle for first qubit
         b1 (float): First basis rotation angle for second qubit
         b2 (float): Second basis rotation angle for second qubit
-        a2 (float): Second basis rotation angle for first qubit
 
     Returns:
         List[Circuit]: List of quantum circuits.
@@ -58,7 +58,6 @@ def run_chsh_inequality(
     device: Device,
     shots: int = 1_000,
 ) -> List[QuantumTask]:
-
     """Submit four CHSH circuits to a device.
 
     Args:

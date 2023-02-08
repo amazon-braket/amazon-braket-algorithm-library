@@ -51,7 +51,6 @@ def run_bell_inequality(
     device: Device,
     shots: int = 1_000,
 ) -> List[QuantumTask]:
-
     """Submit three Bell circuits to a device.
 
     Args:

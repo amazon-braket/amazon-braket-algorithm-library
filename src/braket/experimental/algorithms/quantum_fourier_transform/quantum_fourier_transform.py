@@ -89,7 +89,6 @@ def inverse_quantum_fourier_transform_circuit(num_qubits: int) -> Circuit:
 
     # Start on the last qubit and work to the first.
     for k in reversed(range(num_qubits)):
-
         # Apply the controlled rotations, with weights (angles) defined by the distance
         # to the control qubit. # These angles are the negative of the angle used in the QFT.
         # Start on the last qubit and iterate until the qubit after k.
