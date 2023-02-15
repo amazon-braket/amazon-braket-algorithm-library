@@ -27,6 +27,7 @@ from braket.experimental.algorithms.bells_inequality.bells_inequality import (
 def create_chsh_inequality_circuits(
     qubit0: Qubit = 0,
     qubit1: Qubit = 1,
+    *,
     a1: float = np.pi / 2,
     a2: float = 0,
     b1: float = np.pi / 4,
