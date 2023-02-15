@@ -1,6 +1,8 @@
 # Amazon Braket Algorithm Library
 The Braket Algorithm Library provides Amazon Braket customers with pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
 
+[![Build](https://github.com/aws-samples/amazon-braket-algorithm-library/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/aws-samples/amazon-braket-algorithm-library/actions/workflows/python-package.yml)
+
 ---
 Currently, Braket algorithms are tested on Linux, Windows, and Mac.
 
