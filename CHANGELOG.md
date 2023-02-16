@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.4 (2023-02-16)
+
+### Bug Fixes and Other Changes
+
+ * Add forced keyword args
+ * reformatting from tox
+ * add python 10 support
+
+### Testing and Release Infrastructure
+
+ * support python10 for workflows
+
 ## v1.1.3 (2023-01-31)
 
 ### Bug Fixes and Other Changes
