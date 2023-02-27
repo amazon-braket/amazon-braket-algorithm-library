@@ -2,6 +2,7 @@ The quantum walk is very similar to the classical walk, where a walker observes 
 
 <!--
 [metadata-name]: Quantum Walk
+[metadata-tags]: Textbook
 [metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/quantum_walk
 -->
 

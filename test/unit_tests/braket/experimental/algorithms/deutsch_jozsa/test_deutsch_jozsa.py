@@ -25,8 +25,9 @@ from braket.experimental.algorithms.deutsch_jozsa import (
 
 
 def test_constant_oracle_circuit():
-    circ = constant_oracle(3)
-    assert circ.qubit_count == 4
+    for i in range(1, 10):
+        circ = constant_oracle(i)
+        assert circ.qubit_count == i + 1
 
 
 @pytest.mark.xfail(raises=ValueError)
@@ -35,8 +36,9 @@ def test_fail_constant_oracle_circuit():
 
 
 def test_balanced_oracle_circuit():
-    circ = balanced_oracle(3)
-    assert circ.qubit_count == 4
+    for i in range(1, 10):
+        circ = balanced_oracle(i)
+        assert circ.qubit_count == i + 1
 
 
 @pytest.mark.xfail(raises=ValueError)

@@ -14,6 +14,7 @@
 
 import math
 
+import numpy as np
 from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
@@ -44,6 +45,17 @@ def test_singlet_rotated():
     assert circ == expected
 
 
+def test_bell_inequality_not_verbose():
+    circs = create_bell_inequality_circuits(0, 1)
+    assert len(circs) == 3
+    tasks = run_bell_inequality(circs, LocalSimulator(), shots=0)
+    results, pAB, pAC, pBC = get_bell_inequality_results(tasks, verbose=False)
+    assert math.isclose(pAB, -0.5)
+    assert math.isclose(pBC, -0.5)
+    assert math.isclose(pAC, 0.5)
+    assert len(results) == 3
+
+
 def test_bell_inequality_shots_0():
     circs = create_bell_inequality_circuits(0, 1)
     assert len(circs) == 3
@@ -52,6 +64,17 @@ def test_bell_inequality_shots_0():
     assert math.isclose(pAB, -0.5)
     assert math.isclose(pBC, -0.5)
     assert math.isclose(pAC, 0.5)
+    assert len(results) == 3
+
+
+def test_bell_inequality_not_violated():
+    angle_A: float = 1
+    angle_B: float = 2 * np.pi
+    angle_C: float = np.pi / 3
+    circs = create_bell_inequality_circuits(0, 1, angle_A, angle_B, angle_C)
+    assert len(circs) == 3
+    tasks = run_bell_inequality(circs, LocalSimulator(), shots=0)
+    results, pAB, pAC, pBC = get_bell_inequality_results(tasks)
     assert len(results) == 3
 
 

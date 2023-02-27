@@ -3,7 +3,7 @@ from typing import Tuple
 from braket.circuits import Circuit, circuit
 
 
-def grover_search(
+def grovers_search(
     oracle: Circuit, n_qubits: int, n_reps: int = 1, decompose_ccnot: bool = False
 ) -> Circuit:
     """Generate Grover's circuit for a target solution and oracle.
@@ -100,7 +100,7 @@ def multi_control_not_constructor(
     decompose_ccnot: bool,
     is_outermost_call: bool = True,
 ) -> Tuple[Circuit, int]:
-    """Recusive constructor of a multi-contol Not circuit (generalized Toffoli gate).
+    """Recursive constructor of a multi-contol Not circuit (generalized Toffoli gate).
     Ref: https://arxiv.org/abs/1904.01671
 
     Args:
