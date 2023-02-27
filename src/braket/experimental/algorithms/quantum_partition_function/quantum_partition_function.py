@@ -24,8 +24,8 @@ def quantum_partition_function(
     qubits: List[int],
 ) -> Circuit:
     """Creates two kinds of circuits for quantum partition function:
-      1) The shor's algorithm for irreducible cyclic cocycle code (ICCC)-check
-      2) The quantum fourier transformation circuit for checking gamma values
+      1) Shor's algorithm for irreducible cyclic cocycle code (ICCC)-check
+      2) The quantum Fourier transformation circuit for checking gamma values
 
     Args:
         function (str): Define the function of this circuit, it can be 'shor' or 'qft'
@@ -38,10 +38,10 @@ def quantum_partition_function(
     circuit = None
 
     if function == "shor":
-        print("shor's algorithm for iccc-check hasn't been implemented!")
+        print("Shor's algorithm for iccc-check hasn't been implemented!")
     elif function == "qft":
-        print("qft circuit for checking gamma values")
-        circuit = _quantum_fourier_transform(qubits)
+        print("QFT circuit for checking gamma values")
+        circuit = _quantum_Fourier_transform(qubits)
     else:
         raise ValueError(
             f"Wrong function value {function}, can only be one \
@@ -52,7 +52,7 @@ def quantum_partition_function(
 
 
 @circuit.subroutine(register=True)
-def _quantum_fourier_transform(
+def _quantum_Fourier_transform(
     qft_qubits: List[int],
 ) -> Circuit:
     """
@@ -95,9 +95,9 @@ def run_quantum_partition_function(
         potts_model (dict): Dictionary to save the results of Potts model:
             'graph-model': networkx graph to save the definition of potts model
             'q-state': q-state of potts model
-            'qft-func': dictionary to save information for quantum fourier transform function
-                'task': braket task for quantum fourier transform
-                'circuit': circuit for quantum fourier transform
+            'qft-func': dictionary to save information for quantum Fourier transform function
+                'task': braket task for quantum Fourier transform
+                'circuit': circuit for quantum Fourier transform
                 'param': dictionary for running circuit
                     'shots': shots for running device
                     'device': device for running device
@@ -171,7 +171,7 @@ def run_quantum_partition_function(
     else:
         raise ValueError(
             f"Wrong step value {step}, can only be one \
-                        of pre,ICCC-check,qft and post"
+                        of pre,iccc-check,qft and post"
         )
 
     return out
@@ -185,9 +185,9 @@ def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
         potts_model (dict): Dictionary to save the results of Potts model:
             'graph-model': networkx graph to save the definition of potts model
             'q-state': q-state of potts model
-            'qft-func': dictionary to save information for quantum fourier transform function
-                'task': braket task for quantum fourier transform
-                'circuit': circuit for quantum fourier transform
+            'qft-func': dictionary to save information for quantum Fourier transform function
+                'task': braket task for quantum Fourier transform
+                'circuit': circuit for quantum Fourier transform
                 'param': dictionary for running circuit
                     'shots': shots for running device
                     'device': device for running device
