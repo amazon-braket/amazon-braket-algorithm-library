@@ -92,9 +92,9 @@ def run_quantum_partition_function(
     """Function to run Quantum partition function algorithm and return measurement counts.
 
     Args:
-        potts_model (dict): Dictionary to save the results of Potts model:
-            'graph-model': networkx graph to save the definition of potts model
-            'q-state': q-state of potts model
+        potts_model (dict): Dictionary to save the results of the graphical model form - Potts model:
+            'graph-model': networkx graph to save the definition of Potts model
+            'q-state': q-state of Potts model
             'qft-func': dictionary to save information for quantum Fourier transform function
                 'task': braket task for quantum Fourier transform
                 'circuit': circuit for quantum Fourier transform
@@ -127,7 +127,7 @@ def run_quantum_partition_function(
     elif step == "iccc-check":
         print("Irreducible Cyclic Cocycle Code Check")
         if "nk-code" not in potts_model.keys():
-            raise KeyError("no nk-code found in potts_model, please run pre-process step!")
+            raise KeyError("no nk-code found in Potts model, please run pre-process step!")
         Ga = potts_model["graph-model"]
         # TODO: Add shor algorithm to check ICCC
         N = len(Ga.nodes)
@@ -143,12 +143,12 @@ def run_quantum_partition_function(
     elif step == "qft":
         print("State Preparation and Quantum Fourier Transform")
         if "iccc-check" not in potts_model.keys():
-            raise KeyError("no iccc-check found in potts_model, please run ICCC-check step!")
+            raise KeyError("no iccc-check found in Potts model, please run ICCC-check step!")
         check_result = potts_model["iccc-check"]
         assert check_result is True, "ICCC check didn't pass, no efficient quantum alogrithm!"
 
         if "qft-func" not in potts_model.keys():
-            raise KeyError("no qft-func found in potts_model, please generate circuit!")
+            raise KeyError("no qft-func found in Potts model, please generate circuit!")
 
         qft_circuit = potts_model["qft-func"]["circuit"]
         # Add desired results_types
@@ -183,10 +183,10 @@ def get_quantum_partition_function_results(potts_model: Dict[str, Any]) -> None:
 
     Args:
         potts_model (dict): Dictionary to save the results of Potts model:
-            'graph-model': networkx graph to save the definition of potts model
-            'q-state': q-state of potts model
+            'graph-model': networkx graph to save the definition of Potts model
+            'q-state': q-state of Potts model
             'qft-func': dictionary to save information for quantum Fourier transform function
-                'task': braket task for quantum Fourier transform
+                'task': Amazon Braket task for quantum Fourier transform
                 'circuit': circuit for quantum Fourier transform
                 'param': dictionary for running circuit
                     'shots': shots for running device
