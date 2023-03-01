@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.5 (2023-03-01)
+
+### Bug Fixes and Other Changes
+
+ * Merge pull request #91 from aws-samples/typoqaoa
+ * typo in QAOA
+
 ## v1.1.4 (2023-02-16)
 
 ### Bug Fixes and Other Changes
