@@ -31,6 +31,8 @@ setup(
         "scipy>=1.5.2",
         "pennylane>=0.25.1,<=0.27.0",
         "openfermion==1.0.0",
+        # https://github.com/PennyLaneAI/pennylane/issues/3867
+        "autoray==0.6.0",
     ],
     extras_require={
         "test": [
