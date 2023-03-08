@@ -39,10 +39,10 @@ def create_chsh_inequality_circuits(
     Args:
         qubit0 (Qubit): First qubit.
         qubit1 (Qubit): Second qubit.
-        a1 (float): First basis rotation angle for first qubit
-        a2 (float): Second basis rotation angle for first qubit
-        b1 (float): First basis rotation angle for second qubit
-        b2 (float): Second basis rotation angle for second qubit
+        a1 (float): First basis rotation angle for first qubit.
+        a2 (float): Second basis rotation angle for first qubit.
+        b1 (float): First basis rotation angle for second qubit.
+        b2 (float): Second basis rotation angle for second qubit.
 
     Returns:
         List[Circuit]: List of quantum circuits.
