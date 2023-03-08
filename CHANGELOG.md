@@ -1,5 +1,30 @@
 # Changelog
 
+## v1.2.0 (2023-03-06)
+
+### Features
+
+ * deprecate python 3.7
+
+## v1.1.5 (2023-03-01)
+
+### Bug Fixes and Other Changes
+
+ * Merge pull request #91 from aws-samples/typoqaoa
+ * typo in QAOA
+
+## v1.1.4 (2023-02-16)
+
+### Bug Fixes and Other Changes
+
+ * Add forced keyword args
+ * reformatting from tox
+ * add python 10 support
+
+### Testing and Release Infrastructure
+
+ * support python10 for workflows
+
 ## v1.1.3 (2023-01-31)
 
 ### Bug Fixes and Other Changes
