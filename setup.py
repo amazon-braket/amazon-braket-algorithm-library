@@ -29,10 +29,8 @@ setup(
     install_requires=[
         "amazon-braket-sdk>=1.35.1",
         "scipy>=1.5.2",
-        "pennylane>=0.25.1,<=0.27.0",
+        "pennylane>=0.29.1",
         "openfermion==1.0.0",
-        # https://github.com/PennyLaneAI/pennylane/issues/3867
-        "autoray==0.6.0",
     ],
     extras_require={
         "test": [
