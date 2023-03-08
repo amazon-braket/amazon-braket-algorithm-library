@@ -37,7 +37,9 @@ def test_chsh_reduces_to_bell():
 def test_chsh_reduces_to_bell_not_verbose():
     circuits = create_chsh_inequality_circuits(0, 1, a1=(np.pi / 3), a2=0, b1=0, b2=(2 * np.pi / 3))
     local_tasks = run_chsh_inequality(circuits, LocalSimulator(), shots=0)
-    chsh_value, results, E_a1b1, E_a1b2, E_a2b1, E_a2b2 = get_chsh_results(local_tasks, verbose=False)
+    chsh_value, results, E_a1b1, E_a1b2, E_a2b1, E_a2b2 = get_chsh_results(
+        local_tasks, verbose=False
+    )
     assert np.isclose(E_a1b1, -0.5)
     assert np.isclose(E_a1b2, -0.5)
     assert np.isclose(E_a2b1, -1)
@@ -47,9 +49,7 @@ def test_chsh_reduces_to_bell_not_verbose():
 
 
 def test_chsh_no_violation():
-    circuits = create_chsh_inequality_circuits(
-        0, 1, a1=0, a2=0, b1=0, b2=0
-    )
+    circuits = create_chsh_inequality_circuits(0, 1, a1=0, a2=0, b1=0, b2=0)
     local_tasks = run_chsh_inequality(circuits, LocalSimulator(), shots=0)
     chsh_value, results, E_a1b1, E_a1b2, E_a2b1, E_a2b2 = get_chsh_results(local_tasks)
     assert np.isclose(E_a1b1, -1)
