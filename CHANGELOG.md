@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.0 (2023-03-06)
+
+### Features
+
+ * deprecate python 3.7
+
 ## v1.1.5 (2023-03-01)
 
 ### Bug Fixes and Other Changes
