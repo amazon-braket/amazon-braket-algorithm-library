@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.2.1 (2023-03-09)
+
+### Bug Fixes and Other Changes
+
+ * raise the PennyLane version to >=0.29.1
+ * raise the PennyLane version to >=0.29.1
+
 ## v1.2.0 (2023-03-06)
 
 ### Features
