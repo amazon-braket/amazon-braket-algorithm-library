@@ -12,6 +12,7 @@ We expect algorithms to be built on top of the [Amazon Braket SDK](https://githu
 Please ensure that
 1. Your algorithm is added as functional source code [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms)
 2. Add tests for your new code [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/test/unit_tests/braket/experimental/algorithms)
+3. You illustrate use of the algorithm in a simple python notebook [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/notebooks)
 
 ## Reporting Bugs/Feature Requests
 
