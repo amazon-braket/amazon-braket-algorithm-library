@@ -32,7 +32,7 @@ If you are new to Amazon Braket, onboard to the service and create the resources
 
 ### Issues and Bug Reports
 
-If you encounter bugs or face issues while using the SDK, please let us know by posting 
+If you encounter bugs or face issues while using the algorithm library, please let us know by posting 
 the issue on our [Github issue tracker](https://github.com/aws-samples/amazon-braket-algorithm-library/issues).  
 For other issues or general questions, please ask on the [Quantum Computing Stack Exchange](https://quantumcomputing.stackexchange.com/questions/ask) and add the tag amazon-braket.
 
