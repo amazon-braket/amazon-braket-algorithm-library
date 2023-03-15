@@ -7,7 +7,7 @@ Please read through this document before submitting any issues or pull requests 
 information to effectively respond to your bug report or contribution.
 
 ## Adding a New Algorithm
-We expect algorithms to be built on top of [the Braket SDK](https://github.com/aws/amazon-braket-sdk-python) to provide a unified user experience and to give us a single contract to test against.
+We expect algorithms to be built on top of the [Amazon Braket SDK](https://github.com/aws/amazon-braket-sdk-python) to provide a unified user experience and to give us a single contract to test against.
 
 Please ensure that
 1. Your algorithm is added as functional source code [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms)
