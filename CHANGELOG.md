@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2.2 (2023-03-15)
+
+### Bug Fixes and Other Changes
+
+ * Merge pull request #98 from aws-samples/contribution-guideline-improvements
+ * Update CONTRIBUTING.md
+ * Update CONTRIBUTING.md
+ * Update CONTRIBUTING.md
+
 ## v1.2.1 (2023-03-09)
 
 ### Bug Fixes and Other Changes
