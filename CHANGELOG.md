@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.2.3 (2023-03-16)
+
+### Bug Fixes and Other Changes
+
+ * Merge pull request #101 from aws-samples/readme-updates
+ * Merge branch 'main' into readme-updates
+ * Update README.md
+
+### Documentation Changes
+
+ * Add support info to README
+
 ## v1.2.2 (2023-03-15)
 
 ### Bug Fixes and Other Changes
