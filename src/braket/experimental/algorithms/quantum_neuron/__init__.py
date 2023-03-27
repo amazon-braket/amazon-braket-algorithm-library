@@ -11,8 +11,8 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from braket.experimental.algorithms.quantum_approximate_optimization.quantum_approximate_optimization import (  # noqa: F401,E501
-    cost_function,
-    qaoa,
-    run_qaoa_circuit,
+print('inside __init__.py')
+
+from braket.experimental.algorithms.quantum_neuron.quantum_neuron import (  # noqa: F401
+    linear_combination,
 )
