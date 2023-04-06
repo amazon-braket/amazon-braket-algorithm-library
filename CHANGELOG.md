@@ -1,5 +1,30 @@
 # Changelog
 
+## v1.3.0 (2023-04-06)
+
+### Deprecations and Removals
+
+ * deprecate python 3.7
+
+### Bug Fixes and Other Changes
+
+ * Merge branch 'main' into python3.8
+ * Merge branch 'main' into python3.8
+ * Merge pull request #101 from aws-samples/readme-updates
+ * Merge branch 'main' into python3.8
+
+## v1.2.4 (2023-03-23)
+
+### Bug Fixes and Other Changes
+
+ * Merge branch 'main' into dependabot
+ * Merge branch 'main' into dependabot
+
+### Testing and Release Infrastructure
+
+ * add dependabot updates for GH actions
+ * add dependabot updates for GH actions
+
 ## v1.2.3 (2023-03-16)
 
 ### Bug Fixes and Other Changes
