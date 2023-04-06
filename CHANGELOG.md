@@ -1,5 +1,64 @@
 # Changelog
 
+## v1.3.0 (2023-04-06)
+
+### Deprecations and Removals
+
+ * deprecate python 3.7
+
+### Bug Fixes and Other Changes
+
+ * Merge branch 'main' into python3.8
+ * Merge branch 'main' into python3.8
+ * Merge pull request #101 from aws-samples/readme-updates
+ * Merge branch 'main' into python3.8
+
+## v1.2.4 (2023-03-23)
+
+### Bug Fixes and Other Changes
+
+ * Merge branch 'main' into dependabot
+ * Merge branch 'main' into dependabot
+
+### Testing and Release Infrastructure
+
+ * add dependabot updates for GH actions
+ * add dependabot updates for GH actions
+
+## v1.2.3 (2023-03-16)
+
+### Bug Fixes and Other Changes
+
+ * Merge pull request #101 from aws-samples/readme-updates
+ * Merge branch 'main' into readme-updates
+ * Update README.md
+
+### Documentation Changes
+
+ * Add support info to README
+
+## v1.2.2 (2023-03-15)
+
+### Bug Fixes and Other Changes
+
+ * Merge pull request #98 from aws-samples/contribution-guideline-improvements
+ * Update CONTRIBUTING.md
+ * Update CONTRIBUTING.md
+ * Update CONTRIBUTING.md
+
+## v1.2.1 (2023-03-09)
+
+### Bug Fixes and Other Changes
+
+ * raise the PennyLane version to >=0.29.1
+ * raise the PennyLane version to >=0.29.1
+
+## v1.2.0 (2023-03-06)
+
+### Features
+
+ * deprecate python 3.7
+
 ## v1.1.5 (2023-03-01)
 
 ### Bug Fixes and Other Changes
