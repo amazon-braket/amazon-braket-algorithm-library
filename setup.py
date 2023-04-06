@@ -23,7 +23,7 @@ setup(
     name="amazon-braket-algorithm-library",
     version=version,
     license="Apache License 2.0",
-    python_requires=">= 3.7.2",
+    python_requires=">= 3.8.2",
     packages=find_namespace_packages(where="src", exclude=("test",)),
     package_dir={"": "src"},
     install_requires=[
