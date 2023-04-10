@@ -1,5 +1,40 @@
 # Changelog
 
+## v1.3.1 (2023-04-10)
+
+### Bug Fixes and Other Changes
+
+ * add branch coverage for chsh
+ * Merge branch 'main' into branch_cov
+ * chore(deps): bump aws-actions/stale-issue-cleanup from 3 to 6
+ * Merge branch 'main' into dependabot/github_actions/aws-actions/stale-issue-cleanup-6
+ * update openfermion to version 1.1.0
+ * Merge branch 'main' into dependabot/github_actions/aws-actions/stale-issue-cleanup-6
+ * Merge branch 'main' into math411-patch-3
+ * Add python workflow badge for builds
+ * Merge branch 'main' into math411-patch-2
+ * Merge branch 'main' into branch_cov
+ * update openfermion to version 1.1.0
+ * chore(deps): bump aws-actions/stale-issue-cleanup from 3 to 6
+ * Merge branch 'main' into dependabot
+ * Merge branch 'main' into branch_cov
+ * Merge branch 'main' into dependabot
+ * Merge pull request #101 from aws-samples/readme-updates
+ * Merge branch 'main' into readme-updates
+ * Merge branch 'main' into math411-patch-2
+ * Merge branch 'branch_cov' of github.com:aws-samples/amazon-braket-algorithm-library into branch_cov
+ * tox
+ * Merge branch 'main' into branch_cov
+ * add branch coverage for chsh
+ * raise the PennyLane version to >=0.29.1
+ * raise the PennyLane version to >=0.29.1
+ * Update README.md
+ * Update README.md
+
+### Testing and Release Infrastructure
+
+ * add dependabot updates for GH actions
+
 ## v1.3.0 (2023-04-06)
 
 ### Deprecations and Removals
