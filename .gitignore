@@ -1,7 +1,9 @@
 *~
 *#
 *.swp
+.vscode
 *.idea
+*.iml*
 build_files.tar.gz
 .DS_Store
 
