@@ -52,7 +52,7 @@ def test_qcbm_no_qubits():
     QCBM(device, n_qubits, n_layers, data)
 
 
-def test_qcbm_gradient(set_random_seed):
+def test_qcbm_gradient():
     n_layers = 1
     n_qubits = 2
     n_iterations = 1
