@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.3.2 (2023-04-17)
+
+### Bug Fixes and Other Changes
+
+ * raise base openfermion requirements and loosen the restrictions
+ * Merge branch 'main' into math411-patch-2
+ * randomness in qcbm test
+ * Merge branch 'main' into fix-random
+ * remove unnecessary param
+ * Merge branch 'main' into math411-patch-2
+ * raise base openfermion requirements and loosen the restrictions
+
+### Testing and Release Infrastructure
+
+ * Add JetBrains files to .gitignore
+
 ## v1.3.1.post0 (2023-04-17)
 
 ### Testing and Release Infrastructure
