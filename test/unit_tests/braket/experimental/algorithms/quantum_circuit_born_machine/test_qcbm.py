@@ -11,12 +11,19 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
+import random
+
 import numpy as np
 import pytest
 from braket.devices import LocalSimulator
 from scipy.optimize import minimize
 
 from braket.experimental.algorithms.quantum_circuit_born_machine import QCBM, mmd_loss
+
+
+@pytest.fixture(autouse=True)
+def set_random_seed():
+    random.seed(1234)
 
 
 def test_mmd_loss():
@@ -62,7 +69,6 @@ def test_qcbm_gradient():
         jac=lambda x: qcbm.gradient(x),
         options={"maxiter": n_iterations},
     )
-
     assert result.njev < 4
     assert result.nit == 1
     assert result.status == 1
