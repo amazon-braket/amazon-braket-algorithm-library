@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.1.post0 (2023-04-17)
+
+### Testing and Release Infrastructure
+
+ * Add JetBrains files to .gitignore
+
 ## v1.3.1 (2023-04-10)
 
 ### Bug Fixes and Other Changes
