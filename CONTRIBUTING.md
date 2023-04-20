@@ -46,6 +46,28 @@ To send us a pull request, please:
 GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
+## Development on Braket Notebook Instances
+Braket supports [notebook instances](https://docs.aws.amazon.com/braket/latest/developerguide/braket-get-started-create-notebook.html) that come with an environment with Braket dependencies, examples, and algorithms already installed.
+
+To test changes made on a notebook require an amendment to the environment that is installed on the notebook instance. 
+A contributor can test changes pushed to a remote branch, which will be referred to as `<WORKING_BRANCH>`, or start using the below commands to start development on a notebook instance.
+
+```
+# Remove the algorithm library installed from the environment
+/home/ec2-user/
+source ~/anaconda3/etc/profile.d/conda.sh
+conda activate Braket
+pip uninstall amazon-braket-algorithm-library -y
+
+# Download the repo and install the changes that are to be tested
+cd SageMaker/
+rm -rf "Braket algorithms"
+git clone https://github.com/aws-samples/amazon-braket-algorithm-library.git
+cd amazon-braket-algorithm-library/
+# This command is not needed if a contributor has not published a remote branch already.
+git checkout <WORKING_BRANCH>
+pip install -e '.'
+```
 
 ### Making your changes
 
