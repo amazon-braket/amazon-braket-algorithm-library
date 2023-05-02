@@ -38,5 +38,8 @@ jobs:
       - name: Run unit tests
         run: |
           tox -e unit-tests
+      - name: Run integ tests
+        run: |
+          tox -e integ-tests
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v3
