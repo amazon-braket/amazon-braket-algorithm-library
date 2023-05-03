@@ -41,7 +41,7 @@ def get_mock_paths(notebook_dir, notebook_file):
         )
     path_to_utils = os.path.abspath(
         os.path.join(path_to_root, "test", "integ_tests", "mock_utils.py")
-    )
+    ).replace("\\", "/")
     return path_to_utils, path_to_mocks
 
 
