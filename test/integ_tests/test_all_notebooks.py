@@ -33,7 +33,7 @@ def get_mock_paths(notebook_dir, notebook_file):
     mock_file = notebook_file.replace(".ipynb", "_mocks.py")
     split_notebook_dir = notebook_dir.split(os.sep)
     path_to_root = os.path.abspath(os.path.join(*([".."] * (len(split_notebook_dir)))))
-    mock_dir = os.path.normpath(os.path.join(*split_notebook_dir[1:])).replace("\\", "/")
+    mock_dir = os.path.normpath(os.path.join(*split_notebook_dir[1:])).replace(os.sep, "/")
     path_to_mocks = os.path.normpath(
         os.path.join(path_to_root, "test", "integ_tests", mock_dir, mock_file)
     )
