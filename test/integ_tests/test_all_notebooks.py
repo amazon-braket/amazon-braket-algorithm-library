@@ -37,7 +37,7 @@ def get_mock_paths(notebook_dir, notebook_file):
     path_to_mocks = os.path.join(path_to_root, "test", "integ_tests", mock_dir, mock_file)
     if not os.path.exists(path_to_mocks):
         path_to_mocks = os.path.abspath(
-            os.path.join(path_to_root, "test", "integ_tests", "default_mocks", mock_file)
+            os.path.join(path_to_root, "test", "integ_tests", "default_mocks", "default_mocks.py")
         )
     path_to_utils = os.path.abspath(
         os.path.join(path_to_root, "test", "integ_tests", "mock_utils.py")
