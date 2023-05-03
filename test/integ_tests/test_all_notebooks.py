@@ -38,7 +38,7 @@ def get_mock_paths(notebook_dir, notebook_file):
     if not os.path.exists(path_to_mocks):
         path_to_mocks = os.path.abspath(
             os.path.join(path_to_root, "test", "integ_tests", "default_mocks", "default_mocks.py")
-        )
+        ).replace("\\", "/")
     path_to_utils = os.path.abspath(
         os.path.join(path_to_root, "test", "integ_tests", "mock_utils.py")
     ).replace("\\", "/")
