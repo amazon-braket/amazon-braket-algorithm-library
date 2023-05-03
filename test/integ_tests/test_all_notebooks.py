@@ -34,7 +34,9 @@ def get_mock_paths(notebook_dir, notebook_file):
     split_notebook_dir = notebook_dir.split(os.sep)
     path_to_root = os.path.abspath(os.path.join(*([".."] * (len(split_notebook_dir)))))
     mock_dir = os.path.join(*split_notebook_dir[1:])
-    path_to_mocks = os.path.join(path_to_root, "test", "integ_tests", mock_dir, mock_file)
+    path_to_mocks = os.path.join(path_to_root, "test", "integ_tests", mock_dir, mock_file).replace(
+        "\\", "/"
+    )
     if not os.path.exists(path_to_mocks):
         path_to_mocks = os.path.abspath(
             os.path.join(path_to_root, "test", "integ_tests", "default_mocks", "default_mocks.py")
