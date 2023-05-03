@@ -1,7 +1,6 @@
 import logging
 import os
 from importlib.machinery import SourceFileLoader
-from pathlib import Path
 
 import pytest
 from testbook import testbook
@@ -17,11 +16,10 @@ EXCLUDED_NOTEBOOKS = [
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+if "integ_tests" in os.getcwd():
+    os.chdir(os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)))
 
-if "integ_tests" in Path.cwd().parts:
-    os.chdir(Path.cwd().parent)
-
-root_path = Path.cwd()
+root_path = os.getcwd()
 examples_path = "notebooks"
 test_notebooks = []
 
@@ -34,15 +32,17 @@ for dir_, _, files in os.walk(examples_path):
 def get_mock_paths(notebook_dir, notebook_file):
     mock_file = notebook_file.replace(".ipynb", "_mocks.py")
     split_notebook_dir = notebook_dir.split(os.sep)
-    path_to_root = Path("..") / Path(*([".."] * (len(split_notebook_dir) - 1)))
-    mock_dir = Path(*split_notebook_dir[1:])
-    path_to_mocks = Path(path_to_root) / "test" / "integ_tests" / mock_dir / mock_file
-    if not path_to_mocks.exists():
-        path_to_mocks = (
-            Path(path_to_root) / "test" / "integ_tests" / "default_mocks" / "default_mocks.py"
+    path_to_root = os.path.abspath(os.path.join(*([".."] * (len(split_notebook_dir)))))
+    mock_dir = os.path.join(*split_notebook_dir[1:])
+    path_to_mocks = os.path.join(path_to_root, "test", "integ_tests", mock_dir, mock_file)
+    if not os.path.exists(path_to_mocks):
+        path_to_mocks = os.path.abspath(
+            os.path.join(path_to_root, "test", "integ_tests", "default_mocks", "default_mocks.py")
         )
-    path_to_utils = Path(path_to_root) / "test" / "integ_tests" / "mock_utils.py"
-    return str(path_to_utils), str(path_to_mocks)
+    path_to_utils = os.path.abspath(
+        os.path.join(path_to_root, "test", "integ_tests", "mock_utils.py")
+    )
+    return path_to_utils, path_to_mocks
 
 
 @pytest.mark.parametrize("notebook_dir, notebook_file", test_notebooks)
@@ -86,7 +86,7 @@ def test_record():
     os.chdir(root_path)
     os.chdir(notebook_dir)
     path_to_utils, path_to_mocks = get_mock_paths(notebook_dir, notebook_file)
-    path_to_utils = path_to_utils.with_name("record_utils.py")
+    path_to_utils = path_to_utils.replace("mock_utils.py", "record_utils.py")
     with testbook(notebook_file, timeout=600) as tb:
         tb.inject(
             f"""
