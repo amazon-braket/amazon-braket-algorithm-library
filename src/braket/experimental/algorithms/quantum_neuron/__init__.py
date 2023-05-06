@@ -10,9 +10,9 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-
-print('inside __init__.py')
-
 from braket.experimental.algorithms.quantum_neuron.quantum_neuron import (  # noqa: F401
+    generate_random_numbers,
     linear_combination,
+    quantum_neuron,
+    activation_function
 )

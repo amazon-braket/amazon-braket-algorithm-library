@@ -1,11 +1,23 @@
+# Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+#     http://aws.amazon.com/apache2.0/
+#
+# or in the "license" file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+
 import json
 import os
 import time
-import sys
-import ast
 
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 from typing import List
 from braket.aws import AwsQuantumJob, AwsSession
 from braket.jobs.image_uris import Framework, retrieve_image
@@ -14,7 +26,40 @@ from braket.tracking import Tracker
 
 import pennylane as qml
 
+def generate_random_numbers(n, upper_total):
+    """Generate random numbers such that the sum is greater than or equal to 0 and less than upper_total.
+    
+    Args:
+        n (int): Number of random numbers.
+        upper_total (float): Maximum value that the sum of random numbers can take.
+        
+    Returns:
+        List[float]: List of random numbers.
+    """
+    random.seed(0)
+    random_numbers = [random.uniform(0, upper_total) for _ in range(n)]
+    
+    total = sum(random_numbers)
+    
+    while total < 0 or total >= upper_total:
+        random_numbers = [random.uniform(0, upper_total) for _ in range(n)]
+        total = sum(random_numbers)
+    
+    return sorted(random_numbers)
+
+
 def init_pl_device(device_arn, n_qubits, shots, max_parallel):
+    """Load a Device for PennyLane and return the instance.
+    
+    Args:
+        device_arn (str): Name of the device to load.
+        n_qubits (int): Number of qubits.
+        shots (int): How many circuit executions are used to estimate stochastic return values.
+        max_parallel (int): Maximum number of simultaneous tasks allowed.
+        
+    Returns:
+        Device: Braket device to run on.
+    """
     return qml.device(
         "braket.aws.qubit",
         device_arn=device_arn,
@@ -27,31 +72,42 @@ def init_pl_device(device_arn, n_qubits, shots, max_parallel):
         # poll_timeout_seconds=30,
     )
 
-def linear_combination(inputs:str, weights, bias, ancilla):
-    # print(f'len(inputs): {len(inputs)}')
+def linear_combination(inputs, weights, bias, ancilla, n_qubits):
+    """Build Linear Combination Circuit.
+    
+    Args: 
+        inputs (str): Binary inputs, such as '1011'.
+        weights (List[float]): Weights of the neuron.
+        bias (float): Bias of the neuron.
+        
+    Returns:
+        None (To complete, the expected value must be returned after this function)
+    """
     for qubit in range(len(inputs)):
         if(inputs[qubit]=='1'):
             qml.PauliX(qubit)
     
     for qubit in range(len(inputs)):
-        # print(f'qubit: {qubit}')
         
         qml.CRY(phi=2*weights[qubit], wires=[qubit, ancilla])
     
     qml.RY(2*bias, wires=ancilla)
 
-def activation_function(inputs:str, weights, bias, ancilla, output, n_qubits):
-    '''
-    for qubit in range(len(inputs)):
-        if(inputs[qubit]=='1'):
-            qml.PauliX(qubit)
+def activation_function(inputs, weights, bias, ancilla, output, n_qubits):
+    """Build Activation Function Circuit.
     
-    for qubit in range(len(inputs)):
-        qml.CRY(phi=2*weights[qubit], wires=[qubit, ancilla])
-        
-    qml.RY(2*bias, wires=ancilla)
-    '''
-    linear_combination(inputs, weights, bias, ancilla)
+    Args:
+        inputs (str): Binary inputs, such as '1011'.
+        weights (List[float]): Weights of the neuron.
+        bias (float): Bias of the neuron.
+        ancilla (int): ID of an ancilla qubit.
+        output (int): ID of an output qubit.
+        n_qubits (int): Number of qubits.
+    
+    Returns:
+        None (To complete, the expected value must be returned after this function)
+    """
+    linear_combination(inputs, weights, bias, ancilla, n_qubits)
     
     qml.CY(wires=[ancilla, output])
     qml.RZ(phi=-np.pi/2, wires=ancilla)
@@ -60,25 +116,34 @@ def activation_function(inputs:str, weights, bias, ancilla, output, n_qubits):
         qml.CRY(phi=-2*weights[qubit], wires=[qubit, ancilla])  # note '-(minus)'
         
     qml.RY(-2*bias, wires=ancilla)  # note '-(minus)'
-    
-    # return [qml.sample(qml.PauliZ(i)) for i in range(n_nodes)]
 
-def quantum_neuron(inputs:str, weights, bias, n_qubits, dev):
-    ancilla = len(weights) # ID of an ancilla qubit
-    output = len(weights) + 1   # ID of an output qubit
+def quantum_neuron(inputs, weights, bias, n_qubits, dev):
+    """Build Quantum Neuron Circuit.
+    
+    Args:
+        inputs (str): Binary inputs, such as '1011'.
+        weights (List[float]): Weights of the neuron.
+        bias (float): Bias of the neuron.
+        n_qubits (int): Number of qubits.
+        dev (Device): Braket device to run on.
+        
+    Returns:
+        theta (float): Input signal to the quantum neuron.
+        q_theta (float): Output of the quantum neuron.
+    """
+    ancilla = len(inputs) # ID of an ancilla qubit
+    output = len(inputs) + 1   # ID of an output qubit
     
     theta = np.inner(np.array(list(inputs), dtype=int), np.array(weights)) + bias   # linear comination with numpy
     theta = theta.item()   # Convert numpy array to native python float-type
     
-    # ここでaf_circuitが何かをreturnするように修正する必要がある
-    # af_circuit = qml.QNode(af, dev)
     @qml.qnode(dev)
     def af_circuit():
         activation_function(inputs, weights, bias, ancilla, output, n_qubits)
         
         return [qml.sample(qml.PauliZ(i)) for i in range(n_qubits)]
     
-    
+    ### start of post-processing ###
     sample = af_circuit()
     sample = sample.T
     sample = (1 - sample.numpy()) / 2
@@ -91,6 +156,7 @@ def quantum_neuron(inputs:str, weights, bias, n_qubits, dev):
     p_0 = count_0 / (count_0 + count_1)
     
     q_theta = np.arccos(np.sqrt(p_0))
+    ### end of post-processing ###
     
     return theta, q_theta
 
@@ -109,23 +175,20 @@ def main():
         hyperparams = json.load(f)
     
     n_inputs = int(hyperparams["n_inputs"])
-    weights = ast.literal_eval(hyperparams["weights"])
-    bias = float(hyperparams["bias"])
     shots = int(hyperparams["shots"])
     interface = hyperparams["interface"]
     max_parallel = int(hyperparams["max_parallel"])
+    
+    n_qubits = n_inputs+2 # +2: ancilla and output qubit
+    
+    inputs_list = [format(i, f'0{n_inputs}b') for i in range(2**n_inputs)]
+    bias = 0.05  # constant
+    weights = generate_random_numbers(n_inputs, np.pi/2-bias)
     
     if "copy_checkpoints_from_job" in hyperparams:
         copy_checkpoints_from_job = hyperparams["copy_checkpoints_from_job"].split("/", 2)[-1]
     else:
         copy_checkpoints_from_job = None
-    
-    # Read input strings from input file
-    with open(f"{input_dir}/input/inputs.txt") as f:
-        inputs = [s.strip() for s in f.readlines()]
-    
-    # Prepare quantum neuron circuit
-    n_qubits = n_inputs+2 # +2: ancilla and output qubit
     
     # Run quantum neuron circuit
     dev = init_pl_device(device_arn, n_qubits, shots, max_parallel)
@@ -133,11 +196,11 @@ def main():
     q_theta_list = []
     
     for i in range(2**n_inputs):
-        theta, q_theta = quantum_neuron(inputs[i], weights, bias, n_qubits, dev)
+        theta, q_theta = quantum_neuron(inputs_list[i], weights, bias, n_qubits, dev)
         
         theta_list.append(theta)
         q_theta_list.append(q_theta)
-        
+    
     save_job_result({"theta_list": theta_list, "q_theta_list": q_theta_list, "task summary": t.quantum_tasks_statistics(), "estimated cost": t.qpu_tasks_cost() + t.simulator_tasks_cost()})
 
 if __name__ == "__main__":
