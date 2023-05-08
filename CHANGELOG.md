@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.3.post0 (2023-05-08)
+
+### Testing and Release Infrastructure
+
+ * add mock-integration tests
+
 ## v1.3.3 (2023-04-26)
 
 ### Bug Fixes and Other Changes
