@@ -1,5 +1,120 @@
 # Changelog
 
+## v1.3.3.post0 (2023-05-08)
+
+### Testing and Release Infrastructure
+
+ * add mock-integration tests
+
+## v1.3.3 (2023-04-26)
+
+### Bug Fixes and Other Changes
+
+ * test: parallelize test execution for pytest
+
+## v1.3.2 (2023-04-17)
+
+### Bug Fixes and Other Changes
+
+ * raise base openfermion requirements and loosen the restrictions
+ * Merge branch 'main' into math411-patch-2
+ * randomness in qcbm test
+ * Merge branch 'main' into fix-random
+ * remove unnecessary param
+ * Merge branch 'main' into math411-patch-2
+ * raise base openfermion requirements and loosen the restrictions
+
+### Testing and Release Infrastructure
+
+ * Add JetBrains files to .gitignore
+
+## v1.3.1.post0 (2023-04-17)
+
+### Testing and Release Infrastructure
+
+ * Add JetBrains files to .gitignore
+
+## v1.3.1 (2023-04-10)
+
+### Bug Fixes and Other Changes
+
+ * add branch coverage for chsh
+ * Merge branch 'main' into branch_cov
+ * chore(deps): bump aws-actions/stale-issue-cleanup from 3 to 6
+ * Merge branch 'main' into dependabot/github_actions/aws-actions/stale-issue-cleanup-6
+ * update openfermion to version 1.1.0
+ * Merge branch 'main' into dependabot/github_actions/aws-actions/stale-issue-cleanup-6
+ * Merge branch 'main' into math411-patch-3
+ * Add python workflow badge for builds
+ * Merge branch 'main' into math411-patch-2
+ * Merge branch 'main' into branch_cov
+ * update openfermion to version 1.1.0
+ * chore(deps): bump aws-actions/stale-issue-cleanup from 3 to 6
+ * Merge branch 'main' into dependabot
+ * Merge branch 'main' into branch_cov
+ * Merge branch 'main' into dependabot
+ * Merge pull request #101 from aws-samples/readme-updates
+ * Merge branch 'main' into readme-updates
+ * Merge branch 'main' into math411-patch-2
+ * Merge branch 'branch_cov' of github.com:aws-samples/amazon-braket-algorithm-library into branch_cov
+ * tox
+ * Merge branch 'main' into branch_cov
+ * add branch coverage for chsh
+ * raise the PennyLane version to >=0.29.1
+ * raise the PennyLane version to >=0.29.1
+ * Update README.md
+ * Update README.md
+
+### Testing and Release Infrastructure
+
+ * add dependabot updates for GH actions
+
+## v1.3.0 (2023-04-06)
+
+### Deprecations and Removals
+
+ * deprecate python 3.7
+
+### Bug Fixes and Other Changes
+
+ * Merge branch 'main' into python3.8
+ * Merge branch 'main' into python3.8
+ * Merge pull request #101 from aws-samples/readme-updates
+ * Merge branch 'main' into python3.8
+
+## v1.2.4 (2023-03-23)
+
+### Bug Fixes and Other Changes
+
+ * Merge branch 'main' into dependabot
+ * Merge branch 'main' into dependabot
+
+### Testing and Release Infrastructure
+
+ * add dependabot updates for GH actions
+ * add dependabot updates for GH actions
+
+## v1.2.3 (2023-03-16)
+
+### Bug Fixes and Other Changes
+
+ * Merge pull request #101 from aws-samples/readme-updates
+ * Merge branch 'main' into readme-updates
+ * Update README.md
+
+### Documentation Changes
+
+ * Add support info to README
+
+## v1.2.2 (2023-03-15)
+
+### Bug Fixes and Other Changes
+
+ * Merge pull request #98 from aws-samples/contribution-guideline-improvements
+ * Update CONTRIBUTING.md
+ * Update CONTRIBUTING.md
+ * Update CONTRIBUTING.md
+
 ## v1.2.1 (2023-03-09)
 
 ### Bug Fixes and Other Changes
