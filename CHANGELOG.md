@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.4 (2023-05-11)
+
+### Bug Fixes and Other Changes
+
+ * docs: add instructions for setup and development on a notebook instance
+
 ## v1.3.3.post0 (2023-05-08)
 
 ### Testing and Release Infrastructure
