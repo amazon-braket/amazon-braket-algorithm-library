@@ -25,11 +25,11 @@ def simons_oracle(secret_string: str) -> Circuit:
     """Quantum circuit implementing a particular oracle for Simon's problem.
 
     In the quantum setting, we first copy the input register into some
-    ancillary qubits: |x>|0> -> |x>|x>.
+    ancillary qubits: `|x>|0> -> |x>|x>`.
 
     We then perform the quantum analog of XOR, which means we apply an X gate
     to the kth qubit whenever the kth bit of `string` is 1. However, we only
-    apply this X gate when the flag qubit is also |1>. Thus, our X gate becomes
+    apply this X gate when the flag qubit is also `|1>`. Thus, our X gate becomes
     a CNOT gate between the flag qubit on the input register, and the kth qubit
     on the output.
 
