@@ -23,13 +23,14 @@ class QCBM:
     """Quantum circuit Born machine.
 
     Example: n_layers = 1, n_qubits = 2
-    T  : |    0    |    1    |    2    |3|4|Result Types|
+    ::
+        T  : |    0    |    1    |    2    |3|4|Result Types|
 
-    q0 : -Rx(0.667)-Rz(0.783)-Rx(0.257)-C-X-Probability--
+        q0 : -Rx(0.667)-Rz(0.783)-Rx(0.257)-C-X-Probability--
                                         | | |
-    q1 : -Rx(0.549)-Rz(0.878)-Rx(0.913)-X-C-Probability--
+        q1 : -Rx(0.549)-Rz(0.878)-Rx(0.913)-X-C-Probability--
 
-    T  : |    0    |    1    |    2    |3|4|Result Types|
+        T  : |    0    |    1    |    2    |3|4|Result Types|
     """
 
     def __init__(
@@ -150,7 +151,7 @@ class QCBM:
 def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]) -> float:
     r"""Gaussian radial basis function (RBF) kernel.
 
-    K(x, y) = sum_\sigma exp(-|x-y|^2/(2\sigma^2 ))
+    `K(x, y) = sum_\sigma exp(-|x-y|^2/(2\sigma^2 ))`
 
     Args:
         px (ndarray): Probability distribution
@@ -172,12 +173,12 @@ def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1])
 
     MMD determines if two distributions are equal by looking at the difference between
     their means in feature space.
-
-    MMD(x, y) = | \sum_{j=1}^N \phi(y_j) - \sum_{i=1}^N \phi(x_i) |_2^2
+    ::
+        MMD(x, y) = | \sum_{j=1}^N \phi(y_j) - \sum_{i=1}^N \phi(x_i) |_2^2
 
     With a RBF kernel, we apply the kernel trick to expand MMD to
-
-    MMD(x, y) = \sum_{j=1}^N \sum_{j'=1}^N k(y_j, y_{j'})
+    ::
+        MMD(x, y) = \sum_{j=1}^N \sum_{j'=1}^N k(y_j, y_{j'})
                 + \sum_{i=1}^N \sum_{i'=1}^N k(x_i, x_{i'})
                 - 2 \sum_{j=1}^N \sum_{i=1}^N k(y_j, x_i)
 
