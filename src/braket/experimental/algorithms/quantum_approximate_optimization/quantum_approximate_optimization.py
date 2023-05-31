@@ -152,7 +152,9 @@ def cost_layer(
 
 @circuit.subroutine(register=True)
 def decomposed_zz_gate(qubit0: int, qubit1: int, gamma: float) -> Circuit:
-    """Return a circuit implementing exp(-i gamma Z_i Z_j) using CNOT gates if ZZ not supported.
+    """
+    Return a circuit implementing :math:`exp(-i * \\gamma * Z_i * Z_j)` using CNOT gates
+    if ZZ not supported.
 
     Args:
         qubit0 (int): Index value for the controlling qubit for CNOT gate

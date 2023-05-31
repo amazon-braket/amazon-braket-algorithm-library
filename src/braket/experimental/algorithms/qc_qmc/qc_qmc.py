@@ -222,7 +222,9 @@ def local_energy_quantum(  # noqa: C901
     trial_state_circuit: Callable,
     dev: qml.device,
 ) -> complex:
-    r"""This function estimates the integral $\\langle \\Psi_Q|H|\\phi_l\rangle$ with rotated basis.
+    r"""
+    This function estimates the integral :math:`$\\langle \\Psi_Q|H|\\phi_l\rangle$`
+    with rotated basis.
 
     Args:
         walker (ndarray): np.ndarray; matrix representation of the walker state, not necessarily
