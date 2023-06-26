@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.0 (2023-06-26)
+
+### Features
+
+ * add python 3.11 support
+
 ## v1.3.5.post0 (2023-06-07)
 
 ### Documentation Changes
