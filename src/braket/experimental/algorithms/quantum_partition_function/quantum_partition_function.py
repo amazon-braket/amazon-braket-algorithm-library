@@ -92,7 +92,7 @@ def run_quantum_partition_function(
     """Function to run Quantum partition function algorithm and return measurement counts.
 
     Args:
-        potts_model (dict): Dictionary to save the results of the graphical model form - Potts model:
+        potts_model (dict): Dictionary to save the results of the graphical model form - Potts model
             'graph-model': networkx graph to save the definition of Potts model
             'q-state': q-state of Potts model
             'qft-func': dictionary to save information for quantum Fourier transform function
