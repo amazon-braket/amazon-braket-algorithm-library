@@ -6,6 +6,13 @@ documentation, we greatly value feedback and contributions from our community.
 Please read through this document before submitting any issues or pull requests to ensure we have all the necessary
 information to effectively respond to your bug report or contribution.
 
+## Adding a New Algorithm
+We expect algorithms to be built on top of the [Amazon Braket SDK](https://github.com/aws/amazon-braket-sdk-python) to provide a unified user experience and to give us a single contract to test against.
+
+Please ensure that
+1. Your algorithm is added as functional source code [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms)
+2. Add tests for your new code [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/test/unit_tests/braket/experimental/algorithms)
+3. You illustrate use of the algorithm in a simple python notebook [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/notebooks)
 
 ## Reporting Bugs/Feature Requests
 
@@ -39,6 +46,28 @@ To send us a pull request, please:
 GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
+## Development on Braket Notebook Instances
+Braket supports [notebook instances](https://docs.aws.amazon.com/braket/latest/developerguide/braket-get-started-create-notebook.html) that come with an environment with Braket dependencies, examples, and algorithms already installed.
+
+To test changes made on a notebook requires an amendment to the environment that is installed on the notebook instance. 
+A contributor can test changes pushed to a remote branch, which will be referred to as `<WORKING_BRANCH>`, or start using the below commands to start development on a notebook instance.
+
+```
+# Remove the algorithm library installed from the environment
+cd /home/ec2-user/
+source ~/anaconda3/etc/profile.d/conda.sh
+conda activate Braket
+pip uninstall amazon-braket-algorithm-library -y
+
+# Download the repo and install the changes that are to be tested
+cd SageMaker/
+rm -rf "Braket algorithms"
+git clone https://github.com/aws-samples/amazon-braket-algorithm-library.git
+cd amazon-braket-algorithm-library/
+# This command is not needed if a contributor has not published a remote branch already.
+git checkout <WORKING_BRANCH>
+pip install -e '.'
+```
 
 ### Making your changes
 

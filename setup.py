@@ -23,19 +23,20 @@ setup(
     name="amazon-braket-algorithm-library",
     version=version,
     license="Apache License 2.0",
-    python_requires=">= 3.7.2",
+    python_requires=">= 3.8.2",
     packages=find_namespace_packages(where="src", exclude=("test",)),
     package_dir={"": "src"},
     install_requires=[
         "amazon-braket-sdk>=1.35.1",
         "scipy>=1.5.2",
-        "pennylane>=0.25.1,<=0.27.0",
-        "openfermion==1.0.0",
+        "pennylane>=0.29.1",
+        "openfermion>=1.5.1",
     ],
     extras_require={
         "test": [
             "black>=22.3.0",
             "flake8<=5.0.4",
+            "flake8-rst-docstrings",
             "isort",
             "pytest",
             "pytest-cov",

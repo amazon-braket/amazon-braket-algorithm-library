@@ -1,0 +1,8 @@
+amazon-braket-sdk
+amazon-braket-pennylane-plugin
+matplotlib
+pandas
+pennylane
+pytest
+testbook
+jupyter
