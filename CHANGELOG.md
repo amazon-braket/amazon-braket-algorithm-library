@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.4.0 (2023-06-26)
+
+### Features
+
+ * add python 3.11 support
+
+## v1.3.5.post0 (2023-06-07)
+
+### Documentation Changes
+
+ * add tags to equations for LaTeX rendering in RST docs
+
 ## v1.3.5 (2023-05-29)
 
 ### Bug Fixes and Other Changes

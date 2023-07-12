@@ -151,7 +151,8 @@ class QCBM:
 def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]) -> float:
     r"""Gaussian radial basis function (RBF) kernel.
 
-    `K(x, y) = sum_\sigma exp(-|x-y|^2/(2\sigma^2 ))`
+    .. math::
+        K(x, y) = sum_\sigma exp(-|x-y|^2/(2\sigma^2 ))
 
     Args:
         px (ndarray): Probability distribution
@@ -173,11 +174,13 @@ def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1])
 
     MMD determines if two distributions are equal by looking at the difference between
     their means in feature space.
-    ::
+
+    .. math::
         MMD(x, y) = | \sum_{j=1}^N \phi(y_j) - \sum_{i=1}^N \phi(x_i) |_2^2
 
     With a RBF kernel, we apply the kernel trick to expand MMD to
-    ::
+
+    .. math::
         MMD(x, y) = \sum_{j=1}^N \sum_{j'=1}^N k(y_j, y_{j'})
                 + \sum_{i=1}^N \sum_{i'=1}^N k(x_i, x_{i'})
                 - 2 \sum_{j=1}^N \sum_{i=1}^N k(y_j, x_i)
