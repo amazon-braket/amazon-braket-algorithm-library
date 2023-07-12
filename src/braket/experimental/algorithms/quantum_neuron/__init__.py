@@ -11,8 +11,8 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 from braket.experimental.algorithms.quantum_neuron.quantum_neuron import (  # noqa: F401
+    activation_function,
     generate_random_numbers,
     linear_combination,
     quantum_neuron,
-    activation_function
 )
