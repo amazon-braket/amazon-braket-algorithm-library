@@ -4,6 +4,24 @@ Fixing /home/ec2-user/SageMaker/amazon-braket-algorithm-library/test/unit_tests/
 Skipped 3 files
 linters: commands[1]> black ./
 linters: commands[2]> flake8
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:17:1: F401 'time' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:18:1: F401 'typing.List' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:20:1: F401 'matplotlib.pyplot as plt' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:23:1: F401 'braket.aws.AwsQuantumJob' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:23:1: F401 'braket.aws.AwsSession' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:24:1: F401 'braket.jobs.load_job_checkpoint' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:24:1: F401 'braket.jobs.save_job_checkpoint' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:25:1: F401 'braket.jobs.image_uris.Framework' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:25:1: F401 'braket.jobs.image_uris.retrieve_image' imported but unused
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:30:101: E501 line too long (105 > 100 characters)
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:150:5: E266 too many leading '#' for block comment
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:153:1: W293 blank line contains whitespace
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:155:1: W293 blank line contains whitespace
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:167:5: E266 too many leading '#' for block comment
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:175:5: F841 local variable 'input_dir' is assigned to but never used
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:176:5: F841 local variable 'output_dir' is assigned to but never used
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:188:5: F841 local variable 'interface' is assigned to but never used
+./src/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/quantum_neuron-checkpoint.py:200:9: F841 local variable 'copy_checkpoints_from_job' is assigned to but never used
 ./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:17:1: F401 'time' imported but unused
 ./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:18:1: F401 'typing.List' imported but unused
 ./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:20:1: F401 'matplotlib.pyplot as plt' imported but unused
@@ -15,11 +33,11 @@ linters: commands[2]> flake8
 ./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:25:1: F401 'braket.jobs.image_uris.retrieve_image' imported but unused
 ./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:30:101: E501 line too long (105 > 100 characters)
 ./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:150:5: E266 too many leading '#' for block comment
-./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:163:5: E266 too many leading '#' for block comment
-./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:171:5: F841 local variable 'input_dir' is assigned to but never used
-./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:172:5: F841 local variable 'output_dir' is assigned to but never used
-./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:184:5: F841 local variable 'interface' is assigned to but never used
-./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:196:9: F841 local variable 'copy_checkpoints_from_job' is assigned to but never used
+./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:167:5: E266 too many leading '#' for block comment
+./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:175:5: F841 local variable 'input_dir' is assigned to but never used
+./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:176:5: F841 local variable 'output_dir' is assigned to but never used
+./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:188:5: F841 local variable 'interface' is assigned to but never used
+./src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py:200:9: F841 local variable 'copy_checkpoints_from_job' is assigned to but never used
 ./test/unit_tests/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/test_quantum_neuron-checkpoint.py:17:1: F401 'braket.experimental.algorithms.quantum_neuron.quantum_neuron.activation_function' imported but unused
 ./test/unit_tests/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/test_quantum_neuron-checkpoint.py:28:28: E226 missing whitespace around arithmetic operator
 ./test/unit_tests/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/test_quantum_neuron-checkpoint.py:28:30: E261 at least two spaces before inline comment
@@ -48,13 +66,13 @@ linters: commands[2]> flake8
 ./test/unit_tests/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/test_quantum_neuron-checkpoint.py:79:1: W293 blank line contains whitespace
 ./test/unit_tests/braket/experimental/algorithms/quantum_neuron/.ipynb_checkpoints/test_quantum_neuron-checkpoint.py:79:9: W292 no newline at end of file
 ./test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py:17:1: F401 'braket.experimental.algorithms.quantum_neuron.quantum_neuron.activation_function' imported but unused
-linters: exit 1 (1.38 seconds) /home/ec2-user/SageMaker/amazon-braket-algorithm-library> flake8 pid=21482
-linters: FAIL ✖ in 2.38 seconds
+linters: exit 1 (1.28 seconds) /home/ec2-user/SageMaker/amazon-braket-algorithm-library> flake8 pid=31800
+linters: FAIL ✖ in 2.01 seconds
 .pkg: _optional_hooks> python /home/ec2-user/anaconda3/envs/JupyterSystemEnv/lib/python3.10/site-packages/pyproject_api/_backend.py True setuptools.build_meta __legacy__
 .pkg: get_requires_for_build_sdist> python /home/ec2-user/anaconda3/envs/JupyterSystemEnv/lib/python3.10/site-packages/pyproject_api/_backend.py True setuptools.build_meta __legacy__
 .pkg: prepare_metadata_for_build_wheel> python /home/ec2-user/anaconda3/envs/JupyterSystemEnv/lib/python3.10/site-packages/pyproject_api/_backend.py True setuptools.build_meta __legacy__
 .pkg: build_sdist> python /home/ec2-user/anaconda3/envs/JupyterSystemEnv/lib/python3.10/site-packages/pyproject_api/_backend.py True setuptools.build_meta __legacy__
-docs: install_package> python -I -m pip install --force-reinstall --no-deps /home/ec2-user/SageMaker/amazon-braket-algorithm-library/.tox/.tmp/package/4/amazon-braket-algorithm-library-1.3.6.dev0.tar.gz
+docs: install_package> python -I -m pip install --force-reinstall --no-deps /home/ec2-user/SageMaker/amazon-braket-algorithm-library/.tox/.tmp/package/10/amazon-braket-algorithm-library-1.4.1.dev0.tar.gz
 docs: commands[0]> sphinx-build -E -T -b html doc build/documentation/html
 Running Sphinx v6.2.1
 Creating file /home/ec2-user/SageMaker/amazon-braket-algorithm-library/doc/_apidoc/braket.rst.
@@ -190,13 +208,13 @@ copying static files... done
 copying extra files... done
 dumping search index in English (code: en)... done
 dumping object inventory... done
-build succeeded, 11 warnings.
+build succeeded, 9 warnings.
 
 The HTML pages are in build/documentation/html.
-docs: OK ✔ in 15.16 seconds
-unit-tests: install_package> python -I -m pip install --force-reinstall --no-deps /home/ec2-user/SageMaker/amazon-braket-algorithm-library/.tox/.tmp/package/5/amazon-braket-algorithm-library-1.3.6.dev0.tar.gz
+docs: OK ✔ in 10.79 seconds
+unit-tests: install_package> python -I -m pip install --force-reinstall --no-deps /home/ec2-user/SageMaker/amazon-braket-algorithm-library/.tox/.tmp/package/11/amazon-braket-algorithm-library-1.4.1.dev0.tar.gz
 unit-tests: commands[0]> pytest --cov-report term-missing --cov-report html --cov-report xml --cov=braket
-================================================== test session starts ===================================================
+=================================================== test session starts ===================================================
 platform linux -- Python 3.10.8, pytest-7.3.1, pluggy-1.0.0 -- /home/ec2-user/SageMaker/amazon-braket-algorithm-library/.tox/unit-tests/bin/python
 cachedir: .tox/unit-tests/.pytest_cache
 rootdir: /home/ec2-user/SageMaker/amazon-braket-algorithm-library
@@ -205,7 +223,7 @@ testpaths: test/unit_tests
 plugins: rerunfailures-11.1.2, cov-4.1.0, xdist-3.3.1
 collecting ... collected 78 items
 
-test/unit_tests/braket/experimental/algorithms/bells_inequality/test_bells_inequality.py::test_singlet PASSED      [  1%]
+test/unit_tests/braket/experimental/algorithms/bells_inequality/test_bells_inequality.py::test_singlet PASSED       [  1%]
 test/unit_tests/braket/experimental/algorithms/bells_inequality/test_bells_inequality.py::test_singlet_rotated_zero PASSED [  2%]
 test/unit_tests/braket/experimental/algorithms/bells_inequality/test_bells_inequality.py::test_singlet_rotated PASSED [  3%]
 test/unit_tests/braket/experimental/algorithms/bells_inequality/test_bells_inequality.py::test_bell_inequality_not_verbose PASSED [  5%]
@@ -224,7 +242,7 @@ test/unit_tests/braket/experimental/algorithms/deutsch_jozsa/test_deutsch_jozsa.
 test/unit_tests/braket/experimental/algorithms/deutsch_jozsa/test_deutsch_jozsa.py::test_fail_constant_oracle_circuit XFAIL [ 21%]
 test/unit_tests/braket/experimental/algorithms/deutsch_jozsa/test_deutsch_jozsa.py::test_balanced_oracle_circuit PASSED [ 23%]
 test/unit_tests/braket/experimental/algorithms/deutsch_jozsa/test_deutsch_jozsa.py::test_fail_balanced_oracle_circuit XFAIL [ 24%]
-test/unit_tests/braket/experimental/algorithms/deutsch_jozsa/test_deutsch_jozsa.py::test_dj_circuit PASSED         [ 25%]
+test/unit_tests/braket/experimental/algorithms/deutsch_jozsa/test_deutsch_jozsa.py::test_dj_circuit PASSED          [ 25%]
 test/unit_tests/braket/experimental/algorithms/deutsch_jozsa/test_deutsch_jozsa.py::test_get_deutsch_jozsa_results_constant PASSED [ 26%]
 test/unit_tests/braket/experimental/algorithms/deutsch_jozsa/test_deutsch_jozsa.py::test_get_deutsch_jozsa_results_balanced PASSED [ 28%]
 test/unit_tests/braket/experimental/algorithms/grovers_search/test_grovers_search.py::test_grovers_search_solution[00] PASSED [ 29%]
@@ -233,22 +251,22 @@ test/unit_tests/braket/experimental/algorithms/grovers_search/test_grovers_searc
 test/unit_tests/braket/experimental/algorithms/grovers_search/test_grovers_search.py::test_grovers_search_solution[00000] PASSED [ 33%]
 test/unit_tests/braket/experimental/algorithms/grovers_search/test_grovers_search.py::test_grovers_search_solution_decompose_ccnot[True] PASSED [ 34%]
 test/unit_tests/braket/experimental/algorithms/grovers_search/test_grovers_search.py::test_grovers_search_solution_decompose_ccnot[False] PASSED [ 35%]
-test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_properties PASSED                       [ 37%]
-test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_qc_qmc PASSED                           [ 38%]
-test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_q_full_imag_time_evolution PASSED       [ 39%]
-test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_classical_qmc PASSED                    [ 41%]
-test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_full_imag_time_evolution PASSED         [ 42%]
+test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_properties PASSED                        [ 37%]
+test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_qc_qmc PASSED                            [ 38%]
+test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_q_full_imag_time_evolution PASSED        [ 39%]
+test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_classical_qmc PASSED                     [ 41%]
+test/unit_tests/braket/experimental/algorithms/qc_qmc/test_qc_qmc.py::test_full_imag_time_evolution PASSED          [ 42%]
 test/unit_tests/braket/experimental/algorithms/quantum_approximate_optimization/test_quantum_approximate_optimization.py::test_qaoa PASSED [ 43%]
 test/unit_tests/braket/experimental/algorithms/quantum_approximate_optimization/test_quantum_approximate_optimization.py::test_qaoa_evaluate_circuit PASSED [ 44%]
 test/unit_tests/braket/experimental/algorithms/quantum_approximate_optimization/test_quantum_approximate_optimization.py::test_qaoa_cost_function PASSED [ 46%]
-test/unit_tests/braket/experimental/algorithms/quantum_circuit_born_machine/test_qcbm.py::test_mmd_loss PASSED     [ 47%]
-test/unit_tests/braket/experimental/algorithms/quantum_circuit_born_machine/test_qcbm.py::test_qcbm PASSED         [ 48%]
+test/unit_tests/braket/experimental/algorithms/quantum_circuit_born_machine/test_qcbm.py::test_mmd_loss PASSED      [ 47%]
+test/unit_tests/braket/experimental/algorithms/quantum_circuit_born_machine/test_qcbm.py::test_qcbm PASSED          [ 48%]
 test/unit_tests/braket/experimental/algorithms/quantum_circuit_born_machine/test_qcbm.py::test_qcbm_no_qubits XFAIL [ 50%]
 test/unit_tests/braket/experimental/algorithms/quantum_circuit_born_machine/test_qcbm.py::test_qcbm_gradient PASSED [ 51%]
 test/unit_tests/braket/experimental/algorithms/quantum_fourier_transform/test_quantum_fourier_transform.py::test_qft PASSED [ 52%]
 test/unit_tests/braket/experimental/algorithms/quantum_fourier_transform/test_quantum_fourier_transform.py::test_inverse_qft PASSED [ 53%]
 test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_linear_combination FAILED [ 55%]
-test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_quantum_neuron FAILED   [ 56%]
+test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_quantum_neuron FAILED    [ 56%]
 test/unit_tests/braket/experimental/algorithms/quantum_phase_estimation/test_quantum_phase_estimation.py::test_cnot_qpe_run_2_precision_qubits PASSED [ 57%]
 test/unit_tests/braket/experimental/algorithms/quantum_phase_estimation/test_quantum_phase_estimation.py::test_0_shots PASSED [ 58%]
 test/unit_tests/braket/experimental/algorithms/quantum_phase_estimation/test_quantum_phase_estimation.py::test_cnot_qpe_run_3_precision_qubits PASSED [ 60%]
@@ -272,20 +290,20 @@ test/unit_tests/braket/experimental/algorithms/quantum_walk/test_quantum_walk.py
 test/unit_tests/braket/experimental/algorithms/quantum_walk/test_quantum_walk.py::test_qft_conditional_add_1[3-5--] PASSED [ 83%]
 test/unit_tests/braket/experimental/algorithms/quantum_walk/test_quantum_walk.py::test_qft_conditional_add_1[3-6--] PASSED [ 84%]
 test/unit_tests/braket/experimental/algorithms/quantum_walk/test_quantum_walk.py::test_qft_conditional_add_1[3-7--] PASSED [ 85%]
-test/unit_tests/braket/experimental/algorithms/quantum_walk/test_quantum_walk.py::test_value_error_num_nodes XFAIL [ 87%]
-test/unit_tests/braket/experimental/algorithms/quantum_walk/test_quantum_walk.py::test_run_quantum_walk PASSED     [ 88%]
-test/unit_tests/braket/experimental/algorithms/shors/test_shors.py::test_invalid_a_N PASSED                        [ 89%]
-test/unit_tests/braket/experimental/algorithms/shors/test_shors.py::test_shors_algorithm PASSED                    [ 91%]
-test/unit_tests/braket/experimental/algorithms/shors/test_shors.py::test_all_valid_a PASSED                        [ 92%]
-test/unit_tests/braket/experimental/algorithms/shors/test_shors.py::test_no_counts PASSED                          [ 93%]
-test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_simons_algorithm[00000] PASSED          [ 94%]
-test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_simons_algorithm[10110] PASSED          [ 96%]
-test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_low_shot_number XFAIL                   [ 97%]
-test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_bad_string XFAIL                        [ 98%]
-test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_zero_shot_number XFAIL                  [100%]
+test/unit_tests/braket/experimental/algorithms/quantum_walk/test_quantum_walk.py::test_value_error_num_nodes XFAIL  [ 87%]
+test/unit_tests/braket/experimental/algorithms/quantum_walk/test_quantum_walk.py::test_run_quantum_walk PASSED      [ 88%]
+test/unit_tests/braket/experimental/algorithms/shors/test_shors.py::test_invalid_a_N PASSED                         [ 89%]
+test/unit_tests/braket/experimental/algorithms/shors/test_shors.py::test_shors_algorithm PASSED                     [ 91%]
+test/unit_tests/braket/experimental/algorithms/shors/test_shors.py::test_all_valid_a PASSED                         [ 92%]
+test/unit_tests/braket/experimental/algorithms/shors/test_shors.py::test_no_counts PASSED                           [ 93%]
+test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_simons_algorithm[00000] PASSED           [ 94%]
+test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_simons_algorithm[10110] PASSED           [ 96%]
+test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_low_shot_number XFAIL                    [ 97%]
+test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_bad_string XFAIL                         [ 98%]
+test/unit_tests/braket/experimental/algorithms/simons/test_simons.py::test_zero_shot_number XFAIL                   [100%]
 
-======================================================== FAILURES ========================================================
-________________________________________________ test_linear_combination _________________________________________________
+======================================================== FAILURES =========================================================
+_________________________________________________ test_linear_combination _________________________________________________
 
     def test_linear_combination():
         for n_inputs in range(3, 6):
@@ -301,7 +319,7 @@ ________________________________________________ test_linear_combination _______
 >           dev = qml.device("braket.local.qubit", wires=n_qubits, shots=100000)
 
 test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py:36: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 name = 'braket.local.qubit', args = (), kwargs = {'shots': 100000, 'wires': 5}
 
@@ -499,9 +517,9 @@ name = 'braket.local.qubit', args = (), kwargs = {'shots': 100000, 'wires': 5}
 E       pennylane._device.DeviceError: Device does not exist. Make sure the required plugin is installed.
 
 .tox/unit-tests/lib/python3.10/site-packages/pennylane/__init__.py:338: DeviceError
--------------------------------------------------- Captured stdout call --------------------------------------------------
+-------------------------------------------------- Captured stdout call ---------------------------------------------------
 
-__________________________________________________ test_quantum_neuron ___________________________________________________
+___________________________________________________ test_quantum_neuron ___________________________________________________
 
     def test_quantum_neuron():
         for n_inputs in range(3, 6):
@@ -516,7 +534,7 @@ __________________________________________________ test_quantum_neuron _________
 >           dev = qml.device("braket.local.qubit", wires=n_qubits, shots=100000)
 
 test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py:75: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 name = 'braket.local.qubit', args = (), kwargs = {'shots': 100000, 'wires': 5}
 
@@ -714,9 +732,9 @@ name = 'braket.local.qubit', args = (), kwargs = {'shots': 100000, 'wires': 5}
 E       pennylane._device.DeviceError: Device does not exist. Make sure the required plugin is installed.
 
 .tox/unit-tests/lib/python3.10/site-packages/pennylane/__init__.py:338: DeviceError
--------------------------------------------------- Captured stdout call --------------------------------------------------
+-------------------------------------------------- Captured stdout call ---------------------------------------------------
 
-==================================================== warnings summary ====================================================
+==================================================== warnings summary =====================================================
 .tox/unit-tests/lib/python3.10/site-packages/pkg_resources/__init__.py:121
 test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_linear_combination
 test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_quantum_neuron
@@ -1015,7 +1033,7 @@ src/braket/experimental/algorithms/quantum_circuit_born_machine/qcbm.py         
 src/braket/experimental/algorithms/quantum_fourier_transform/__init__.py                                                            1      0      0      0   100%
 src/braket/experimental/algorithms/quantum_fourier_transform/quantum_fourier_transform.py                                          44      0     18      0   100%
 src/braket/experimental/algorithms/quantum_neuron/__init__.py                                                                       1      0      0      0   100%
-src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py                                                                85     59     26      1    30%   63, 87-94, 111-119, 136-165, 169-209, 220
+src/braket/experimental/algorithms/quantum_neuron/quantum_neuron.py                                                                85     59     26      1    30%   63, 87-94, 111-119, 136-169, 173-213, 224
 src/braket/experimental/algorithms/quantum_phase_estimation/__init__.py                                                             1      0      0      0   100%
 src/braket/experimental/algorithms/quantum_phase_estimation/quantum_phase_estimation.py                                            75      0     30      0   100%
 src/braket/experimental/algorithms/quantum_walk/__init__.py                                                                         1      0      0      0   100%
@@ -1029,16 +1047,16 @@ TOTAL                                                                           
 Coverage HTML written to dir build/coverage
 Coverage XML written to file build/coverage/coverage.xml
 
-================================================ short test summary info =================================================
-FAILED test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_linear_combination - ...
-FAILED test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_quantum_neuron - penn...
-================================= 2 failed, 69 passed, 7 xfailed, 40 warnings in 36.31s ==================================
-unit-tests: exit 1 (37.55 seconds) /home/ec2-user/SageMaker/amazon-braket-algorithm-library> pytest --cov-report term-missing --cov-report html --cov-report xml --cov=braket pid=21884
-unit-tests: FAIL ✖ in 40.96 seconds
-integ_tests: install_package> python -I -m pip install --force-reinstall --no-deps /home/ec2-user/SageMaker/amazon-braket-algorithm-library/.tox/.tmp/package/6/amazon-braket-algorithm-library-1.3.6.dev0.tar.gz
+================================================= short test summary info =================================================
+FAILED test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_linear_combination - p...
+FAILED test/unit_tests/braket/experimental/algorithms/quantum_neuron/test_quantum_neuron.py::test_quantum_neuron - penny...
+================================== 2 failed, 69 passed, 7 xfailed, 40 warnings in 34.09s ==================================
+unit-tests: exit 1 (35.18 seconds) /home/ec2-user/SageMaker/amazon-braket-algorithm-library> pytest --cov-report term-missing --cov-report html --cov-report xml --cov=braket pid=32164
+unit-tests: FAIL ✖ in 38.53 seconds
+integ_tests: install_package> python -I -m pip install --force-reinstall --no-deps /home/ec2-user/SageMaker/amazon-braket-algorithm-library/.tox/.tmp/package/12/amazon-braket-algorithm-library-1.4.1.dev0.tar.gz
 .pkg: _exit> python /home/ec2-user/anaconda3/envs/JupyterSystemEnv/lib/python3.10/site-packages/pyproject_api/_backend.py True setuptools.build_meta __legacy__
-  linters: FAIL code 1 (2.38=setup[0.10]+cmd[0.47,0.42,1.38] seconds)
-  docs: OK (15.16=setup[3.93]+cmd[11.23] seconds)
-  unit-tests: FAIL code 1 (40.96=setup[3.41]+cmd[37.55] seconds)
-  integ_tests: OK (3.68 seconds)
-  evaluation failed :( (62.51 seconds)
+  linters: FAIL code 1 (2.01=setup[0.05]+cmd[0.28,0.39,1.28] seconds)
+  docs: OK (10.79=setup[3.45]+cmd[7.34] seconds)
+  unit-tests: FAIL code 1 (38.53=setup[3.34]+cmd[35.18] seconds)
+  integ_tests: OK (2.99 seconds)
+  evaluation failed :( (54.50 seconds)

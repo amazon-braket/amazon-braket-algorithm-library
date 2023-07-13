@@ -150,9 +150,9 @@ def quantum_neuron(inputs, weights, bias, n_qubits, dev):
     ### start of post-processing ###
     # sample = af_circuit()
     sample = np.array(af_circuit())
-    
+
     sample = sample.T
-    
+
     # sample = (1 - sample.numpy()) / 2
     sample = (1 - sample) / 2
 
