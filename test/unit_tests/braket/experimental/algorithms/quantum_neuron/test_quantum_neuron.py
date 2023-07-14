@@ -44,10 +44,11 @@ def test_linear_combination():
         z_expected_value = lc_circuit()
         print(f"z_expected_value: {z_expected_value}\n")
 
-        theta = (
-            np.inner(np.array(list(inputs_list[input_to_test]), dtype=int), np.array(weights))
+        theta = (  # linear comination with numpy
+            np.inner(np.array(list(inputs_list[input_to_test]), dtype=int),
+                     np.array(weights))
             + bias
-        )  # linear comination with numpy
+        )
         theta = theta.item()  # Convert numpy array to native python float-type
 
         theoritical_z_expected_value = (
