@@ -14,24 +14,21 @@
 import json
 import os
 import random
-import time
-from typing import List
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pennylane as qml
-from braket.aws import AwsQuantumJob, AwsSession
-from braket.jobs import load_job_checkpoint, save_job_checkpoint, save_job_result
-from braket.jobs.image_uris import Framework, retrieve_image
+from braket.jobs import save_job_result
 from braket.tracking import Tracker
 
 
 def generate_random_numbers(n: int, upper_total: float):
-    """Generate random numbers such that the sum is greater than or equal to 0 and less than upper_total.
+    """Generate random numbers such that
+    the sum is greater than or equal to 0 and less than upper_total.
 
     Args:
         n (int): Number of random numbers.
-        upper_total (float): Maximum value that the sum of random numbers can take.
+        upper_total (float):
+            Maximum value that the sum of random numbers can take.
 
     Returns:
         List[float]: List of random numbers.
@@ -54,7 +51,8 @@ def init_pl_device(device_arn, n_qubits, shots, max_parallel):
     Args:
         device_arn (str): Name of the device to load.
         n_qubits (int): Number of qubits.
-        shots (int): How many circuit executions are used to estimate stochastic return values.
+        shots (int): How many circuit executions are used to estimate
+            stochastic return values.
         max_parallel (int): Maximum number of simultaneous tasks allowed.
 
     Returns:
@@ -114,9 +112,11 @@ def activation_function(inputs, weights, bias, ancilla, output, n_qubits):
     qml.RZ(phi=-np.pi / 2, wires=ancilla)
 
     for qubit in range(len(inputs)):
-        qml.CRY(phi=-2 * weights[qubit], wires=[qubit, ancilla])  # note '-(minus)'
+        # note '-(minus)'
+        qml.CRY(phi=-2 * weights[qubit], wires=[qubit, ancilla])
 
-    qml.RY(-2 * bias, wires=ancilla)  # note '-(minus)'
+    # note '-(minus)'
+    qml.RY(-2 * bias, wires=ancilla)
 
 
 def quantum_neuron(inputs, weights, bias, n_qubits, dev):
@@ -147,7 +147,7 @@ def quantum_neuron(inputs, weights, bias, n_qubits, dev):
 
         return [qml.sample(qml.PauliZ(i)) for i in range(n_qubits)]
 
-    ### start of post-processing ###
+    # start of post-processing #
     # sample = af_circuit()
     sample = np.array(af_circuit())
 
@@ -164,7 +164,7 @@ def quantum_neuron(inputs, weights, bias, n_qubits, dev):
     p_0 = count_0 / (count_0 + count_1)
 
     q_theta = np.arccos(np.sqrt(p_0))
-    ### end of post-processing ###
+    # end of post-processing #
 
     return theta, q_theta
 
@@ -172,10 +172,6 @@ def quantum_neuron(inputs, weights, bias, n_qubits, dev):
 def main():
     t = Tracker().start()
 
-    input_dir = os.environ["AMZN_BRAKET_INPUT_DIR"]
-    output_dir = os.environ["AMZN_BRAKET_JOB_RESULTS_DIR"]
-    job_name = os.environ["AMZN_BRAKET_JOB_NAME"]  # noqa
-    checkpoint_dir = os.environ["AMZN_BRAKET_CHECKPOINT_DIR"]  # noqa
     hp_file = os.environ["AMZN_BRAKET_HP_FILE"]
     device_arn = os.environ["AMZN_BRAKET_DEVICE_ARN"]
 
@@ -185,7 +181,6 @@ def main():
 
     n_inputs = int(hyperparams["n_inputs"])
     shots = int(hyperparams["shots"])
-    interface = hyperparams["interface"]
     max_parallel = int(hyperparams["max_parallel"])
 
     n_qubits = n_inputs + 2  # +2: ancilla and output qubit
@@ -193,11 +188,6 @@ def main():
     inputs_list = [format(i, f"0{n_inputs}b") for i in range(2**n_inputs)]
     bias = 0.05  # constant
     weights = generate_random_numbers(n_inputs, np.pi / 2 - bias)
-
-    if "copy_checkpoints_from_job" in hyperparams:
-        copy_checkpoints_from_job = hyperparams["copy_checkpoints_from_job"].split("/", 2)[-1]
-    else:
-        copy_checkpoints_from_job = None
 
     # Run quantum neuron circuit
     dev = init_pl_device(device_arn, n_qubits, shots, max_parallel)

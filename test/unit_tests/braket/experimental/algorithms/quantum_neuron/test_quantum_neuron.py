@@ -15,7 +15,6 @@ import numpy as np
 import pennylane as qml
 
 from braket.experimental.algorithms.quantum_neuron.quantum_neuron import (
-    activation_function,
     generate_random_numbers,
     linear_combination,
     quantum_neuron,
@@ -50,16 +49,14 @@ def test_linear_combination():
             + bias
         )  # linear comination with numpy
         theta = theta.item()  # Convert numpy array to native python float-type
-        # print(f'theta: {theta}')
-        # print(f'RY(theta): {qml.matrix(qml.RY(phi=theta, wires=0))}')
-        # print(f'shape of RY(theta): {qml.matrix(qml.RY(phi=theta, wires=0)).shape}')
 
         theoritical_z_expected_value = (
             np.cos(theta) ** 2 - np.sin(theta) ** 2
         )  # Z expected value of Ry(2*theta)|0>
         print(f"theoritical_z_expected_value: {z_expected_value}")
 
-        np.testing.assert_almost_equal(z_expected_value, theoritical_z_expected_value, decimal=2)
+        np.testing.assert_almost_equal(z_expected_value,
+                                       theoritical_z_expected_value, decimal=2)
 
 
 def test_quantum_neuron():
@@ -74,7 +71,8 @@ def test_quantum_neuron():
 
         dev = qml.device("braket.local.qubit", wires=n_qubits, shots=100000)
 
-        theta, q_theta = quantum_neuron(inputs_list[input_to_test], weights, bias, n_qubits, dev)
+        theta, q_theta = quantum_neuron(inputs_list[input_to_test],
+                                        weights, bias, n_qubits, dev)
         print(f"q_theta: {q_theta}")
 
         expected_q_theta = np.arctan(np.tan(theta) ** 2)
