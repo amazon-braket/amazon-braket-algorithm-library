@@ -45,8 +45,7 @@ def test_linear_combination():
         print(f"z_expected_value: {z_expected_value}\n")
 
         theta = (  # linear comination with numpy
-            np.inner(np.array(list(inputs_list[input_to_test]), dtype=int),
-                     np.array(weights))
+            np.inner(np.array(list(inputs_list[input_to_test]), dtype=int), np.array(weights))
             + bias
         )
         theta = theta.item()  # Convert numpy array to native python float-type
@@ -56,8 +55,7 @@ def test_linear_combination():
         )  # Z expected value of Ry(2*theta)|0>
         print(f"theoritical_z_expected_value: {z_expected_value}")
 
-        np.testing.assert_almost_equal(z_expected_value,
-                                       theoritical_z_expected_value, decimal=2)
+        np.testing.assert_almost_equal(z_expected_value, theoritical_z_expected_value, decimal=2)
 
 
 def test_quantum_neuron():
@@ -72,8 +70,7 @@ def test_quantum_neuron():
 
         dev = qml.device("braket.local.qubit", wires=n_qubits, shots=100000)
 
-        theta, q_theta = quantum_neuron(inputs_list[input_to_test],
-                                        weights, bias, n_qubits, dev)
+        theta, q_theta = quantum_neuron(inputs_list[input_to_test], weights, bias, n_qubits, dev)
         print(f"q_theta: {q_theta}")
 
         expected_q_theta = np.arctan(np.tan(theta) ** 2)
