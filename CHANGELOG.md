@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.1 (2023-08-03)
+
+### Bug Fixes and Other Changes
+
+ * Update Quantum_Approximate_Optimization_Algorithm.ipynb
+
 ## v1.4.0 (2023-06-26)
 
 ### Features
