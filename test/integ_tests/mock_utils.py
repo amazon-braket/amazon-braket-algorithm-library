@@ -27,7 +27,7 @@ class Mocker:
 
     def set_create_quantum_task_result(self, result):
         self._wrapper.boto_client.create_quantum_task.return_value = result
-        
+
     ### test
     def set_create_job_result(self, result):
         self._wrapper.boto_client.create_job.return_value = result
