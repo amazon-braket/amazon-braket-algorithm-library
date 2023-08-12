@@ -31,10 +31,10 @@ class Mocker:
     # test
     def set_create_job_result(self, result):
         self._wrapper.boto_client.create_job.return_value = result
-
+    
     # test
-    def set_get_default_jobs_role(self):
-        self._wrapper.boto_client.get_default_jobs_role.return_value = mock.Mock()
+    def set_get_default_jobs_role(self, result):
+        self._wrapper.boto_client.get_default_jobs_role.return_value = result
 
     def set_get_quantum_task_result(self, result):
         self._wrapper.boto_client.get_quantum_task.return_value = result
