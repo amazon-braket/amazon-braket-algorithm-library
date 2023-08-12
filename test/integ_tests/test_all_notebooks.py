@@ -11,8 +11,6 @@ EXCLUDED_NOTEBOOKS = [
     # need high processing power and lead to timeouts.
     "Quantum_Computing_Quantum_Monte_Carlo.ipynb",
     "Template.ipynb",
-    # for test
-    "Quantum_Neuron.ipynb",
 ]
 
 logging.basicConfig(level=logging.INFO)
