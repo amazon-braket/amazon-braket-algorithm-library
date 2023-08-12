@@ -22,10 +22,6 @@ class Mocker:
         tracker.qpu_tasks_cost.return_value = 0
         tracker.simulator_tasks_cost.return_value = 0
 
-    # test
-    def __iter__(self):
-        return iter(self.list)
-
     def set_get_device_result(self, result):
         self._wrapper.boto_client.get_device.return_value = result
 
@@ -35,7 +31,10 @@ class Mocker:
     # test
     def set_create_job_result(self, result):
         self._wrapper.boto_client.create_job.return_value = result
-        self._wrapper.boto_client.create_job.__iter__.return_value = []
+
+    # test
+    def set_get_default_jobs_role(self):
+        self._wrapper.boto_client.get_default_jobs_role.return_value = mock.Mock()
 
     def set_get_quantum_task_result(self, result):
         self._wrapper.boto_client.get_quantum_task.return_value = result
@@ -120,14 +119,12 @@ class SessionWrapper:
             "authorizationData": [{"authorizationToken": "TestToken"}]
         }
 
-    def __iter__(self):
-        return iter(self.list)
-
 
 class Boto3SessionAllWrapper(SessionWrapper):
     def __init__(self):
         super().__init__()
         boto3.Session = self
+        print("inside Boto3SessionAllWrapeper constructor")
 
     def __call__(self, *args, **kwargs):
         return self

@@ -3,6 +3,7 @@ def pre_run_inject(mock_utils):
 
     mocker = mock_utils.Mocker()
     mock_utils.mock_default_device_calls(mocker)
+    mocker.set_get_default_jobs_role()
     mocker.set_create_job_result({"jobArn": "arn:aws:braket:us-east-1:000000:job/TestARN"})
 
 
