@@ -21,7 +21,7 @@ class Mocker:
         tracker = braket.tracking.Tracker().start()
         tracker.qpu_tasks_cost.return_value = 0
         tracker.simulator_tasks_cost.return_value = 0
-    
+
     # test
     def __iter__(self):
         return iter(self.list)
@@ -35,7 +35,6 @@ class Mocker:
     # test
     def set_create_job_result(self, result):
         self._wrapper.boto_client.create_job.return_value = result
-        
 
     def set_get_quantum_task_result(self, result):
         self._wrapper.boto_client.get_quantum_task.return_value = result
@@ -119,6 +118,7 @@ class SessionWrapper:
         self.boto_client.get_authorization_token.return_value = {
             "authorizationData": [{"authorizationToken": "TestToken"}]
         }
+
     def __iter__(self):
         return iter(self.list)
 
