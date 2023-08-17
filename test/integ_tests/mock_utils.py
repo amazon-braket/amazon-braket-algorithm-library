@@ -35,7 +35,7 @@ class Mocker:
     # test
     def set_get_default_jobs_role(self, result):
         self._wrapper.boto_client.get_default_jobs_role.return_value = result
-    
+
     def set_get_job_result(self, result):
         self._wrapper.boto_client.get_job.return_value = result
 
