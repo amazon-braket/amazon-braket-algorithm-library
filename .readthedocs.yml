@@ -13,9 +13,14 @@ sphinx:
 formats:
   - pdf
 
+# setting up build.os and the python version
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.9"
+
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  version: 3.9
   install:
     - method: pip
       path: .
