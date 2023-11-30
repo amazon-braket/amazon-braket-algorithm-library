@@ -3,5 +3,5 @@ The `random_circuit` function generates a random quantum circuit using the Brake
 <!--
 [metadata-name]: Random Quantum Circuit Generator
 [metadata-tags]: Textbook
-[metadata-url]: 
+[metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/random_circuit
 -->
