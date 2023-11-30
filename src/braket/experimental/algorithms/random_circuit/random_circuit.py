@@ -49,7 +49,6 @@ def random_circuit(
     # Get filtered gate set based on the minimum number of qubits
     filtered_gate_set = get_filtered_gates(max_qubits_gate)
     instructions = []
-    print(filtered_gate_set)
     for _ in range(num_instructions):
         # Choose a random gate from the filtered set
         gate_class = random.choice(filtered_gate_set)
