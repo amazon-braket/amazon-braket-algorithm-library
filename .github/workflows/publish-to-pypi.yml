@@ -18,10 +18,10 @@ jobs:
         run: python -m pip install --user --upgrade wheel
       - name: Install twine
         run: python -m pip install --user --upgrade twine
-      - name: Build a binary wheel and a source tarball
-        run: python setup.py sdist bdist_wheel
       - name: Install setuptools
         run: python -m pip install --user --upgrade setuptools
+      - name: Build a binary wheel and a source tarball
+        run: python setup.py sdist bdist_wheel
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
