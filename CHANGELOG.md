@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.3 (2023-12-05)
+
+### Bug Fixes and Other Changes
+
+ * install setuptools
+
 ## v1.4.2 (2023-12-05)
 
 ### Bug Fixes and Other Changes
