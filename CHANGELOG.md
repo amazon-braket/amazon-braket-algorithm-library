@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.4.2 (2023-12-05)
+
+### Bug Fixes and Other Changes
+
+ * vector rescaling in PCA notebook
+ * Quantum principal component analysis notebook added
+
+### Documentation Changes
+
+ * update readthedocs for v2
+
 ## v1.4.1 (2023-08-03)
 
 ### Bug Fixes and Other Changes
