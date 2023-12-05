@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.4 (2023-12-05)
+
+### Bug Fixes and Other Changes
+
+ * reorder installs for pypi publishing
+
 ## v1.4.3 (2023-12-05)
 
 ### Bug Fixes and Other Changes
