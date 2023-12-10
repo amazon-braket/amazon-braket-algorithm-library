@@ -1,7 +1,10 @@
 import inspect
 import random
+from typing import Dict
 
 from braket.circuits import Circuit, Instruction, gates
+from braket.tasks import QuantumTask
+from braket.devices import Device
 
 
 def get_filtered_gates(max_qubits: int):
@@ -74,3 +77,33 @@ def random_circuit(
 
     # Create a circuit with the list of instructions
     return Circuit().add(instructions)
+
+
+def get_random_circuit_results(task: QuantumTask) -> Dict[str, float]:
+    """Return the probabilities and corresponding bitstrings.
+
+    Args:
+        task (QuantumTask): Quantum task to process.
+
+    Returns:
+        Dict[str, float]: Results as a dictionary of bitstrings with their corresponding probabilities
+    """
+
+    return task.result().measurement_probabilities
+
+
+def run_random_circuit(
+    circuit: Circuit,
+    device: Device,
+    shots: int = 1000,
+) -> QuantumTask:
+    """Function to run a random circuit on a device.
+    Args:
+        circuit (Circuit): Random circuit
+        device (Device): Braket device backend
+        shots (int) : Number of measurement shots (default is 1000).
+    Returns:
+        QuantumTask: Task from running the random circuit
+    """
+
+    return device.run(circuit, shots=shots)

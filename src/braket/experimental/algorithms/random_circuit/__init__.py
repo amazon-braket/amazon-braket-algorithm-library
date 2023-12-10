@@ -14,4 +14,6 @@
 from braket.experimental.algorithms.random_circuit.random_circuit import (  # noqa: F401
     get_filtered_gates,
     random_circuit,
+    run_random_circuit,
+    get_random_circuit_results
 )
