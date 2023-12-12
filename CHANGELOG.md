@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.5 (2023-12-12)
+
+### Bug Fixes and Other Changes
+
+ * build(deps): bump actions/setup-python from 4 to 5
+
 ## v1.4.4 (2023-12-05)
 
 ### Bug Fixes and Other Changes
