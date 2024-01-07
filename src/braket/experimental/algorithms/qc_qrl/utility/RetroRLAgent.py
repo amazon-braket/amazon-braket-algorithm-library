@@ -38,7 +38,7 @@ class RetroRLAgent:
         init_param = param["init_param"]
         retro_rl_model = RetroRLModel(data=None, method=init_method, **init_param)
         if load_path != None:
-            print(f"try to load agent from {load_path} for pathway function...")
+            logging.info(f"try to load agent from {load_path} for pathway function...")
             logging.info("load data...")
             self.cost1 = {}
             self.cost2 = {}
@@ -59,12 +59,13 @@ class RetroRLAgent:
             self.NN.load_state_dict(torch.load(f"{load_path}/{agent_name}"))
             self.NN.eval()
         else:
-            print(f"initial a new agent...")
+            logging.info(f"initial a new agent...")
             self.param = param
             self.train_mode = param["train_mode"]
             # self.model_path = param["model_path"]
             self.model_name = param["model_name"]
             self.episodes = param["episodes"]
+            self.epoches = param["epoches_per_episode"]
             self.method = method
             # load data
             logging.info("load data...")
@@ -115,7 +116,7 @@ class RetroRLAgent:
 
                     model_param = param["model_param"]
 
-                    print(f"model_param is {model_param}")
+                    logging.info(f"model_param is {model_param}")
                     retro_rl_model.build_model(**model_param)
                     self.NN = retro_rl_model.get_model(method,self.model_name)['nn_model']
                     self.opt = torch.optim.SGD(self.NN.parameters(), lr=0.001 / (1 + 2 * math.sqrt(self.updates)))
@@ -265,7 +266,7 @@ class RetroRLAgent:
     def game(self, episodes):
         # for episode in range(1, 301):
         for episode in range(1, episodes):
-            print('episode', episode)
+            logging.info(f'episode {episode}')
             episodecost = 0
             for name in self.file3:
                 self.layer[1] = [name]
@@ -296,7 +297,7 @@ class RetroRLAgent:
             if episode % 1 == 0:
                 self.updates += 1
                 self.is_model = True
-                print(f"epsiode {episode} training...")
+                logging.info(f"epsiode {episode} averate cost {avc} start training for {self.epoches} epoches...")
                 self.train(self.file1, self.file2)
             if episode % 100 == 0:
                 if self.epsilon - 0.05 > 0:
@@ -430,7 +431,7 @@ class RetroRLAgent:
 
     def train(self, file1, file2):
         # for epoch in range(50):
-        for epoch in range(2):
+        for epoch in range(self.epoches):
             start = time.time()
             y = []
             x = []
@@ -494,7 +495,7 @@ class RetroRLAgent:
             # print(f"opt step")
             self.opt.step()
             end = time.time()
-            print(f'finish epoch {epoch} for {(end - start) / 60} minutes')
+            # print(f'finish epoch {epoch} for {(end - start) / 60} minutes')
 
     def add_child2(self, index, m):
         self.layer2[self.depth + 1][index] = m
