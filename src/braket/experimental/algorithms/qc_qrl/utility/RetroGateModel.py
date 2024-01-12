@@ -160,7 +160,7 @@ class CirModel(nn.Module):
         optimizer = None
         if self.device == 'local':
             # dev = qml.device("braket.local.qubit", wires=self.n_qubits)
-            dev = qml.device("lightning.qubit", wires=self.n_qubits)
+            dev = qml.device("lightning.gpu", wires=self.n_qubits)
         elif self.device == 'sv1':
             dev = qml.device("braket.aws.qubit", 
             device_arn="arn:aws:braket:::device/quantum-simulator/amazon/sv1", 
