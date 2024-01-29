@@ -4,10 +4,12 @@ import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 # from deepquantum.gates.qcircuit import Circuit as dqCircuit
 from braket.circuits import Circuit as bkCircuit
 from braket.tracking import Tracker
 from braket.jobs import save_job_checkpoint
+
 # import deepquantum.gates.qoperator as op
 import boto3
 
@@ -18,9 +20,9 @@ import time
 import json
 
 from platform import python_version
-  
-os.environ['PYTHONUNBUFFERED'] = '1'
-  
+
+os.environ["PYTHONUNBUFFERED"] = "1"
+
 print("Current Python Version-", python_version())
 import sys
 
@@ -29,6 +31,7 @@ sys.path.append(file_dir)
 
 from utility.RetroGateModel import RetroRLModel
 from utility.RetroRLAgent import RetroRLAgent
+
 t = Tracker().start()
 
 input_dir = os.environ["AMZN_BRAKET_INPUT_DIR"]
@@ -79,14 +82,14 @@ else:
     copy_checkpoints_from_job = None
 
 try:
-    input_data_path = f'{input_dir}/input'
+    input_data_path = f"{input_dir}/input"
     os.system(f"ls -alh {input_data_path}")
     # retro_rl_model = RetroRLModel.load(f'{input_data_path}/{model_path}')
 except Exception as e1:
     print(f"error e1 {e1}")
     try:
         # Second solution
-        input_data_path = f'{input_dir}/data'
+        input_data_path = f"{input_dir}/data"
         os.system(f"ls -alh {input_data_path}")
         # retro_rl_model = RetroRLModel.load(f'{input_data_path}/{model_path}')
     except Exception as e2:
@@ -94,7 +97,7 @@ except Exception as e1:
         print(f"error e2 {e2}")
         try:
             # Second solution
-            input_data_path = f'/opt/ml/input/data/input'
+            input_data_path = f"/opt/ml/input/data/input"
             os.system(f"ls -alh {input_data_path}")
             # retro_rl_model = RetroRLModel.load(f'{input_data_path}/{model_path}')
         except Exception as e3:
@@ -102,7 +105,9 @@ except Exception as e1:
             print(f"error e1 {e1}")
             print(f"error e2 {e2}")
             print(f"error e3 {e3}")
-            print(f"Can't find data in {input_dir}/input or {input_dir}/data or {input_data_path}!!!")
+            print(
+                f"Can't find data in {input_dir}/input or {input_dir}/data or {input_data_path}!!!"
+            )
 else:
     # Code to execute when the first solution succeeds
     print(f"Found data in {input_data_path}!!")
@@ -113,34 +118,34 @@ else:
 agent_param = {}
 # initial the RetroRLModel object
 init_param = {}
-method = ['retro-rl', 'retro-qrl']
+method = ["retro-rl", "retro-qrl"]
 
 for mt in method:
-    if mt == 'retro-rl':
+    if mt == "retro-rl":
         init_param[mt] = {}
-        init_param[mt]['param'] = ['inputsize', 'middlesize', 'outputsize']
-    elif mt == 'retro-qrl':
+        init_param[mt]["param"] = ["inputsize", "middlesize", "outputsize"]
+    elif mt == "retro-qrl":
         init_param[mt] = {}
-        init_param[mt]['param'] = ['n_qubits', 'device', 'framework', 'shots', 'layers']
-    
+        init_param[mt]["param"] = ["n_qubits", "device", "framework", "shots", "layers"]
+
 # retro_rl_model = RetroRLModel(data=None, method=method, **init_param)
-agent_param['init_param'] = init_param
+agent_param["init_param"] = init_param
 
-model_param={}
-method = 'retro-qrl'
+model_param = {}
+method = "retro-qrl"
 model_param[method] = {}
-model_param[method]['n_qubits'] = [int(model_name.split('_')[0])]
+model_param[method]["n_qubits"] = [int(model_name.split("_")[0])]
 # model_param[method]['device'] = ['local', 'sv1', 'aspen-m-3', 'aria-2']
-model_param[method]['device'] = [model_name.split('_')[1]]
-model_param[method]['framework'] = [model_name.split('_')[2]]
+model_param[method]["device"] = [model_name.split("_")[1]]
+model_param[method]["framework"] = [model_name.split("_")[2]]
 # model_param[method]['shots'] = [100,1000]
-model_param[method]['shots'] = [int(model_name.split('_')[3])]
+model_param[method]["shots"] = [int(model_name.split("_")[3])]
 # model_param[method]['layers'] = [1,2,3]
-model_param[method]['layers'] = [int(model_name.split('_')[4])]
+model_param[method]["layers"] = [int(model_name.split("_")[4])]
 
-agent_param['model_param'] = model_param
+agent_param["model_param"] = model_param
 
-agent_param['data_path'] = input_data_path
+agent_param["data_path"] = input_data_path
 agent_param["train_mode"] = train_mode
 agent_param["model_name"] = model_name
 # agent_param["model_path"] = model_path
@@ -180,4 +185,3 @@ s3_client.upload_file(save_path, s3, f"data/{save_name}")
 #     S3_BUCKET_NAME = "amazon-braket-us-west-1-493904798517"
 #     s3_client = boto3.client("s3", region_name=AWS_REGION)
 #     s3_client.upload_file(save_path, S3_BUCKET_NAME, f'data/{save_name}')
-

@@ -7,9 +7,11 @@ from .RetroGateModel import RetroRLModel
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 # from deepquantum.gates.qcircuit import Circuit as dqCircuit
 
 from braket.circuits import Circuit as bkCircuit
+
 # import deepquantum.gates.qoperator as op
 from braket.aws import AwsQuantumJob, AwsSession
 from braket.jobs.local.local_job import LocalQuantumJob
@@ -25,15 +27,16 @@ import pickle
 import os
 
 log = logging.getLogger()
-log.setLevel('INFO')
+log.setLevel("INFO")
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 current_path = os.path.realpath(os.path.dirname(__file__))
 
+
 class RetroRLAgent:
     def __init__(self, build_model=False, method=None, load_path=None, agent_name=None, **param):
-        self.model_name = param['model_name']
+        self.model_name = param["model_name"]
         init_method = list(param["init_param"].keys())
         init_param = param["init_param"]
         retro_rl_model = RetroRLModel(data=None, method=init_method, **init_param)
@@ -45,17 +48,17 @@ class RetroRLAgent:
             self.method = method
             self._load_data(input_data_path=load_path)
             # self.NN = model['nn_model']
-            model_param={}
-            method = 'retro-qrl'
+            model_param = {}
+            method = "retro-qrl"
             model_param[method] = {}
-            model_param[method]['n_qubits'] = [8]
-            model_param[method]['device'] = ['local']
-            model_param[method]['framework'] = ['pennylane']
-            model_param[method]['shots'] = [100]
-            model_param[method]['layers'] = [1]
+            model_param[method]["n_qubits"] = [8]
+            model_param[method]["device"] = ["local"]
+            model_param[method]["framework"] = ["pennylane"]
+            model_param[method]["shots"] = [100]
+            model_param[method]["layers"] = [1]
 
             retro_rl_model.build_model(**model_param)
-            self.NN = retro_rl_model.get_model(method,self.model_name)['nn_model']
+            self.NN = retro_rl_model.get_model(method, self.model_name)["nn_model"]
             self.NN.load_state_dict(torch.load(f"{load_path}/{agent_name}"))
             self.NN.eval()
         else:
@@ -84,19 +87,30 @@ class RetroRLAgent:
             current_time = f"{currentYear}{currentMonth}{currentDay}"
             self.save_name = f"{self.model_name}_agent_{current_time}.pt"
             try:
-                s3_data_path = self.param['s3_data_path']
+                s3_data_path = self.param["s3_data_path"]
                 self.s3_save_path = f"{s3_data_path}/{self.save_name}"
             except:
                 self.s3_save_path = None
 
-            if method == 'retro-qrl' or method == 'retro-rl':
+            if method == "retro-qrl" or method == "retro-rl":
                 self.depth = 1
                 self.maxdepth = 10
                 self.cost1 = {}
                 self.cost2 = {}
                 self.is_model = False
                 self.layer = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []}
-                self.layer2 = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}}
+                self.layer2 = {
+                    1: {},
+                    2: {},
+                    3: {},
+                    4: {},
+                    5: {},
+                    6: {},
+                    7: {},
+                    8: {},
+                    9: {},
+                    10: {},
+                }
                 self.data = None
                 self.updates = 0
                 self.epsilon = 0.2
@@ -105,7 +119,7 @@ class RetroRLAgent:
                 if build_model != False:
                     # self.name = model['model_name']
                     # self.NN = model['nn_model']
-                    model_param={}
+                    model_param = {}
                     # method = 'retro-qrl'
                     # model_param[method] = {}
                     # model_param[method]['n_qubits'] = [8]
@@ -118,8 +132,10 @@ class RetroRLAgent:
 
                     logging.info(f"model_param is {model_param}")
                     retro_rl_model.build_model(**model_param)
-                    self.NN = retro_rl_model.get_model(method,self.model_name)['nn_model']
-                    self.opt = torch.optim.SGD(self.NN.parameters(), lr=0.001 / (1 + 2 * math.sqrt(self.updates)))
+                    self.NN = retro_rl_model.get_model(method, self.model_name)["nn_model"]
+                    self.opt = torch.optim.SGD(
+                        self.NN.parameters(), lr=0.001 / (1 + 2 * math.sqrt(self.updates))
+                    )
 
                 self.tocost = {}
                 self.avtocost = []
@@ -127,12 +143,14 @@ class RetroRLAgent:
 
     def _load_data(self, input_data_path=None):
         if input_data_path == None:
-            input_data_path = self.param['data_path']
-        self.file1 = np.load(f'{input_data_path}/reactions_dictionary.npy', allow_pickle=True).item()
-        self.file2 = np.load(f'{input_data_path}/smiles_dictionary.npy', allow_pickle=True).item()
-        self.file3 = np.load(f'{input_data_path}/target_product.npy').tolist()
-        self.deadend = np.load(f'{input_data_path}/Deadend.npy').tolist()
-        self.buyable = np.load(f'{input_data_path}/buyable.npy').tolist()
+            input_data_path = self.param["data_path"]
+        self.file1 = np.load(
+            f"{input_data_path}/reactions_dictionary.npy", allow_pickle=True
+        ).item()
+        self.file2 = np.load(f"{input_data_path}/smiles_dictionary.npy", allow_pickle=True).item()
+        self.file3 = np.load(f"{input_data_path}/target_product.npy").tolist()
+        self.deadend = np.load(f"{input_data_path}/Deadend.npy").tolist()
+        self.buyable = np.load(f"{input_data_path}/buyable.npy").tolist()
         # self.file1 = np.load('reactions_dictionary.npy', allow_pickle=True).item()
         # self.file2 = np.load('smiles_dictionary.npy', allow_pickle=True).item()
         # self.file3 = np.load('target_product.npy').tolist()
@@ -152,7 +170,7 @@ class RetroRLAgent:
         self.job = AwsQuantumJob(arn)
 
     def game_job(self):
-        device_name = self.model_name.split('_')[1]
+        device_name = self.model_name.split("_")[1]
         # model_name = self.name
         train_mode = self.param["train_mode"]
 
@@ -160,31 +178,31 @@ class RetroRLAgent:
         #     self.game()
         #     return
 
-        if train_mode == 'local-instance':
+        if train_mode == "local-instance":
             self.game(self.episodes)
         else:
             device = None
-            if device_name == 'sv1':
+            if device_name == "sv1":
                 device = "arn:aws:braket:::device/quantum-simulator/amazon/sv1"
-            elif device_name == 'aspen-m-3':
-                device = "arn:aws:braket:us-west-1::device/qpu/rigetti/Aspen-M-3",
-            elif device_name == 'local':
+            elif device_name == "aspen-m-3":
+                device = ("arn:aws:braket:us-west-1::device/qpu/rigetti/Aspen-M-3",)
+            elif device_name == "local":
                 device = "arn:aws:braket:::device/quantum-simulator/amazon/sv1"
-            elif device_name == 'aria-2':
-                device ="arn:aws:braket:us-east-1::device/qpu/ionq/Aria-2"
+            elif device_name == "aria-2":
+                device = "arn:aws:braket:us-east-1::device/qpu/ionq/Aria-2"
             else:
                 device = "arn:aws:braket:::device/quantum-simulator/amazon/sv1"
 
             print(f"Going to run {device_name} mode")
 
             input_data = {}
-            input_data['data'] = self.param['data_path']
-            s3_data_path = self.param['s3_data_path']
+            input_data["data"] = self.param["data_path"]
+            s3_data_path = self.param["s3_data_path"]
 
             region = AwsSession().region
             image_uri = retrieve_image(Framework.PL_PYTORCH, region)
 
-            interface = 'torch'
+            interface = "torch"
 
             def define_hyperparameters(interface):
                 hyperparameters = {
@@ -217,7 +235,12 @@ class RetroRLAgent:
                     source_module=f"{current_path}",
                     # Any unique name works. Note 50-character limit in job name
                     # (comment out to use default naming)
-                    job_name="retrorl-job-" + device_name + "-" + interface + "-" + str(int(time.time())),
+                    job_name="retrorl-job-"
+                    + device_name
+                    + "-"
+                    + interface
+                    + "-"
+                    + str(int(time.time())),
                     image_uri=image_uri,
                     # Relative to the source_module
                     entry_point="retrorl_algorithm_script",
@@ -227,7 +250,7 @@ class RetroRLAgent:
                     output_data_config=OutputDataConfig(s3_data_path),
                 )
             elif train_mode == "hybrid-job":
-                if device_name == 'aspen-m-3' or device_name == 'aria-2':
+                if device_name == "aspen-m-3" or device_name == "aria-2":
                     t = datetime.datetime.utcfromtimestamp(time.time())
                     # print(t)
                     if t.hour == 5 or t.hour == 17:
@@ -236,7 +259,12 @@ class RetroRLAgent:
                     job = AwsQuantumJob.create(
                         device=device,
                         source_module="hybridjobs",
-                        job_name="retrorl-job-" + device_name + "-" + interface + "-" + str(int(time.time())),
+                        job_name="retrorl-job-"
+                        + device_name
+                        + "-"
+                        + interface
+                        + "-"
+                        + str(int(time.time())),
                         image_uri=image_uri,
                         # Relative to the source_module
                         entry_point="hybridjobs.retrorl_algorithm_script",
@@ -250,7 +278,12 @@ class RetroRLAgent:
                     job = AwsQuantumJob.create(
                         device=device,
                         source_module="hybridjobs",
-                        job_name="retrorl-job-" + device_name + "-" + interface + "-" + str(int(time.time())),
+                        job_name="retrorl-job-"
+                        + device_name
+                        + "-"
+                        + interface
+                        + "-"
+                        + str(int(time.time())),
                         image_uri=image_uri,
                         # Relative to the source_module
                         entry_point="hybridjobs.retrorl_algorithm_script",
@@ -266,7 +299,7 @@ class RetroRLAgent:
     def game(self, episodes):
         # for episode in range(1, 301):
         for episode in range(1, episodes):
-            logging.info(f'episode {episode}')
+            logging.info(f"episode {episode}")
             episodecost = 0
             for name in self.file3:
                 self.layer[1] = [name]
@@ -277,7 +310,9 @@ class RetroRLAgent:
                         self.depth = 10
                     else:
                         for name in self.layer[self.depth]:
-                            rm, minv, _ = self.choosereaction(name, self.file1, self.file2, self.deadend, self.buyable)
+                            rm, minv, _ = self.choosereaction(
+                                name, self.file1, self.file2, self.deadend, self.buyable
+                            )
                             namecost += minv
                             episodecost += minv
                             if rm:
@@ -297,7 +332,9 @@ class RetroRLAgent:
             if episode % 1 == 0:
                 self.updates += 1
                 self.is_model = True
-                logging.info(f"epsiode {episode} averate cost {avc} start training for {self.epoches} epoches...")
+                logging.info(
+                    f"epsiode {episode} averate cost {avc} start training for {self.epoches} epoches..."
+                )
                 self.train(self.file1, self.file2)
             if episode % 100 == 0:
                 if self.epsilon - 0.05 > 0:
@@ -325,7 +362,9 @@ class RetroRLAgent:
                 if not self.is_model:
                     for m in rm:
                         if (m, 9 - self.depth) in self.cost1.keys():
-                            rmv = sum(self.cost1[m, 9 - self.depth]) / len(self.cost1[m, 9 - self.depth])
+                            rmv = sum(self.cost1[m, 9 - self.depth]) / len(
+                                self.cost1[m, 9 - self.depth]
+                            )
                             tempv = tempv + rmv
                         else:
                             if m in buyable:
@@ -344,7 +383,9 @@ class RetroRLAgent:
                 else:
                     for m in rm:
                         if (m, 9 - self.depth) in self.cost1.keys():
-                            rmv = sum(self.cost1[m, 9 - self.depth]) / len(self.cost1[m, 9 - self.depth])
+                            rmv = sum(self.cost1[m, 9 - self.depth]) / len(
+                                self.cost1[m, 9 - self.depth]
+                            )
                             tempv = tempv + rmv
                         else:
                             if m in buyable:
@@ -357,7 +398,7 @@ class RetroRLAgent:
                                 fp = torch.tensor(file2[m], dtype=torch.float)
                                 depth = torch.tensor([self.depth], dtype=torch.float)
                                 fp = torch.cat([fp, depth])
-                                if self.method == 'retro-qrl':
+                                if self.method == "retro-qrl":
                                     fp = fp.reshape(1, -1)
                                     fp = nn.functional.normalize(fp)
                                 # print(f"choose reaction 1 type of forward tensor {fp.dtype}")
@@ -377,7 +418,9 @@ class RetroRLAgent:
             if not self.is_model:
                 for m in rm:
                     if (m, 9 - self.depth) in self.cost1.keys():
-                        rmv = sum(self.cost1[m, 9 - self.depth]) / len(self.cost1[m, 9 - self.depth])
+                        rmv = sum(self.cost1[m, 9 - self.depth]) / len(
+                            self.cost1[m, 9 - self.depth]
+                        )
                         tempv = tempv + rmv
                     else:
                         if m in buyable:
@@ -396,7 +439,9 @@ class RetroRLAgent:
             else:
                 for m in rm:
                     if (m, 9 - self.depth) in self.cost1.keys():
-                        rmv = sum(self.cost1[m, 9 - self.depth]) / len(self.cost1[m, 9 - self.depth])
+                        rmv = sum(self.cost1[m, 9 - self.depth]) / len(
+                            self.cost1[m, 9 - self.depth]
+                        )
                         tempv = tempv + rmv
                     else:
                         if m in buyable:
@@ -409,7 +454,7 @@ class RetroRLAgent:
                             fp = torch.tensor(file2[m], dtype=torch.float)
                             depth = torch.tensor([self.depth], dtype=torch.float)
                             fp = torch.cat([fp, depth])
-                            if self.method == 'retro-qrl':
+                            if self.method == "retro-qrl":
                                 fp = fp.reshape(1, -1)
                                 fp = nn.functional.normalize(fp)
                             # print(f"choose reaction else type of forward tensor {fp.dtype}")
@@ -444,14 +489,14 @@ class RetroRLAgent:
                 fp = np.append(fp, depth)
                 x.append(fp)
             x = np.array(x)
-            if self.method == 'retro-qrl':
+            if self.method == "retro-qrl":
                 y = torch.tensor(y, dtype=torch.float64).reshape(-1, 1)
                 # x = torch.tensor(x, dtype=torch.float)+0j
                 x = torch.tensor(x, dtype=torch.float64)
             else:
                 y = torch.tensor(y, dtype=torch.float).reshape(-1, 1)
                 x = torch.tensor(x, dtype=torch.float)
-            if self.method == 'retro-qrl':
+            if self.method == "retro-qrl":
                 x = nn.functional.normalize(x)
             # x = x.reshape(128,1,-1)
             dtype = x.dtype
@@ -470,7 +515,7 @@ class RetroRLAgent:
             # #
 
             # ② 使用 qml.qnn.TorchLayer(qnode, weight_shapes)
-            if self.method == 'retro-qrl':
+            if self.method == "retro-qrl":
                 output = self.NN.forward(x).reshape(-1, 1)
             #
             else:
@@ -504,15 +549,20 @@ class RetroRLAgent:
         self.renew()
         self.is_model = True
         self.epsilon = 0
-        self.layer2[1]['1'] = name
+        self.layer2[1]["1"] = name
         namecost = 0
         while self.depth < 10:
             if self.layer2[self.depth] == {}:
                 self.depth = 10
             else:
                 for key in self.layer2[self.depth].keys():
-                    rm, minv, r = self.choosereaction(self.layer2[self.depth][key], self.file1, self.file2,
-                                                      self.deadend, self.buyable)
+                    rm, minv, r = self.choosereaction(
+                        self.layer2[self.depth][key],
+                        self.file1,
+                        self.file2,
+                        self.deadend,
+                        self.buyable,
+                    )
                     namecost += minv
                     if rm:
                         for m in range(len(rm)):
@@ -533,9 +583,7 @@ class RetroRLAgent:
     class DataS(object):
 
         def __init__(self, name):
-            self.data = {
-                "id": name
-            }
+            self.data = {"id": name}
 
         def add_child(self):
             self.data["children"] = []
@@ -566,7 +614,9 @@ class RetroRLAgent:
                 tempm.add_child()
         data["children"].append(copy.deepcopy(tempm.data))
         if rm:
-            self.expansion1(name, data["children"][data["children"].index(copy.deepcopy(tempm.data))])
+            self.expansion1(
+                name, data["children"][data["children"].index(copy.deepcopy(tempm.data))]
+            )
 
     # def smiles2url(self, name):
     #     input_data_path = self.param['data_path']
@@ -585,7 +635,6 @@ class RetroRLAgent:
             save_path = os.path.join(path, save_name)
         else:
             save_path = os.path.join(".", save_name)
-
 
         logging.info(f"{self.s3_save_path}")
 
@@ -628,10 +677,10 @@ class RetroRLAgent:
     #     return RetroRLAgent(load_path)
 
     def get_parameter_num(self):
-        total_trainable_params = sum(
-            p.numel() for p in self.NN.parameters() if p.requires_grad)
-        print(f'{total_trainable_params:,} training parameters.')
+        total_trainable_params = sum(p.numel() for p in self.NN.parameters() if p.requires_grad)
+        print(f"{total_trainable_params:,} training parameters.")
         return total_trainable_params
+
 
 # tree =Tree()
 # tree.game()

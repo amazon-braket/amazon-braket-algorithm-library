@@ -111,9 +111,11 @@ class Product(object):
 
 
 def expansion(target, input_data_path):
-    reactions_dictionary = np.load(input_data_path+'reactions_dictionary.npy', allow_pickle=True).item()
-    Deadend = np.load(input_data_path+'Deadend.npy').tolist()
-    buyable = np.load(input_data_path+'buyable.npy').tolist()
+    reactions_dictionary = np.load(
+        input_data_path + "reactions_dictionary.npy", allow_pickle=True
+    ).item()
+    Deadend = np.load(input_data_path + "Deadend.npy").tolist()
+    buyable = np.load(input_data_path + "buyable.npy").tolist()
     if target.name not in reactions_dictionary.keys():
         if target.name in buyable:
             target.cost.append(0.0)
@@ -142,4 +144,3 @@ def expansion(target, input_data_path):
         target.reaction[num_r - 1].pathway()
     target.calculate()
     target.pathway()
-
