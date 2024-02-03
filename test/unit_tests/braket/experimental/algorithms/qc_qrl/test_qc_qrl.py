@@ -1,9 +1,6 @@
-from unittest.mock import patch
-
 import pytest
-
+import numpy as np
 from braket.experimental.algorithms.qc_qrl.utility.RetroRLAgent import RetroRLAgent
-from braket.experimental.algorithms.qc_qrl.utility.RetroGateModel import RetroGateModel
 
 np.set_printoptions(precision=4, edgeitems=10, linewidth=150, suppress=True)
 
@@ -83,7 +80,8 @@ def test_classical_circuit_parameters(common_agent_param):
     model_param[method]["outputsize"] = [1]
 
     agent_param["model_param"] = model_param
-    model_name = f"{model_param[method]['inputsize'][0]}_{model_param[method]['middlesize'][0]}_{model_param[method]['outputsize'][0]}"
+    model_name = f"{model_param[method]['inputsize'][0]}_{model_param[method]['middlesize'][0]}_\
+        {model_param[method]['outputsize'][0]}"
     agent_param["model_name"] = model_name
 
     agent_param["train_mode"] = "local-instance"

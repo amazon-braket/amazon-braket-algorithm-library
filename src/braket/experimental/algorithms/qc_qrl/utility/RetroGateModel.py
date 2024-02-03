@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 # from deepquantum.gates.qcircuit import Circuit as dqCircuit
 import pennylane as qml
@@ -63,9 +62,11 @@ class CirModel(nn.Module):
         self.n_layers = layers
 
         # # weights for old implementation
-        # self.weights = nn.Parameter(nn.init.uniform_(torch.empty(6 * self.n_qubits), a=0.0, b=2 * np.pi) * init_std)
+        # self.weights = nn.Parameter(nn.init.uniform_(torch.empty(6 * self.n_qubits),
+        # a=0.0, b=2 * np.pi) * init_std)
         # weights for pennlylane implementation
-        # self.weights = nn.Parameter(nn.init.uniform_(torch.empty((n_layers, self.n_qubits)), a=0.0, b=2 * np.pi) * init_std)
+        # self.weights = nn.Parameter(nn.init.uniform_(torch.empty((n_layers, self.n_qubits))
+        # , a=0.0, b=2 * np.pi) * init_std)
         # global dev
         if framework == "pennylane":
             # self.dev, _ = self._pl_def()
@@ -231,7 +232,7 @@ class RetroRLModel:
 
         self.param = param
         # self.name = f"retrorl_{self.mol_data.name}_model"
-        self.name = f"retrorl_model"
+        self.name = "retrorl_model"
         # initial variables
         self.model_info = {}
         self.model = {}
@@ -269,7 +270,8 @@ class RetroRLModel:
                     # check availability
                     if model_name in self.model["retro-rl"].keys():
                         logging.info(
-                            f"duplicate model !! pass !! inputsize {inputsize}, middlesize {middlesize}, outputsize {outputsize}"
+                            f"duplicate model !! pass !! inputsize {inputsize}, \
+                                middlesize {middlesize}, outputsize {outputsize}"
                         )
                         continue
                     else:
@@ -289,7 +291,8 @@ class RetroRLModel:
                     self.model["retro-rl"][model_name]["nn_model"] = NN_model
 
                     logging.info(
-                        f"Construct model for inputsize:{inputsize},middlesize:{middlesize},outputsize:{outputsize} {(end-start)/60} min"
+                        f"Construct model for inputsize:{inputsize},middlesize:{middlesize},\
+                            outputsize:{outputsize} {(end-start)/60} min"
                     )
 
     def _build_retroqrl_model(self, **model_param):
@@ -302,7 +305,9 @@ class RetroRLModel:
                             # check availability
                             if model_name in self.model["retro-qrl"].keys():
                                 logging.info(
-                                    f"duplicate model !! pass !! n_qubits {n_qubits}, device {device}, framework {framework}, shots {shots}, layers {layers}"
+                                    f"duplicate model !! pass !! n_qubits {n_qubits}, \
+                                        device {device}, framework {framework}, shots {shots}, \
+                                            layers {layers}"
                                 )
                                 continue
                             else:
@@ -324,7 +329,9 @@ class RetroRLModel:
                             self.model["retro-qrl"][model_name]["nn_model"] = NN_model
 
                             logging.info(
-                                f"Construct model for n_qubits:{n_qubits},device:{device},framework:{framework},layers:{layers} {(end-start)/60} min"
+                                f"Construct model for n_qubits:{n_qubits},device:{device},\
+                                    framework:{framework},layers:{layers} \
+                                        {(end-start)/60} min"
                             )
 
     def _update_model_info(self, values, names, method):
@@ -360,7 +367,7 @@ class RetroRLModel:
         save_path = None
         save_name = f"{self.name}_{version}.pickle"
 
-        if path != None:
+        if path is not None:
             save_path = os.path.join(path, save_name)
         else:
             save_path = os.path.join(".", save_name)

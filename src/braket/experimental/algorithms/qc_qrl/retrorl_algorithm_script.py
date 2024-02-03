@@ -1,36 +1,17 @@
-import numpy as np
-import random
 import sys
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
-# from deepquantum.gates.qcircuit import Circuit as dqCircuit
-from braket.circuits import Circuit as bkCircuit
 from braket.tracking import Tracker
-from braket.jobs import save_job_checkpoint
-
-# import deepquantum.gates.qoperator as op
 import boto3
-
 import os
-import math
-import logging
-import time
 import json
-
 from platform import python_version
+from utility.RetroRLAgent import RetroRLAgent
 
 os.environ["PYTHONUNBUFFERED"] = "1"
 
 print("Current Python Version-", python_version())
-import sys
 
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
-
-from utility.RetroGateModel import RetroRLModel
-from utility.RetroRLAgent import RetroRLAgent
 
 t = Tracker().start()
 
@@ -97,8 +78,8 @@ except Exception as e1:
         print(f"error e2 {e2}")
         try:
             # Second solution
-            input_data_path = f"/opt/ml/input/data/input"
-            os.system(f"ls -alh {input_data_path}")
+            input_data_path = "/opt/ml/input/data/input"
+            os.system(f'ls -alh {input_data_path}')
             # retro_rl_model = RetroRLModel.load(f'{input_data_path}/{model_path}')
         except Exception as e3:
             # Handle both solutions failing

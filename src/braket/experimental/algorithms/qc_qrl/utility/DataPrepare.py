@@ -7,8 +7,7 @@ from rdkit.Chem import AllChem
 from tqdm import tqdm
 import os.path
 
-# from utility.BruteForceSearch import expansion, Product, Reaction
-from .BruteForceSearch import expansion, Product, Reaction
+from .BruteForceSearch import expansion, Product
 
 import logging
 
@@ -37,57 +36,45 @@ class Prepare(object):
 
         file_type = data_file.split(".")[-1]
 
+        self._update_name(name, data_file)
+
+        self._update_path(path, data_file)
+
+        if retrain is False:
+            self._load_processed_files(file_type, buyable_file)
+        else:
+            self._reprocess_files(file_type, buyable_file)
+        # read uspto-50k.xlsx
+        self._read(data_file)
+
+    def _update_name(self, name, data_file):
         if name is None:
             self.name = data_file.split("/")[-1].split(".")[0]
         else:
             self.name = name
 
+    def _update_path(self, path, data_file):
         if path is None:
             self.path = data_file.split(".")[0].replace(self.name, "")
 
-        if retrain is False:
-            if (
-                (os.path.isfile(self.path + "Deadend.npy"))
-                and (os.path.isfile(self.path + "buyable.npy"))
-                and (os.path.isfile(self.path + "smiles_dictionary.npy"))
-                and (os.path.isfile(self.path + "reactions_dictionary.npy"))
-                and (os.path.isfile(self.path + "target_product.npy"))
-            ):
-                logging.info("Files are present.")
-                self.exist = True
-                pass
-            else:
-                if file_type == "xlsx" or file_type == "csv":
-                    logging.info("parse {} file!".format(file_type))
-                else:
-                    logging.error(
-                        "file type {} not supported! only support xlsx,csv".format(file_type)
-                    )
-                    raise Exception("file type not supported!")
-
-                if buyable_file is not None:
-                    buyable_file_type = buyable_file.split(".")[-1]
-                    if buyable_file_type == "xlsx" or buyable_file_type == "csv":
-                        logging.info("parse {} file!".format(buyable_file_type))
-                    else:
-                        logging.error(
-                            "file type {} not supported! only support xlsx,csv".format(
-                                buyable_file_type
-                            )
-                        )
-                        raise Exception("file type not supported!")
-                    buyable = pd.read_excel(buyable_file, engine="openpyxl")
-                    self.buyable = buyable["buyable"].tolist()
-                else:
-                    self.buyable = None
-
-                # read uspto-50k.xlsx
-                self._read(data_file)
+    def _load_processed_files(self, file_type, buyable_file):
+        if (
+            (os.path.isfile(self.path + "Deadend.npy"))
+            and (os.path.isfile(self.path + "buyable.npy"))
+            and (os.path.isfile(self.path + "smiles_dictionary.npy"))
+            and (os.path.isfile(self.path + "reactions_dictionary.npy"))
+            and (os.path.isfile(self.path + "target_product.npy"))
+        ):
+            logging.info("Files are present.")
+            self.exist = True
+            pass
         else:
             if file_type == "xlsx" or file_type == "csv":
                 logging.info("parse {} file!".format(file_type))
             else:
-                logging.error("file type {} not supported! only support xlsx,csv".format(file_type))
+                logging.error(
+                    "file type {} not supported! only support xlsx,csv".format(file_type)
+                )
                 raise Exception("file type not supported!")
 
             if buyable_file is not None:
@@ -106,8 +93,28 @@ class Prepare(object):
             else:
                 self.buyable = None
 
-            # read uspto-50k.xlsx
-            self._read(data_file)
+    def _reprocess_files(self, file_type, buyable_file):
+        if file_type == "xlsx" or file_type == "csv":
+            logging.info("parse {} file!".format(file_type))
+        else:
+            logging.error("file type {} not supported! only support xlsx,csv".format(file_type))
+            raise Exception("file type not supported!")
+
+        if buyable_file is not None:
+            buyable_file_type = buyable_file.split(".")[-1]
+            if buyable_file_type == "xlsx" or buyable_file_type == "csv":
+                logging.info("parse {} file!".format(buyable_file_type))
+            else:
+                logging.error(
+                    "file type {} not supported! only support xlsx,csv".format(
+                        buyable_file_type
+                    )
+                )
+                raise Exception("file type not supported!")
+            buyable = pd.read_excel(buyable_file, engine="openpyxl")
+            self.buyable = buyable["buyable"].tolist()
+        else:
+            self.buyable = None
 
     def _read(self, file):
         df = pd.read_excel(file, engine="openpyxl")
@@ -120,12 +127,15 @@ class Prepare(object):
         punc_re = "|".join(re.escape(x) for x in punc)
         list11 = list()
         n = 0
+        num_list = []
         for i in range(len(listr)):
             tokens = re.sub(punc_re, lambda x: " " + x.group() + " ", listr[i])
             tokens = tokens.split()
-            num = tokens.count(".")
-            if num > n:
-                n = num
+            # num = tokens.count(".")
+            num_list.append(tokens.count("."))
+            # if num > n:
+            #     n = num
+        n = max(num_list)
         for i in range(len(listr)):
             tokens = re.sub(punc_re, lambda x: " " + x.group() + " ", listr[i])
             tokens = tokens.split()
@@ -138,10 +148,13 @@ class Prepare(object):
 
         # Determine the amount of reactants in all reactions
         k = 0
+        k_len_list = []
         for j in range(len(listr)):
             c = list11[j]
-            if len(c) > k:
-                k = len(c)
+            # if len(c) > k:
+            #     k = len(c)
+            k_len_list.append(len(c))
+        k = max(k_len_list)
         logging.info("There are at most {} reactants in one reaction!".format(k))
         self.k = k
 
@@ -172,15 +185,15 @@ class Prepare(object):
         product_uniques = set(list5)
         len(product_uniques)  # 49673-products
 
-        # Using the non-repetitive set of reactants and products to get intermediate reactants (molecules contained in
-        # both the reactants and the products), then reaction substrates and final products can be derived.
-        middle = [
-            x for x in reactant_uniques if x in product_uniques
-        ]  # 1965-intermediate reactants
-        buyable = [y for y in reactant_uniques if y not in middle]  # 51025-reaction substrates
+        # Using the non-repetitive set of reactants and products to get intermediate reactants
+        # (molecules contained in both the reactants and the products), then reaction substrates
+        # and final products can be derived.
+        middle = self._list_construct_helper(reactant_uniques, product_uniques)
+        # 1965-intermediate reactants
+        # buyable = [y for y in reactant_uniques if y not in middle]  # 51025-reaction substrates
 
-        # By querying the location of the intermediate products, the synthesis reactions of more than two steps are
-        # screened.
+        # By querying the location of the intermediate products, the synthesis reactions of more
+        # than two steps are screened.
         c = pd.DataFrame(
             columns=["reactant" + str(i) for i in range(1, k + 1)] + ["product", "category"]
         )
@@ -195,21 +208,26 @@ class Prepare(object):
                 if middle[j] == df.iloc[i, k]:  # If intermediate reactant in products, we can store
                     c.loc[len(c)] = df.loc[i].tolist()  # intermediate reactions.
                     k1 += 1
-                po = False
+                # po = False
+                # for w in range(k):
+                #     if middle[j] == df.iloc[i, w]:
+                #         po = True
+                # if po is True:  # If intermediate reactant in reactants, we can store
+                #     d.loc[len(d)] = df.loc[i].tolist()  # final reactions.
+                #     k2 += 1
                 for w in range(k):
                     if middle[j] == df.iloc[i, w]:
-                        po = True
-                if po is True:  # If intermediate reactant in reactants, we can store
-                    d.loc[len(d)] = df.loc[i].tolist()  # final reactions.
-                    k2 += 1
+                        d.loc[len(d)] = df.loc[i].tolist()  # final reactions.
+                        k2 += 1
+                        break
             # print(i, k1, k2)
         logging.info("There are {} intermediate reactions.".format(k1))
         logging.info("There are {} final reactions.".format(k2))
 
         c.to_excel(self.path + "middle_reaction.xlsx", index=False)
         d.to_excel(self.path + "final_reaction.xlsx", index=False)
-        logging.info("Intermediate reactions are saved!".format(k1))
-        logging.info("Final reactions are saved!".format(k2))
+        logging.info("Intermediate reactions are saved!")
+        logging.info("Final reactions are saved!")
         selected = pd.concat([c, d], axis=0, join="inner")
         # Remove the data with the same product and reaction category.
         selected2 = selected.drop_duplicates(
@@ -235,11 +253,12 @@ class Prepare(object):
         list55 = selected["product"].tolist()
         selected2_product_uniques = set(list55)  # 5048-all unique products
 
-        middle2 = [
-            x for x in selected2_product_uniques if x in selected2_reactant_uniques
-        ]  # 1964intermediate reactant
-        buyable2 = [y for y in selected2_reactant_uniques if y not in middle2]  # 4231 substrates
-        target2 = [z for z in selected2_product_uniques if z not in middle2]  # 3084 target_product
+        # 1964 intermediate reactant
+        middle2 = self._list_construct_helper(selected2_product_uniques, selected2_reactant_uniques)
+        # 4231 substrates
+        buyable2 = self._list_construct_helper(selected2_reactant_uniques, middle2, False)
+        # 3084 target_product
+        target2 = self._list_construct_helper(selected2_product_uniques, middle2, False)
         buyable2.pop(buyable2.index("none"))  # 4230
         logging.info("Storing data!")
 
@@ -249,6 +268,17 @@ class Prepare(object):
         self.selected2_reactant_uniques = selected2_reactant_uniques
         self.selected2_product_uniques = selected2_product_uniques
         logging.info("Preparing is done!")
+
+    def _list_construct_helper(self, original_list, judge_list, check_in=True):
+        if check_in :
+            new_list = [
+                x for x in original_list if x in judge_list
+            ]
+        else:
+            new_list = [
+                x for x in original_list if x not in judge_list
+            ]
+        return new_list
 
     def generate_files(self):
         if self.exist is False:
@@ -268,7 +298,8 @@ class Prepare(object):
         which contains three columns: product, category, reactant,
         represent product, reaction category and composition respectively;
         The data format of the processed reactions_dictionary file is as follows:
-        {product1:{category1:[reactant1,reactant1,reactant1...],category2:[reactant1,reactant1,reactant1...]...}}，
+        {product1:{category1:[reactant1,reactant1,reactant1...],
+        category2:[reactant1,reactant1,reactant1...]...}}，
         That is, a combination of nested dictionaries and lists."""
         file1 = {}
         df = pd.read_excel(self.path + "selected2.xlsx", engine="openpyxl")
@@ -289,9 +320,9 @@ class Prepare(object):
 
     def _generate_smiles_dictionary(self):
         """
-        The smiles_dictionary is used to record the molecular code of each molecule. The molecular code is implemented by
-        the Morgan fingerprint coding API in the rdkit library. The generation of the file is realized by the
-        following code:
+        The smiles_dictionary is used to record the molecular code of each molecule.
+        The molecular code is implemented by the Morgan fingerprint coding API in the rdkit
+        library. The generation of the file is realized by the following code:
         temp is a list, which saves the SMILES codes of all molecules in the database.
         The data format of the processed file2 file is as follows:
         {smiles1:fingerprint1,smiles2:fingerprint2,...}"""
@@ -326,8 +357,8 @@ class Prepare(object):
 
     def _generate_target(self):
         """
-        The target_product file is used to record all molecular SMILES codes that need to be trained for retrosynthesis,
-        extracted from the database, and saved in the following format:
+        The target_product file is used to record all molecular SMILES codes that need to be
+        trained for retrosynthesis, extracted from the database, and saved in the following format:
         [smiles1,smiles2,...]"""
         file3 = self.target
         file_path = self.path + "target_product.npy"
@@ -336,8 +367,8 @@ class Prepare(object):
 
     def _generate_buyalbe(self):
         """
-        The buyalbe file is used to record the SMILES codes of all the smallest commercially available synthetic
-        substrate molecules, file is stored in the following format:
+        The buyalbe file is used to record the SMILES codes of all the smallest commercially
+        available synthetic substrate molecules, file is stored in the following format:
         [smiles1,smiles2,...]"""
 
         if self.buyable is None:
@@ -353,8 +384,8 @@ class Prepare(object):
 
     def _generate_Deadend(self):
         """
-        Deadend files are used to record SMILES codes for all non-commercial minimal synthetic substrate molecules.
-        File is saved in the following formats:
+        Deadend files are used to record SMILES codes for all non-commercial minimal synthetic
+        substrate molecules. File is saved in the following formats:
         [smiles1,smiles2,...]"""
         Deadend = self.buyable2.copy()
         for i in self.buyable:
@@ -365,10 +396,11 @@ class Prepare(object):
 
     def generate_ground_truth(self):
         """
-        The ground_truth file is used to record the true least cost value and its path obtained by the brute force
-        search algorithm for the molecular results of all target products.
-        File is saved in the following formats:
-        {smiles1:{'cost':cost1, 'path':[smiles11,smiles12,...]},smiles2:{'cost':cost2, 'path':[smiles21,smiles22,...]},...}
+        The ground_truth file is used to record the true least cost value and its path
+        obtained by the brute force search algorithm for the molecular results of all target
+        products. File is saved in the following formats:
+        {smiles1:{'cost':cost1, 'path':[smiles11,smiles12,...]},
+        smiles2:{'cost':cost2, 'path':[smiles21,smiles22,...]},...}
         """
         if os.path.isfile(self.path + "ground_truth.npy"):
             logging.info("File is present.")

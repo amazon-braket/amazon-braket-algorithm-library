@@ -6,16 +6,15 @@ from .RetroGateModel import RetroRLModel
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+# import torch.nn.functional as F
 
 # from deepquantum.gates.qcircuit import Circuit as dqCircuit
 
-from braket.circuits import Circuit as bkCircuit
+# from braket.circuits import Circuit as bkCircuit
 
 # import deepquantum.gates.qoperator as op
 from braket.aws import AwsQuantumJob, AwsSession
 from braket.jobs.local.local_job import LocalQuantumJob
-from braket.aws import AwsQuantumJob
 from braket.jobs.image_uris import Framework, retrieve_image
 from braket.jobs.config import OutputDataConfig
 
@@ -23,7 +22,7 @@ import math
 import logging
 import time
 import datetime
-import pickle
+# import pickle
 import os
 
 log = logging.getLogger()
@@ -40,7 +39,7 @@ class RetroRLAgent:
         init_method = list(param["init_param"].keys())
         init_param = param["init_param"]
         retro_rl_model = RetroRLModel(data=None, method=init_method, **init_param)
-        if load_path != None:
+        if load_path is not None:
             logging.info(f"try to load agent from {load_path} for pathway function...")
             logging.info("load data...")
             self.cost1 = {}
@@ -62,7 +61,7 @@ class RetroRLAgent:
             self.NN.load_state_dict(torch.load(f"{load_path}/{agent_name}"))
             self.NN.eval()
         else:
-            logging.info(f"initial a new agent...")
+            logging.info("initial a new agent...")
             self.param = param
             self.train_mode = param["train_mode"]
             # self.model_path = param["model_path"]
@@ -89,7 +88,7 @@ class RetroRLAgent:
             try:
                 s3_data_path = self.param["s3_data_path"]
                 self.s3_save_path = f"{s3_data_path}/{self.save_name}"
-            except:
+            except Exception:
                 self.s3_save_path = None
 
             if method == "retro-qrl" or method == "retro-rl":
@@ -116,7 +115,7 @@ class RetroRLAgent:
                 self.epsilon = 0.2
                 self.loss_fn = torch.nn.MSELoss()
 
-                if build_model != False:
+                if build_model is not False:
                     # self.name = model['model_name']
                     # self.NN = model['nn_model']
                     model_param = {}
@@ -142,7 +141,7 @@ class RetroRLAgent:
                 self.lossv = []
 
     def _load_data(self, input_data_path=None):
-        if input_data_path == None:
+        if input_data_path is None:
             input_data_path = self.param["data_path"]
         self.file1 = np.load(
             f"{input_data_path}/reactions_dictionary.npy", allow_pickle=True
@@ -213,7 +212,8 @@ class RetroRLAgent:
                     "p": "2",
                     # Maximum number of simultaneous tasks allowed
                     "max_parallel": "10",
-                    # Number of total optimization iterations, including those from previous checkpoint (if any)
+                    # Number of total optimization iterations, including those from previous
+                    # checkpoint (if any)
                     "num_iterations": "5",
                     # Step size / learning rate for gradient descent
                     "stepsize": "0.1",
@@ -333,7 +333,8 @@ class RetroRLAgent:
                 self.updates += 1
                 self.is_model = True
                 logging.info(
-                    f"epsiode {episode} averate cost {avc} start training for {self.epoches} epoches..."
+                    f"epsiode {episode} averate cost {avc} start training for {self.epoches} \
+                        epoches..."
                 )
                 self.train(self.file1, self.file2)
             if episode % 100 == 0:
@@ -474,10 +475,11 @@ class RetroRLAgent:
     def merge(self):
         self.cost1.update(self.cost2)
 
-    def train(self, file1, file2):
+    # def train(self, file1, file2):
+    def train(self, file2):
         # for epoch in range(50):
-        for epoch in range(self.epoches):
-            start = time.time()
+        for _ in range(self.epoches):
+            # start = time.time()
             y = []
             x = []
             # OLD: temp = random.sample(self.cost1.keys(), 128)
@@ -499,7 +501,7 @@ class RetroRLAgent:
             if self.method == "retro-qrl":
                 x = nn.functional.normalize(x)
             # x = x.reshape(128,1,-1)
-            dtype = x.dtype
+            # dtype = x.dtype
             # print(f"train type of forward tensor {dtype} with size {x.size()}")
             # output = []
             # for sample in x:
@@ -539,7 +541,7 @@ class RetroRLAgent:
             loss.backward()
             # print(f"opt step")
             self.opt.step()
-            end = time.time()
+            # end = time.time()
             # print(f'finish epoch {epoch} for {(end - start) / 60} minutes')
 
     def add_child2(self, index, m):
@@ -620,10 +622,12 @@ class RetroRLAgent:
 
     # def smiles2url(self, name):
     #     input_data_path = self.param['data_path']
-    #     # smiles_map = np.load(f'{input_data_path}/smiles/smiles_map.npy', allow_pickle=True).item()
+    #     # smiles_map = np.load(f'{input_data_path}/smiles/smiles_map.npy',
+            # allow_pickle=True).item()
     #     smiles_map = np.load(f'{input_data_path}/smiles_map.npy', allow_pickle=True).item()
     #     index = smiles_map[name]
-    #     url = "https://web-demo-test2.s3.us-west-2.amazonaws.com/data/smiles/" + str(index) + ".svg"
+    #     url = "https://web-demo-test2.s3.us-west-2.amazonaws.com/data/smiles/"
+            # + str(index) + ".svg"
 
     #     return url
 
@@ -631,7 +635,7 @@ class RetroRLAgent:
         save_path = None
         save_name = self.save_name
 
-        if path != None:
+        if path is not None:
             save_path = os.path.join(path, save_name)
         else:
             save_path = os.path.join(".", save_name)
@@ -651,7 +655,7 @@ class RetroRLAgent:
         save_path = None
         save_name = f"{self.model_name}_{version}"
 
-        if path != None:
+        if path is not None:
             save_path = os.path.join(path, save_name)
         else:
             save_path = os.path.join(".", save_name)
