@@ -10,13 +10,13 @@ information to effectively respond to your bug report or contribution.
 We expect algorithms to be built on top of the [Amazon Braket SDK](https://github.com/aws/amazon-braket-sdk-python) to provide a unified user experience and to give us a single contract to test against.
 
 Please ensure that
-1. Your algorithm is added as functional source code [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms)
-2. Add tests for your new code [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/test/unit_tests/braket/experimental/algorithms)
-3. You illustrate use of the algorithm in a simple python notebook [here](https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/notebooks)
+1. Your algorithm is added as functional source code [here](https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms)
+2. Add tests for your new code [here](https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/test/unit_tests/braket/experimental/algorithms)
+3. You illustrate use of the algorithm in a simple python notebook [here](https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/notebooks)
 
 ## Reporting Bugs/Feature Requests
 
-We welcome you to use the [GitHub issue tracker](https://github.com/aws-samples/amazon-braket-algorithm-library/issues) to report bugs or suggest features.
+We welcome you to use the [GitHub issue tracker](https://github.com/amazon-braket/amazon-braket-algorithm-library/issues) to report bugs or suggest features.
 
 When filing an issue, please check existing open, or recently closed, issues to make sure somebody else hasn't already
 reported the issue. Please try to include as much information as you can. Details like these are incredibly useful:
@@ -62,7 +62,7 @@ pip uninstall amazon-braket-algorithm-library -y
 # Download the repo and install the changes that are to be tested
 cd SageMaker/
 rm -rf "Braket algorithms"
-git clone https://github.com/aws-samples/amazon-braket-algorithm-library.git
+git clone https://github.com/amazon-braket/amazon-braket-algorithm-library.git
 cd amazon-braket-algorithm-library/
 # This command is not needed if a contributor has not published a remote branch already.
 git checkout <WORKING_BRANCH>

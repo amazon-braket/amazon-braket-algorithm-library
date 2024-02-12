@@ -6,7 +6,7 @@ The Braket Algorithm Library provides Amazon Braket customers with pre-built imp
 
 Currently, Braket algorithms are tested on Linux, Windows, and Mac.
 
-Running notebooks locally requires additional dependencies located in notebooks/textbook/requirements.txt https://github.com/aws-samples/amazon-braket-algorithm-library/blob/main/notebooks/textbook/requirements.txt. See notebooks/textbook/README.md for more information.
+Running notebooks locally requires additional dependencies located in notebooks/textbook/requirements.txt https://github.com/amazon-braket/amazon-braket-algorithm-library/blob/main/notebooks/textbook/requirements.txt. See notebooks/textbook/README.md for more information.
 __________________
 
 * :doc:`_apidoc/modules`
