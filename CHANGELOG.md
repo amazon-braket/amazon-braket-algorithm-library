@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.6 (2024-02-07)
+
+### Bug Fixes and Other Changes
+
+ * update isort to use a specific profile
+
 ## v1.4.5 (2023-12-12)
 
 ### Bug Fixes and Other Changes
