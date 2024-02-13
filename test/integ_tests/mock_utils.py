@@ -28,6 +28,17 @@ class Mocker:
     def set_create_quantum_task_result(self, result):
         self._wrapper.boto_client.create_quantum_task.return_value = result
 
+    # test
+    def set_create_job_result(self, result):
+        self._wrapper.boto_client.create_job.return_value = result
+
+    # test
+    def set_get_default_jobs_role(self, result):
+        self._wrapper.boto_client.get_default_jobs_role.return_value = result
+
+    def set_get_job_result(self, result):
+        self._wrapper.boto_client.get_job.return_value = result
+
     def set_get_quantum_task_result(self, result):
         self._wrapper.boto_client.get_quantum_task.return_value = result
 
@@ -116,6 +127,7 @@ class Boto3SessionAllWrapper(SessionWrapper):
     def __init__(self):
         super().__init__()
         boto3.Session = self
+        print("inside Boto3SessionAllWrapeper constructor")
 
     def __call__(self, *args, **kwargs):
         return self
