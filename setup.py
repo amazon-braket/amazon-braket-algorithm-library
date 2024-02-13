@@ -28,9 +28,10 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         "amazon-braket-sdk>=1.35.1",
-        "scipy>=1.5.2",
-        "pennylane>=0.29.1",
+        "numpy<=1.26.3",
         "openfermion>=1.5.1",
+        "pennylane>=0.29.1",
+        "scipy>=1.5.2",
     ],
     extras_require={
         "test": [
