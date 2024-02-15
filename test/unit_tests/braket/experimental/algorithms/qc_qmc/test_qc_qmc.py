@@ -22,7 +22,7 @@ def qmc_data():
     mol = qml.qchem.Molecule(symbols, geometry, basis_name="sto-3g")
     trial = np.array([[1, 0], [0, 1], [0, 0], [0, 0]])
     prop = chemistry_preparation(mol, geometry, trial)
-    dev = qml.device("default.qubit", wires=4)
+    dev = qml.device("braket.local.qubit", wires=4)
     e_hf = hartree_fock_energy(trial, prop)
     return (trial, prop, dev, e_hf)
 
