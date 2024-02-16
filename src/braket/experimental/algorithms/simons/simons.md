@@ -3,5 +3,5 @@ Simon's algorithm solves the problem of given a function f:{0,1}^n→{0,1}^n tha
 <!--
 [metadata-name]: Simon's Algorithm
 [metadata-tags]: Textbook
-[metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/simons
+[metadata-url]: https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/simons
 -->

@@ -2,5 +2,5 @@ CHSH (Clauser, Horne, Shimony and Holt) inequality is one of the Bell's inequali
 
 <!--
 [metadata-name]: Violation of CHSH inequality
-[metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/chsh_inequality
+[metadata-url]: https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/chsh_inequality
 -->
