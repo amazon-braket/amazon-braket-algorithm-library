@@ -7,7 +7,7 @@ Please read through this document before submitting any issues or pull requests 
 information to effectively respond to your bug report or contribution.
 
 ## Adding a New Algorithm
-We expect algorithms to be built on top of the [Amazon Braket SDK](https://github.com/aws/amazon-braket-sdk-python) to provide a unified user experience and to give us a single contract to test against.
+We expect algorithms to be built on top of the [Amazon Braket SDK](https://github.com/amazon-braket/amazon-braket-sdk-python) to provide a unified user experience and to give us a single contract to test against.
 
 Please ensure that
 1. Your algorithm is added as functional source code [here](https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms)
@@ -94,7 +94,7 @@ When you make a contribution please ensure that you:
            -->
 3.  Only have Open Source licensed dependencies in your example.
 4.  Run your algorithm on a simulator and optionally on a QPU in your notebook.
-5.  Ensure that your example runs without issues on both a recent Braket Notebook Instance (create a new Braket Notebook Instance or restart one from Amazon Braket [in the console](https://docs.aws.amazon.com/braket/latest/developerguide/braket-get-started-create-notebook.html)) and locally, using our most [recently released Amazon Braket SDK version](https://github.com/aws/amazon-braket-sdk-python/blob/main/README.md#installing-the-amazon-braket-python-sdk). Run the entire notebook by clicking `Cells > Run All`, either in the console or locally, and confirm that every cell completes without error.
+5.  Ensure that your example runs without issues on both a recent Braket Notebook Instance (create a new Braket Notebook Instance or restart one from Amazon Braket [in the console](https://docs.aws.amazon.com/braket/latest/developerguide/braket-get-started-create-notebook.html)) and locally, using our most [recently released Amazon Braket SDK version](https://github.com/amazon-braket/amazon-braket-sdk-python/blob/main/README.md#installing-the-amazon-braket-python-sdk). Run the entire notebook by clicking `Cells > Run All`, either in the console or locally, and confirm that every cell completes without error.
 
 In addition we encourage re-use of existing examples but it is not required. If you see an opportunity to make use of existing modules,
 feel free to do so. For instance if your example implementation requires Quantum Fourier Transform and you can use the existing
@@ -115,7 +115,7 @@ opensource-codeofconduct@amazon.com with any additional questions or comments.
 
 
 ## Security issue notifications
-If you discover a potential security issue in this project we ask that you notify AWS/Amazon Security via our [vulnerability reporting page](http://aws.amazon.com/security/vulnerability-reporting/). Please do **not** create a public github issue.
+If you discover a potential security issue in this project we ask that you notify AWS/Amazon Security via our [vulnerability reporting page](http://aws.amazon.com/security/vulnerability-reporting/). Please do **not** create a public GitHub issue.
 
 
 ## Licensing
