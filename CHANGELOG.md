@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.4.7 (2024-02-19)
+
+### Bug Fixes and Other Changes
+
+ * Update GitHub URL paths to use amazon-braket
+ * Update Bells_Inequality.ipynb
+ * Update CHSH_Inequality.ipynb
+ * change qmc test device to pennylane default instead of lightning
+
 ## v1.4.6 (2024-02-07)
 
 ### Bug Fixes and Other Changes
