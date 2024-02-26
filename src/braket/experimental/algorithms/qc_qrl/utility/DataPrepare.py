@@ -72,9 +72,7 @@ class Prepare(object):
             if file_type == "xlsx" or file_type == "csv":
                 logging.info("parse {} file!".format(file_type))
             else:
-                logging.error(
-                    "file type {} not supported! only support xlsx,csv".format(file_type)
-                )
+                logging.error("file type {} not supported! only support xlsx,csv".format(file_type))
                 raise Exception("file type not supported!")
 
             if buyable_file is not None:
@@ -106,9 +104,7 @@ class Prepare(object):
                 logging.info("parse {} file!".format(buyable_file_type))
             else:
                 logging.error(
-                    "file type {} not supported! only support xlsx,csv".format(
-                        buyable_file_type
-                    )
+                    "file type {} not supported! only support xlsx,csv".format(buyable_file_type)
                 )
                 raise Exception("file type not supported!")
             buyable = pd.read_excel(buyable_file, engine="openpyxl")
@@ -272,14 +268,10 @@ class Prepare(object):
         logging.info("Preparing is done!")
 
     def _list_construct_helper(self, original_list, judge_list, check_in=True):
-        if check_in :
-            new_list = [
-                x for x in original_list if x in judge_list
-            ]
+        if check_in:
+            new_list = [x for x in original_list if x in judge_list]
         else:
-            new_list = [
-                x for x in original_list if x not in judge_list
-            ]
+            new_list = [x for x in original_list if x not in judge_list]
         return new_list
 
     def generate_files(self):

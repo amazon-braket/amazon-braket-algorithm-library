@@ -6,6 +6,7 @@ from .RetroGateModel import RetroRLModel
 
 import torch
 import torch.nn as nn
+
 # import torch.nn.functional as F
 
 # from deepquantum.gates.qcircuit import Circuit as dqCircuit
@@ -22,6 +23,7 @@ import math
 import logging
 import time
 import datetime
+
 # import pickle
 import os
 
@@ -230,31 +232,36 @@ class RetroRLAgent:
 
             job = None
             if train_mode == "local-job":
-                job = self.local_job(device, device_name, interface, image_uri,
-                                     hyperparameters, input_data, s3_data_path)
+                job = self.local_job(
+                    device,
+                    device_name,
+                    interface,
+                    image_uri,
+                    hyperparameters,
+                    input_data,
+                    s3_data_path,
+                )
             elif train_mode == "hybrid-job":
                 if device_name == "aspen-m-3" or device_name == "aria-2":
-                    job = self.hybrid_job(device, device_name, interface, image_uri,
-                                          hyperparameters, s3_data_path)
+                    job = self.hybrid_job(
+                        device, device_name, interface, image_uri, hyperparameters, s3_data_path
+                    )
                 else:
-                    job = self.ohter_job(device, device_name, interface, image_uri,
-                                         hyperparameters, s3_data_path)
+                    job = self.ohter_job(
+                        device, device_name, interface, image_uri, hyperparameters, s3_data_path
+                    )
 
             self.job = job
 
-    def local_job(self, device, device_name, interface, image_uri,
-                  hyperparameters, input_data, s3_data_path):
+    def local_job(
+        self, device, device_name, interface, image_uri, hyperparameters, input_data, s3_data_path
+    ):
         job = LocalQuantumJob.create(
             device=device,
             source_module=f"{current_path}",
             # Any unique name works. Note 50-character limit in job name
             # (comment out to use default naming)
-            job_name="retrorl-job-"
-                     + device_name
-                     + "-"
-                     + interface
-                     + "-"
-                     + str(int(time.time())),
+            job_name="retrorl-job-" + device_name + "-" + interface + "-" + str(int(time.time())),
             image_uri=image_uri,
             # Relative to the source_module
             entry_point="retrorl_algorithm_script",
@@ -274,12 +281,7 @@ class RetroRLAgent:
         job = AwsQuantumJob.create(
             device=device,
             source_module="hybridjobs",
-            job_name="retrorl-job-"
-                     + device_name
-                     + "-"
-                     + interface
-                     + "-"
-                     + str(int(time.time())),
+            job_name="retrorl-job-" + device_name + "-" + interface + "-" + str(int(time.time())),
             image_uri=image_uri,
             # Relative to the source_module
             entry_point="hybridjobs.retrorl_algorithm_script",
@@ -295,12 +297,7 @@ class RetroRLAgent:
         job = AwsQuantumJob.create(
             device=device,
             source_module="hybridjobs",
-            job_name="retrorl-job-"
-                     + device_name
-                     + "-"
-                     + interface
-                     + "-"
-                     + str(int(time.time())),
+            job_name="retrorl-job-" + device_name + "-" + interface + "-" + str(int(time.time())),
             image_uri=image_uri,
             # Relative to the source_module
             entry_point="hybridjobs.retrorl_algorithm_script",
@@ -401,9 +398,7 @@ class RetroRLAgent:
     def process1(self, rm, buyable, deadend, tempv):
         for m in rm:
             if (m, 9 - self.depth) in self.cost1.keys():
-                rmv = sum(self.cost1[m, 9 - self.depth]) / len(
-                    self.cost1[m, 9 - self.depth]
-                )
+                rmv = sum(self.cost1[m, 9 - self.depth]) / len(self.cost1[m, 9 - self.depth])
                 tempv = tempv + rmv
             else:
                 if m in buyable:
@@ -424,9 +419,7 @@ class RetroRLAgent:
     def process2(self, rm, buyable, deadend, file2, tempv):
         for m in rm:
             if (m, 9 - self.depth) in self.cost1.keys():
-                rmv = sum(self.cost1[m, 9 - self.depth]) / len(
-                    self.cost1[m, 9 - self.depth]
-                )
+                rmv = sum(self.cost1[m, 9 - self.depth]) / len(self.cost1[m, 9 - self.depth])
                 tempv = tempv + rmv
             else:
                 if m in buyable:
@@ -605,11 +598,11 @@ class RetroRLAgent:
     # def smiles2url(self, name):
     #     input_data_path = self.param['data_path']
     #     # smiles_map = np.load(f'{input_data_path}/smiles/smiles_map.npy',
-            # allow_pickle=True).item()
+    # allow_pickle=True).item()
     #     smiles_map = np.load(f'{input_data_path}/smiles_map.npy', allow_pickle=True).item()
     #     index = smiles_map[name]
     #     url = "https://web-demo-test2.s3.us-west-2.amazonaws.com/data/smiles/"
-            # + str(index) + ".svg"
+    # + str(index) + ".svg"
 
     #     return url
 
