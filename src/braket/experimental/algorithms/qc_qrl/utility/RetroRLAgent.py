@@ -230,71 +230,87 @@ class RetroRLAgent:
 
             job = None
             if train_mode == "local-job":
-                job = LocalQuantumJob.create(
-                    device=device,
-                    source_module=f"{current_path}",
-                    # Any unique name works. Note 50-character limit in job name
-                    # (comment out to use default naming)
-                    job_name="retrorl-job-"
-                    + device_name
-                    + "-"
-                    + interface
-                    + "-"
-                    + str(int(time.time())),
-                    image_uri=image_uri,
-                    # Relative to the source_module
-                    entry_point="retrorl_algorithm_script",
-                    # general parameters
-                    hyperparameters=hyperparameters,
-                    input_data=input_data,
-                    output_data_config=OutputDataConfig(s3_data_path),
-                )
+                job = self.local_job(device, device_name, interface, image_uri,
+                                     hyperparameters, input_data, s3_data_path)
             elif train_mode == "hybrid-job":
                 if device_name == "aspen-m-3" or device_name == "aria-2":
-                    t = datetime.datetime.utcfromtimestamp(time.time())
-                    # print(t)
-                    if t.hour == 5 or t.hour == 17:
-                        if t.minute >= 50:
-                            time.sleep(900)
-                    job = AwsQuantumJob.create(
-                        device=device,
-                        source_module="hybridjobs",
-                        job_name="retrorl-job-"
-                        + device_name
-                        + "-"
-                        + interface
-                        + "-"
-                        + str(int(time.time())),
-                        image_uri=image_uri,
-                        # Relative to the source_module
-                        entry_point="hybridjobs.retrorl_algorithm_script",
-                        copy_checkpoints_from_job=None,
-                        # general parameters
-                        hyperparameters=hyperparameters,
-                        input_data=s3_data_path,
-                        wait_until_complete=False,
-                    )
+                    job = self.hybrid_job(device, device_name, interface, image_uri,
+                                          hyperparameters, s3_data_path)
                 else:
-                    job = AwsQuantumJob.create(
-                        device=device,
-                        source_module="hybridjobs",
-                        job_name="retrorl-job-"
-                        + device_name
-                        + "-"
-                        + interface
-                        + "-"
-                        + str(int(time.time())),
-                        image_uri=image_uri,
-                        # Relative to the source_module
-                        entry_point="hybridjobs.retrorl_algorithm_script",
-                        copy_checkpoints_from_job=None,
-                        # general parameters
-                        hyperparameters=hyperparameters,
-                        input_data=s3_data_path,
-                        wait_until_complete=False,
-                    )
+                    job = self.ohter_job(device, device_name, interface, image_uri,
+                                         hyperparameters, s3_data_path)
 
             self.job = job
+
+    def local_job(self, device, device_name, interface, image_uri,
+                  hyperparameters, input_data, s3_data_path):
+        job = LocalQuantumJob.create(
+            device=device,
+            source_module=f"{current_path}",
+            # Any unique name works. Note 50-character limit in job name
+            # (comment out to use default naming)
+            job_name="retrorl-job-"
+                     + device_name
+                     + "-"
+                     + interface
+                     + "-"
+                     + str(int(time.time())),
+            image_uri=image_uri,
+            # Relative to the source_module
+            entry_point="retrorl_algorithm_script",
+            # general parameters
+            hyperparameters=hyperparameters,
+            input_data=input_data,
+            output_data_config=OutputDataConfig(s3_data_path),
+        )
+        return job
+
+    def hybrid_job(self, device, device_name, interface, image_uri, hyperparameters, s3_data_path):
+        t = datetime.datetime.utcfromtimestamp(time.time())
+        # print(t)
+        if t.hour == 5 or t.hour == 17:
+            if t.minute >= 50:
+                time.sleep(900)
+        job = AwsQuantumJob.create(
+            device=device,
+            source_module="hybridjobs",
+            job_name="retrorl-job-"
+                     + device_name
+                     + "-"
+                     + interface
+                     + "-"
+                     + str(int(time.time())),
+            image_uri=image_uri,
+            # Relative to the source_module
+            entry_point="hybridjobs.retrorl_algorithm_script",
+            copy_checkpoints_from_job=None,
+            # general parameters
+            hyperparameters=hyperparameters,
+            input_data=s3_data_path,
+            wait_until_complete=False,
+        )
+        return job
+
+    def ohter_job(self, device, device_name, interface, image_uri, hyperparameters, s3_data_path):
+        job = AwsQuantumJob.create(
+            device=device,
+            source_module="hybridjobs",
+            job_name="retrorl-job-"
+                     + device_name
+                     + "-"
+                     + interface
+                     + "-"
+                     + str(int(time.time())),
+            image_uri=image_uri,
+            # Relative to the source_module
+            entry_point="hybridjobs.retrorl_algorithm_script",
+            copy_checkpoints_from_job=None,
+            # general parameters
+            hyperparameters=hyperparameters,
+            input_data=s3_data_path,
+            wait_until_complete=False,
+        )
+        return job
 
     def game(self, episodes):
         # for episode in range(1, 301):
@@ -324,26 +340,29 @@ class RetroRLAgent:
                 # else:
                 #     self.tocost[name] = [namecost]
                 self.renew()
-            with torch.no_grad():
-                avc = float(episodecost) / len(self.file3)
-            self.avtocost.append(avc)
-            self.merge()
-            # if episode % 30 == 0:
-            if episode % 1 == 0:
-                self.updates += 1
-                self.is_model = True
-                logging.info(
-                    f"epsiode {episode} averate cost {avc} start training for {self.epoches} \
-                        epoches..."
-                )
-                self.train(self.file1, self.file2)
-            if episode % 100 == 0:
-                if self.epsilon - 0.05 > 0:
-                    self.epsilon -= 0.03
-                else:
-                    self.epsilon = 0
-                self.cost1 = {}
-                self.cost2 = {}
+            self._train(episodecost, episode)
+
+    def _train(self, episodecost, episode):
+        with torch.no_grad():
+            avc = float(episodecost) / len(self.file3)
+        self.avtocost.append(avc)
+        self.merge()
+        # if episode % 30 == 0:
+        if episode % 1 == 0:
+            self.updates += 1
+            self.is_model = True
+            logging.info(
+                f"epsiode {episode} averate cost {avc} start training for {self.epoches} \
+                    epoches..."
+            )
+            self.train(self.file1, self.file2)
+        if episode % 100 == 0:
+            if self.epsilon - 0.05 > 0:
+                self.epsilon -= 0.03
+            else:
+                self.epsilon = 0
+            self.cost1 = {}
+            self.cost2 = {}
 
     def renew(self):
         self.depth = 1
@@ -361,54 +380,9 @@ class RetroRLAgent:
                 rm = file1[name][r]
                 tempv = 1
                 if not self.is_model:
-                    for m in rm:
-                        if (m, 9 - self.depth) in self.cost1.keys():
-                            rmv = sum(self.cost1[m, 9 - self.depth]) / len(
-                                self.cost1[m, 9 - self.depth]
-                            )
-                            tempv = tempv + rmv
-                        else:
-                            if m in buyable:
-                                rmv = 0
-                            elif m in deadend:
-                                rmv = 100
-                            elif self.depth == 9:
-                                rmv = 10
-                            else:
-                                rmv = np.random.randint(1, 101)
-                            if (m, 9 - self.depth) in self.cost2.keys():
-                                self.cost2[m, 9 - self.depth].append(rmv)
-                            else:
-                                self.cost2[m, 9 - self.depth] = [rmv]
-                            tempv = tempv + rmv
+                    tempv = self.process1(rm, buyable, deadend, tempv)
                 else:
-                    for m in rm:
-                        if (m, 9 - self.depth) in self.cost1.keys():
-                            rmv = sum(self.cost1[m, 9 - self.depth]) / len(
-                                self.cost1[m, 9 - self.depth]
-                            )
-                            tempv = tempv + rmv
-                        else:
-                            if m in buyable:
-                                rmv = 0
-                            elif m in deadend:
-                                rmv = 100
-                            elif self.depth == 9:
-                                rmv = 10
-                            else:
-                                fp = torch.tensor(file2[m], dtype=torch.float)
-                                depth = torch.tensor([self.depth], dtype=torch.float)
-                                fp = torch.cat([fp, depth])
-                                if self.method == "retro-qrl":
-                                    fp = fp.reshape(1, -1)
-                                    fp = nn.functional.normalize(fp)
-                                # print(f"choose reaction 1 type of forward tensor {fp.dtype}")
-                                rmv = self.NN.forward(fp)[0]
-                            if (m, 9 - self.depth) in self.cost2.keys():
-                                self.cost2[m, 9 - self.depth].append(rmv)
-                            else:
-                                self.cost2[m, 9 - self.depth] = [rmv]
-                            tempv = tempv + rmv
+                    tempv = self.process2(rm, buyable, deadend, file2, tempv)
                 if tempv < minv:
                     minv = tempv
                     mink = r
@@ -417,57 +391,65 @@ class RetroRLAgent:
             rm = file1[name][mink]
             tempv = 1
             if not self.is_model:
-                for m in rm:
-                    if (m, 9 - self.depth) in self.cost1.keys():
-                        rmv = sum(self.cost1[m, 9 - self.depth]) / len(
-                            self.cost1[m, 9 - self.depth]
-                        )
-                        tempv = tempv + rmv
-                    else:
-                        if m in buyable:
-                            rmv = 0
-                        elif m in deadend:
-                            rmv = 100
-                        elif self.depth == 9:
-                            rmv = 10
-                        else:
-                            rmv = np.random.randint(1, 101)
-                        if (m, 9 - self.depth) in self.cost2.keys():
-                            self.cost2[m, 9 - self.depth].append(rmv)
-                        else:
-                            self.cost2[m, 9 - self.depth] = [rmv]
-                        tempv = tempv + rmv
+                tempv = self.process1(rm, buyable, deadend, tempv)
             else:
-                for m in rm:
-                    if (m, 9 - self.depth) in self.cost1.keys():
-                        rmv = sum(self.cost1[m, 9 - self.depth]) / len(
-                            self.cost1[m, 9 - self.depth]
-                        )
-                        tempv = tempv + rmv
-                    else:
-                        if m in buyable:
-                            rmv = 0
-                        elif m in deadend:
-                            rmv = 100
-                        elif self.depth == 9:
-                            rmv = 10
-                        else:
-                            fp = torch.tensor(file2[m], dtype=torch.float)
-                            depth = torch.tensor([self.depth], dtype=torch.float)
-                            fp = torch.cat([fp, depth])
-                            if self.method == "retro-qrl":
-                                fp = fp.reshape(1, -1)
-                                fp = nn.functional.normalize(fp)
-                            # print(f"choose reaction else type of forward tensor {fp.dtype}")
-                            rmv = self.NN.forward(fp)[0]
-                        if (m, 9 - self.depth) in self.cost2.keys():
-                            self.cost2[m, 9 - self.depth].append(rmv)
-                        else:
-                            self.cost2[m, 9 - self.depth] = [rmv]
-                        tempv = tempv + rmv
+                tempv = self.process2(rm, buyable, deadend, file2, tempv)
             minv = tempv
 
         return file1[name][mink], minv, mink
+
+    def process1(self, rm, buyable, deadend, tempv):
+        for m in rm:
+            if (m, 9 - self.depth) in self.cost1.keys():
+                rmv = sum(self.cost1[m, 9 - self.depth]) / len(
+                    self.cost1[m, 9 - self.depth]
+                )
+                tempv = tempv + rmv
+            else:
+                if m in buyable:
+                    rmv = 0
+                elif m in deadend:
+                    rmv = 100
+                elif self.depth == 9:
+                    rmv = 10
+                else:
+                    rmv = np.random.randint(1, 101)
+                if (m, 9 - self.depth) in self.cost2.keys():
+                    self.cost2[m, 9 - self.depth].append(rmv)
+                else:
+                    self.cost2[m, 9 - self.depth] = [rmv]
+                tempv = tempv + rmv
+        return tempv
+
+    def process2(self, rm, buyable, deadend, file2, tempv):
+        for m in rm:
+            if (m, 9 - self.depth) in self.cost1.keys():
+                rmv = sum(self.cost1[m, 9 - self.depth]) / len(
+                    self.cost1[m, 9 - self.depth]
+                )
+                tempv = tempv + rmv
+            else:
+                if m in buyable:
+                    rmv = 0
+                elif m in deadend:
+                    rmv = 100
+                elif self.depth == 9:
+                    rmv = 10
+                else:
+                    fp = torch.tensor(file2[m], dtype=torch.float)
+                    depth = torch.tensor([self.depth], dtype=torch.float)
+                    fp = torch.cat([fp, depth])
+                    if self.method == "retro-qrl":
+                        fp = fp.reshape(1, -1)
+                        fp = nn.functional.normalize(fp)
+                    # print(f"choose reaction 1 type of forward tensor {fp.dtype}")
+                    rmv = self.NN.forward(fp)[0]
+                if (m, 9 - self.depth) in self.cost2.keys():
+                    self.cost2[m, 9 - self.depth].append(rmv)
+                else:
+                    self.cost2[m, 9 - self.depth] = [rmv]
+                tempv = tempv + rmv
+        return tempv
 
     def add_child(self, m):
         self.layer[self.depth + 1].append(m)

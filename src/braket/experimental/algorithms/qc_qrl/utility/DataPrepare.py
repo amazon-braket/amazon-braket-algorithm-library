@@ -191,7 +191,9 @@ class Prepare(object):
         middle = self._list_construct_helper(reactant_uniques, product_uniques)
         # 1965-intermediate reactants
         # buyable = [y for y in reactant_uniques if y not in middle]  # 51025-reaction substrates
+        self._next(middle, df, k)
 
+    def _next(self, middle, df, k):
         # By querying the location of the intermediate products, the synthesis reactions of more
         # than two steps are screened.
         c = pd.DataFrame(
