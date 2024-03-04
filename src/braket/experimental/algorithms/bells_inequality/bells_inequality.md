@@ -3,5 +3,5 @@ Bell's Inequality shows that certain predictions of quantum mechanics cannot be 
 <!--
 [metadata-name]: Violation of Bell's Inequality
 [metadata-tags]: Textbook
-[metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/bells_inequality
+[metadata-url]: https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/bells_inequality
 -->

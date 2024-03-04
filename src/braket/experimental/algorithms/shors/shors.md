@@ -3,5 +3,5 @@ Shor's algorithm is used to find prime factors of an integer. On a quantum compu
 <!--
 [metadata-name]: Shor's Algorithm
 [metadata-tags]: Textbook
-[metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/blob/main/src/braket/experimental/algorithms/shors
+[metadata-url]: https://github.com/amazon-braket/amazon-braket-algorithm-library/blob/main/src/braket/experimental/algorithms/shors
 -->

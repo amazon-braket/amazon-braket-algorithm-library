@@ -3,5 +3,5 @@ One of the first quantum algorithm’s developed by pioneers David Deutsch and R
 <!--
 [metadata-name]: Deutsch-Jozsa Algorithm
 [metadata-tags]: Textbook
-[metadata-url]: https://github.com/aws-samples/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/deutsch_jozsa
+[metadata-url]: https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/deutsch_jozsa
 -->

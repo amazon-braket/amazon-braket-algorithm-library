@@ -50,7 +50,7 @@ setup(
         ]
     },
     include_package_data=True,
-    url="https://github.com/aws-samples/amazon-braket-algorithm-library",
+    url="https://github.com/amazon-braket/amazon-braket-algorithm-library",
     author="Amazon Web Services",
     description=(
         "An open source library of quantum computing algorithms implemented on Amazon Braket"
