@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.8 (2024-03-05)
+
+### Bug Fixes and Other Changes
+
+ * build(deps): bump codecov/codecov-action from 3 to 4
+
 ## v1.4.7 (2024-02-19)
 
 ### Bug Fixes and Other Changes
