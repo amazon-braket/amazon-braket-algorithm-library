@@ -15,10 +15,10 @@ def test_filter_gate_set_returns_classes():
     assert all(isinstance(cls, type) for cls in gate_classes)
 
 
-def test_filter_gate_set_min_qubits():
-    min_qubits = 2
-    gate_classes = filter_gate_set(min_qubits)
-    assert all(cls.fixed_qubit_count() >= min_qubits for cls in gate_classes)
+def test_filter_gate_set_max_qubits():
+    max_qubits = 2
+    gate_classes = filter_gate_set(max_qubits)
+    assert all(cls.fixed_qubit_count() <= max_qubits for cls in gate_classes)
 
 
 def test_random_circuit_returns_circuit():
