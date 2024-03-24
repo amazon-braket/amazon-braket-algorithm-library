@@ -46,7 +46,7 @@ def test_random_circuit_variability_without_seed():
 
 def test_get_random_circuit_results():
     local_simulator = LocalSimulator()
-    circuit = random_circuit(2, 3, 1, seed=123)
+    circuit = random_circuit(2, 3, 1, seed=20)
     circuit.probability()
 
     result = run_random_circuit(circuit, local_simulator, shots=0).result()
