@@ -1,8 +1,7 @@
 import pytest
 from braket.circuits import Circuit
-from braket.devices import LocalSimulator
 
-from braket.experimental.auxilary_functions.random_circuit import random_circuit
+from braket.experimental.auxilary_functions.random_circuit.random_circuit import random_circuit
 
 
 def test_random_circuit_returns_circuit():
@@ -11,7 +10,8 @@ def test_random_circuit_returns_circuit():
 
 
 def test_random_circuit_instruction_count():
-    circuit = random_circuit(num_qubits=3, num_gates=5, seed=1)
+    num_gates = 5
+    circuit = random_circuit(num_qubits=3, num_gates=num_gates, seed=1)
     assert len(circuit.instructions) == num_gates
 
 

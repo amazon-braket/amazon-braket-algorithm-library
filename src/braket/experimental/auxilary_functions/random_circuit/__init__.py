@@ -11,8 +11,4 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from braket.experimental.algorithms.random_circuit.random_circuit import (  # noqa: F401
-    filter_gate_set,
-    random_circuit,
-    run_random_circuit,
-)
+from braket.experimental.auxilary_functions.random_circuit import random_circuit

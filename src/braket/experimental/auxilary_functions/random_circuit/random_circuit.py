@@ -3,7 +3,7 @@ import math
 import random
 from typing import List
 
-from braket.circuits import Circuit, Instruction, gates
+from braket.circuits import Circuit, Gate, Instruction
 from braket.circuits.gates import CNot, H, S, T
 
 
@@ -30,13 +30,13 @@ def random_circuit(
     for _ in range(num_gates):
         gate = random.choice(gate_set)
         gate_class = gate.__class__
-        gate_qubits = gate_class.fixed_qubit_count()
+        gate_qubits = gate.fixed_qubit_count()
 
         # Select random qubits for the gate
         qubits = random.sample(range(num_qubits), gate_qubits)
 
         # Get the constructor's signature to determine required parameters
-        init_signature = inspect.signature(gate_class.__init__)
+        init_signature = inspect.signature(gate.__init__)
 
         # Calculate the number of parameters (excluding 'self')
         num_params = len(init_signature.parameters) - 1
@@ -45,10 +45,10 @@ def random_circuit(
         params = [random.uniform(0, 2 * math.pi) for _ in range(num_params)]
 
         # Create the gate instance
-        gate = gate_class(*params)
+        g = gate(*params)
 
         # Add the gate as an instruction
-        instructions.append(Instruction(gate, qubits))
+        instructions.append(Instruction(g, qubits))
 
     # Create a circuit with the list of instructions
     circuit = Circuit().add(instructions)
