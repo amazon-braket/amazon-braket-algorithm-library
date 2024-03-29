@@ -29,7 +29,6 @@ def random_circuit(
     instructions = []
     for _ in range(num_gates):
         gate = random.choice(gate_set)
-        gate_class = gate.__class__
         gate_qubits = gate.fixed_qubit_count()
 
         # Select random qubits for the gate
