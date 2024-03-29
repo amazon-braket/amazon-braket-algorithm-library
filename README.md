@@ -31,6 +31,11 @@ Running notebooks locally requires additional dependencies located in [notebooks
 | Quantum PCA | [Quantum_Principal_Component_Analysis.ipynb](notebooks/advanced_algorithms/Quantum_Principal_Component_Analysis.ipynb) | [He2022](https://ieeexplore.ieee.org/document/9669030) |
 | QMC | [Quantum_Computing_Quantum_Monte_Carlo.ipynb](notebooks/advanced_algorithms/Quantum_Computing_Quantum_Monte_Carlo.ipynb) | [Motta2018](https://wires.onlinelibrary.wiley.com/doi/10.1002/wcms.1364), [Peruzzo2014](https://www.nature.com/articles/ncomms5213) |
 
+
+| Auxiliary functions | Notebook |
+| ----- | ----- |
+| Random circuit generator | [Random_Circuit.ipynb](notebooks/auxiliary_functions/Random_Circuit.ipynb) |
+
 ---
 ### Community repos
 
