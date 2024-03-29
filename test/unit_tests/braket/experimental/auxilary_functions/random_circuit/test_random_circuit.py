@@ -1,4 +1,3 @@
-import pytest
 from braket.circuits import Circuit
 
 from braket.experimental.auxilary_functions.random_circuit.random_circuit import random_circuit
