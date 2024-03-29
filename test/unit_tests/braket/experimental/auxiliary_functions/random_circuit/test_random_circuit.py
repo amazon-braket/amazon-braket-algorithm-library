@@ -1,6 +1,6 @@
 from braket.circuits import Circuit
 
-from braket.experimental.auxilary_functions.random_circuit.random_circuit import random_circuit
+from braket.experimental.auxiliary_functions.random_circuit import random_circuit
 
 
 def test_random_circuit_returns_circuit():
