@@ -11,4 +11,4 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from .random_circuit import random_circuit
+from .random_circuit import random_circuit  # noqa: F401
