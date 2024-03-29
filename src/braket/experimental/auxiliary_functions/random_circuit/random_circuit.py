@@ -19,7 +19,8 @@ def random_circuit(
     Args:
         num_qubits (int): Number of qubits in the circuit.
         num_gates (int): Number of instructions (gates) in the circuit.
-        gate_set (List[Gate]): List of basis gates for the random circuit (default is None).
+        gate_set (Optional[List[Gate]]): List of basis gates for the random circuit
+            (default is None).
         seed (Optional[int]): Random seed for reproducibility (default is None).
 
     Returns:
