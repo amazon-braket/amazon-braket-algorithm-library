@@ -33,9 +33,10 @@ Running notebooks locally requires additional dependencies located in [notebooks
 
 ---
 ### Community repos
-Quantum algorithm implementations using Braket in other repos
 
 > :warning: **The following includes projects that are not provided by AWS. You are solely responsible for your use of those projects (including compliance with any applicable licenses and fitness of the project for your particular purpose).**
+
+Quantum algorithm implementations using Braket in other repos:
 
 | Algorithm | Repo | References | Additional dependencies |
 | ----- | ----- | ----- | ----- |
