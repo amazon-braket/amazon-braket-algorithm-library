@@ -1,7 +1,7 @@
 from braket.circuits import Circuit
 from braket.circuits.gates import XY, CNot, CPhaseShift, H, Rx, Ry, Rz, S, T
 
-from braket.experimental.auxiliary_functions.random_circuit import random_circuit
+from braket.experimental.auxiliary_functions import random_circuit
 
 
 def test_random_circuit_returns_circuit():
