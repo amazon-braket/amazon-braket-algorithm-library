@@ -36,7 +36,8 @@ Running notebooks locally requires additional dependencies located in [notebooks
 Quantum algorithm implementations using Braket in other repos
 | Algorithm | Repo | References | Additional dependencies |
 | ----- | ----- | ----- | ----- |
-| <Name> | <link to github repo> | <published reference> | <list of required packages on top of what is listed in amazon-braket-algorithm-library setup.py> |
+
+[comment]: <> (If you wish to highlight your implementation,  append the following content in a new line to the table above : | <Name> | <link to github repo> | <published reference> | <list of required packages on top of what is listed in amazon-braket-algorithm-library setup.py> |)
 
 ---
 ## <a name="install">Installing the Amazon Braket Algorithm Library</a>
