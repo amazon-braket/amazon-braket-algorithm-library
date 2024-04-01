@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.4.9 (2024-04-01)
+
+### Bug Fixes and Other Changes
+
+ * Add random circuit algo
+ * add summary table to README.md
+
 ## v1.4.8 (2024-03-05)
 
 ### Bug Fixes and Other Changes
