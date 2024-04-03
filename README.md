@@ -45,6 +45,7 @@ Quantum algorithm implementations using Braket in other repos:
 
 | Algorithm | Repo | References | Additional dependencies |
 | ----- | ----- | ----- | ----- |
+| Quantum Reinforcement Learning | [quantum-computing-exploration-for-drug-discovery-on-aws](https://github.com/awslabs/quantum-computing-exploration-for-drug-discovery-on-aws)| [Learning Retrosynthetic Planning through Simulated Experience(2019)](https://pubs.acs.org/doi/10.1021/acscentsci.9b00055) | [dependencies](https://github.com/awslabs/quantum-computing-exploration-for-drug-discovery-on-aws/blob/main/source/src/notebook/healthcare-and-life-sciences/d-1-retrosynthetic-planning-quantum-reinforcement-learning/requirements.txt)
 
 [comment]: <> (If you wish to highlight your implementation,  append the following content in a new line to the table above : | <Name> | <link to github repo> | <published reference> | <list of required packages on top of what is listed in amazon-braket-algorithm-library setup.py> |)
 
