@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.4.10 (2024-04-16)
+
+### Bug Fixes and Other Changes
+
+ * update description of community repositories
+ * add community repo: quantum-computing-exploration-for-drug-discovery-on-aws
+
 ## v1.4.9 (2024-04-01)
 
 ### Bug Fixes and Other Changes
