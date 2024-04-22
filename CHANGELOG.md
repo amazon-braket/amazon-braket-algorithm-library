@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.11 (2024-04-22)
+
+### Bug Fixes and Other Changes
+
+ * add parallel testing for pytest
+
 ## v1.4.10 (2024-04-16)
 
 ### Bug Fixes and Other Changes
