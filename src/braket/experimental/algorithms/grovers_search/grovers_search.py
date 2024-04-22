@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from braket.circuits import Circuit, circuit
 
 
@@ -99,7 +97,7 @@ def multi_control_not_constructor(
     n_qubit: int,
     decompose_ccnot: bool,
     is_outermost_call: bool = True,
-) -> Tuple[Circuit, int]:
+) -> tuple[Circuit, int]:
     """Recursive constructor of a multi-contol Not circuit (generalized Toffoli gate).
     Ref: https://arxiv.org/abs/1904.01671
 
@@ -109,7 +107,7 @@ def multi_control_not_constructor(
         is_outermost_call (bool):  Whether the call is the outermost call from external functions.
 
     Returns:
-        Tuple[Circuit, int]:  the multi-contol Not circuit and the number of ancilla in the circuit
+        tuple[Circuit, int]:  the multi-contol Not circuit and the number of ancilla in the circuit
     """
     if n_qubit == 1:
         n_ancilla = 1

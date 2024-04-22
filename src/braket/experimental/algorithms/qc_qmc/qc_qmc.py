@@ -1,6 +1,6 @@
 import multiprocessing as mp
 import os
-from typing import Callable, List, Tuple
+from typing import Callable
 
 import numpy as np
 import pennylane as qml
@@ -29,7 +29,7 @@ def qc_qmc(
     trial_state_circuit: Callable,
     dev: qml.Device,
     max_pool: int = 8,
-) -> Tuple[List[float], List[float]]:
+) -> tuple[list[float], list[float]]:
     """Quantum assisted Auxiliary-Field Quantum Monte Carlo.
 
     Args:
@@ -44,7 +44,7 @@ def qc_qmc(
         max_pool (int): Max workers. Defaults to 8.
 
     Returns:
-        Tuple[List[float], List[float]]: quantum and classical energies
+        tuple[list[float], list[float]]: quantum and classical energies
     """
     e_hf = hartree_fock_energy(trial, prop)
     walkers = [trial] * num_walkers
@@ -83,7 +83,7 @@ def qc_qmc(
     return quantum_energies, energies
 
 
-def q_full_imag_time_evolution_wrapper(args: Tuple) -> Callable:
+def q_full_imag_time_evolution_wrapper(args: tuple) -> Callable:
     return q_full_imag_time_evolution(*args)
 
 
@@ -98,7 +98,7 @@ def q_full_imag_time_evolution(
     weight: float,
     trial_state_circuit: Callable,
     dev: qml.Device,
-) -> Tuple[List[float], List[float], List[float], List[float]]:
+) -> tuple[list[float], list[float], list[float], list[float]]:
     """Imaginary time evolution of a single walker.
 
     Args:
@@ -117,7 +117,7 @@ def q_full_imag_time_evolution(
             for quantum device;
 
     Returns:
-        Tuple[List[float],List[float],List[float],List[float]]: energy_list, weights, qs, cs
+        tuple[list[float], list[float], list[float], list[float]]: energy_list, weights, qs, cs
     """
     # random seed for mutliprocessing
     np.random.seed(int.from_bytes(os.urandom(4), byteorder="little"))
@@ -150,7 +150,7 @@ def imag_time_propogator_qaee(
     e_shift: float,
     trial_state_circuit: Callable,
     dev: qml.Device,
-) -> Tuple[float, float, float, np.ndarray, float]:
+) -> tuple[float, float, float, np.ndarray, float]:
     """Imaginary time propogator with quantum energy evaluations.
 
     Args:
@@ -165,7 +165,7 @@ def imag_time_propogator_qaee(
         dev (qml.Device): Pennylane device
 
     Returns:
-        Tuple[float, float, float, ndarray, float]: propogatpr results
+        tuple[float, float, float, ndarray, float]: propogatpr results
         e_loc: local energy
         e_loc_q / c_ovlp: numerator
         q_ovlp / c_ovlp: denominator for evaluation of total energy
@@ -284,11 +284,11 @@ def local_energy_quantum(  # noqa: C901
     return energy
 
 
-def givens_block_circuit(givens: Tuple) -> None:
+def givens_block_circuit(givens: tuple) -> None:
     r"""This function defines the Givens rotation circuit from a single givens tuple.
 
     Args:
-        givens (Tuple): (i, j, \theta, \varphi)
+        givens (tuple): (i, j, \theta, \varphi)
     """
     (i, j, theta, varphi) = givens
 
@@ -304,11 +304,11 @@ def givens_block_circuit(givens: Tuple) -> None:
     qml.CNOT(wires=[j, i])
 
 
-def prepare_slater_circuit(circuit_description: List[Tuple]) -> None:
+def prepare_slater_circuit(circuit_description: list[tuple]) -> None:
     """Creating Givens rotation circuit to prepare arbitrary Slater determinant.
 
     Args:
-        circuit_description (List[Tuple]): list of tuples containing Givens rotation
+        circuit_description (list[tuple]): list of tuples containing Givens rotation
             (i, j, theta, phi) in reversed order.
     """
 
@@ -446,7 +446,7 @@ def u_circuit(u_matrix: np.ndarray) -> None:
 
 
 def pauli_real(
-    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: List[int]
+    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: list[int]
 ) -> Callable:
     """Construct the the vacuum reference circuit for measuring expectation value
         of a pauli real part
@@ -454,7 +454,7 @@ def pauli_real(
         q_state (ndarray): orthonormalized walker state
         trial_state_circuit (Callable): quantum trial state
         u_matrix (ndarray): unitary transformation to change the Pauli into Z basis
-        pauli (List[int]): list that stores the position of the Z gate, e.g., [0,1]
+        pauli (list[int]): list that stores the position of the Z gate, e.g., [0,1]
             represents 'ZZII'.
 
     Returns:
@@ -471,7 +471,7 @@ def pauli_real(
 
 
 def pauli_imag(
-    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: List[int]
+    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: list[int]
 ) -> Callable:
     """Construct the the vacuum reference circuit for measuring expectation value
         of a pauli imaginary part
@@ -479,7 +479,7 @@ def pauli_imag(
         q_state (ndarray): orthonormalized walker state
         trial_state_circuit (Callable): quantum trial state
         u_matrix (ndarray): unitary transformation to change the Pauli into Z basis
-        pauli (List[int]): list that stores the position of the Z gate, e.g., [0,1]
+        pauli (list[int]): list that stores the position of the Z gate, e.g., [0,1]
             represents 'ZZII'.
 
     Returns:
@@ -499,7 +499,7 @@ def pauli_estimate(
     q_state: np.ndarray,
     trial_state_circuit: Callable,
     u_matrix: np.ndarray,
-    pauli: List[int],
+    pauli: list[int],
     dev: qml.device,
 ) -> float:
     """This function returns the expectation value of $\\langle \\Psi_q_state|pauli|\\phi_l\rangle$.
@@ -508,7 +508,7 @@ def pauli_estimate(
             orthonormalized.
         trial_state_circuit (Callable): circuit unitary to prepare the quantum trial state
         u_matrix (ndarray): eigenvector of Cholesky vectors, $L = U \\lambda U^{\\dagger}$
-        pauli (List[int]): list of 0 and 1 as the representation of a Pauli string,
+        pauli (list[int]): list of 0 and 1 as the representation of a Pauli string,
             e.g., [0,1] represents 'ZZII'.
         dev (qml.device): `qml.device('lightning.qubit', wires=wires)` for simulator;
             or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`

@@ -10,8 +10,8 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
+
 from collections import Counter
-from typing import List, Tuple
 
 import numpy as np
 from braket.circuits import Circuit, Qubit, circuit
@@ -25,7 +25,7 @@ def create_bell_inequality_circuits(
     angle_A: float = 0,
     angle_B: float = np.pi / 3,
     angle_C: float = 2 * np.pi / 3,
-) -> List[Circuit]:
+) -> list[Circuit]:
     """Create the three circuits for Bell's inequality. Default angles will give maximum violation
     of Bell's inequality.
 
@@ -38,7 +38,7 @@ def create_bell_inequality_circuits(
             maximum violation of Bell's inequality.
 
     Returns:
-        List[Circuit]: Three circuits circAB, circAC, circBC.
+        list[Circuit]: Three circuits circAB, circAC, circBC.
     """
     circAB = bell_singlet_rotated_basis(qubit0, qubit1, angle_A, angle_B)
     circAC = bell_singlet_rotated_basis(qubit0, qubit1, angle_A, angle_C)
@@ -47,35 +47,35 @@ def create_bell_inequality_circuits(
 
 
 def run_bell_inequality(
-    circuits: List[Circuit],
+    circuits: list[Circuit],
     device: Device,
     shots: int = 1_000,
-) -> List[QuantumTask]:
+) -> list[QuantumTask]:
     """Submit three Bell circuits to a device.
 
     Args:
-        circuits (List[Circuit]): Three Bell inequality circuits in order circAB, circAC, circBC.
+        circuits (list[Circuit]): Three Bell inequality circuits in order circAB, circAC, circBC.
         device (Device): Quantum device or simulator.
         shots (int): Number of shots. Defaults to 1_000.
 
     Returns:
-        List[QuantumTask]: List of quantum tasks.
+        list[QuantumTask]: List of quantum tasks.
     """
     tasks = [device.run(circ, shots=shots) for circ in circuits]
     return tasks
 
 
 def get_bell_inequality_results(
-    tasks: List[QuantumTask], verbose: bool = True
-) -> Tuple[List[Counter], float, float, float]:
+    tasks: list[QuantumTask], verbose: bool = True
+) -> tuple[list[Counter], float, float, float]:
     """Return Bell task results after post-processing.
 
     Args:
-        tasks (List[QuantumTask]): List of quantum tasks.
+        tasks (list[QuantumTask]): List of quantum tasks.
         verbose (bool): Controls printing of the inequality result. Defaults to True.
 
     Returns:
-        Tuple[List[Counter], float, float, float]: results, pAB, pAC, pBC
+        tuple[list[Counter], float, float, float]: results, pAB, pAC, pBC
     """
     results = [task.result().result_types[0].value for task in tasks]  # probability result type
     prob_same = np.array([d[0] + d[3] for d in results])  # 00 and 11 states

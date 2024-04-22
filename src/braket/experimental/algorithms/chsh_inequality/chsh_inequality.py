@@ -12,7 +12,6 @@
 # language governing permissions and limitations under the License.
 
 from collections import Counter
-from typing import List, Tuple
 
 import numpy as np
 from braket.circuits import Circuit, Qubit
@@ -32,7 +31,7 @@ def create_chsh_inequality_circuits(
     a2: float = 0,
     b1: float = np.pi / 4,
     b2: float = 3 * np.pi / 4,
-) -> List[Circuit]:
+) -> list[Circuit]:
     """Create the four circuits for CHSH inequality. Default angles will give maximum violation of
     the inequality.
 
@@ -45,7 +44,7 @@ def create_chsh_inequality_circuits(
         b2 (float): Second basis rotation angle for second qubit.
 
     Returns:
-        List[Circuit]: List of quantum circuits.
+        list[Circuit]: List of quantum circuits.
     """
     circ_a1b1 = bell_singlet_rotated_basis(qubit0, qubit1, a1, b1)
     circ_a1b2 = bell_singlet_rotated_basis(qubit0, qubit1, a1, b2)
@@ -55,35 +54,35 @@ def create_chsh_inequality_circuits(
 
 
 def run_chsh_inequality(
-    circuits: List[Circuit],
+    circuits: list[Circuit],
     device: Device,
     shots: int = 1_000,
-) -> List[QuantumTask]:
+) -> list[QuantumTask]:
     """Submit four CHSH circuits to a device.
 
     Args:
-        circuits (List[Circuit]): Four CHSH inequality circuits to run.
+        circuits (list[Circuit]): Four CHSH inequality circuits to run.
         device (Device): Quantum device or simulator.
         shots (int): Number of shots. Defaults to 1_000.
 
     Returns:
-        List[QuantumTask]: List of quantum tasks.
+        list[QuantumTask]: List of quantum tasks.
     """
     tasks = [device.run(circ, shots=shots) for circ in circuits]
     return tasks
 
 
 def get_chsh_results(
-    tasks: List[QuantumTask], verbose: bool = True
-) -> Tuple[float, List[Counter], float, float, float]:
+    tasks: list[QuantumTask], verbose: bool = True
+) -> tuple[float, list[Counter], float, float, float]:
     """Return CHSH task results after post-processing.
 
     Args:
-        tasks (List[QuantumTask]): List of quantum tasks.
+        tasks (list[QuantumTask]): List of quantum tasks.
         verbose (bool): Controls printing of the inequality result. Defaults to True.
 
     Returns:
-        Tuple[float, List[Counter], float, float, float]: The chsh_value, list of results,
+        tuple[float, list[Counter], float, float, float]: The chsh_value, list of results,
         and the four probabilities: E_a1b1, E_a1b2, E_a2b1, E_a2b2.
     """
     results = [task.result().result_types[0].value for task in tasks]

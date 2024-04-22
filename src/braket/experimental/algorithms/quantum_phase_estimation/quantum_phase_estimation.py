@@ -13,7 +13,7 @@
 
 import math
 from collections import Counter
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable
 
 import numpy as np
 from braket.circuits import Circuit, circuit
@@ -125,7 +125,7 @@ def get_quantum_phase_estimation_results(
     precision_qubits: QubitSetInput,
     query_qubits: QubitSetInput,
     verbose: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Function to postprocess results returned by run_quantum_phase_estimation and pretty print
     results.
 
@@ -136,7 +136,7 @@ def get_quantum_phase_estimation_results(
         verbose (bool) : If True, prints aggregate results (default is False)
 
     Returns:
-        Dict[str, Any]: aggregate measurement results
+        dict[str, Any]: aggregate measurement results
     """
 
     result = task.result()
@@ -210,7 +210,7 @@ def _binary_to_decimal(binary: str) -> float:
 
 def _get_quantum_phase_estimation_phases(
     measurement_counts: Counter, precision_qubits: QubitSetInput
-) -> Tuple[List[float], Dict[str, int]]:
+) -> tuple[list[float], dict[str, int]]:
     """Get Quantum Phase Estimates phase estimate from measurement_counts for given number of
     precision qubits.
 
@@ -219,7 +219,7 @@ def _get_quantum_phase_estimation_phases(
         precision_qubits (QubitSetInput): Qubits defining the precision register
 
     Returns:
-        Tuple[List[float], Dict[str, int]]: decimal phase estimates, precision results
+        tuple[list[float], dict[str, int]]: decimal phase estimates, precision results
     """
 
     # Aggregate the results (i.e., ignore/trace out the query register qubits):

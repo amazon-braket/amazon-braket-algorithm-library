@@ -10,7 +10,6 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-from typing import Dict
 
 import numpy as np
 from braket.circuits import Circuit
@@ -60,14 +59,14 @@ def bernstein_vazirani_circuit(hidden_string: str) -> Circuit:
     return bv_circuit
 
 
-def get_bernstein_vazirani_results(task: QuantumTask) -> Dict[str, float]:
+def get_bernstein_vazirani_results(task: QuantumTask) -> dict[str, float]:
     """Return the probabilities and corresponding bitstrings.
 
     Args:
         task (QuantumTask): Quantum task to process.
 
     Returns:
-        Dict[str, float]: Results as a dictionary of bitstrings
+        dict[str, float]: Results as a dictionary of bitstrings
     """
 
     probabilities = task.result().result_types[0].value

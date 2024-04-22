@@ -14,7 +14,7 @@
 import math
 from collections import Counter
 from fractions import Fraction
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 from braket.circuits import Circuit, circuit
@@ -70,19 +70,19 @@ def shors_algorithm(integer_N: int, integer_a: int) -> Circuit:
 def run_shors_algorithm(
     circuit: Circuit,
     device: Device,
-    shots: Optional[int] = 1000,
-) -> Dict[str, Any]:
+    shots: int | None = 1000,
+) -> dict[str, Any]:
     """
     Function to run Shor's algorithm and return measurement counts.
 
     Args:
         circuit (Circuit): Shor's algorithm circuit
         device (Device): Braket device backend
-        shots (Optional[int]) : Number of measurement shots (default is 1000).
+        shots (int | None) : Number of measurement shots (default is 1000).
             0 shots results in no measurement.
 
     Returns:
-        Dict[str, Any]: measurements and results from running Shors's algorithm
+        dict[str, Any]: measurements and results from running Shors's algorithm
     """
 
     task = device.run(circuit, shots=shots)
@@ -179,23 +179,23 @@ def modular_exponentiation_amod15(
 
 
 def get_factors_from_results(
-    results: Dict[str, Any],
+    results: dict[str, Any],
     integer_N: int,
     integer_a: int,
     verbose: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Function to postprocess dictionary returned by run_shors_algorithm
         and pretty print results
 
     Args:
-        results (Dict[str, Any]): Results associated with quantum phase estimation run as produced
+        results (dict[str, Any]): Results associated with quantum phase estimation run as produced
             by run_shors_algorithm
         integer_N (int) : The integer to be factored
         integer_a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
         verbose (bool) : If True, prints aggregate results (default is False)
     Returns:
-        Dict[str, Any]: Factors of the integer N
+        dict[str, Any]: Factors of the integer N
     """
 
     # unpack results
@@ -234,14 +234,14 @@ def get_factors_from_results(
     return aggregate_results
 
 
-def _get_phases(measurement_counts: Counter) -> List[float]:
+def _get_phases(measurement_counts: Counter) -> list[float]:
     """
     Get phase estimate from measurement_counts using top half qubits
 
     Args:
         measurement_counts (Counter) : measurement results from a device run
     Returns:
-        List[float] : decimal phase estimates
+        list[float] : decimal phase estimates
     """
 
     # Aggregate the results (i.e., ignore/trace out the query register qubits):

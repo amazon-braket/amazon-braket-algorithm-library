@@ -12,7 +12,7 @@
 # language governing permissions and limitations under the License.
 
 from collections import Counter
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import numpy as np
 from braket.circuits import Circuit
@@ -80,15 +80,13 @@ def simons_algorithm(oracle: Circuit) -> Circuit:
     return Circuit().h(range(nb_base_qubits)).add(oracle).h(range(nb_base_qubits))
 
 
-def run_simons_algorithm(
-    oracle: Circuit, device: Device, shots: Optional[int] = None
-) -> QuantumTask:
+def run_simons_algorithm(oracle: Circuit, device: Device, shots: int | None = None) -> QuantumTask:
     """Function to run Simon's algorithm and return the secret string.
 
     Args:
         oracle (Circuit): The oracle encoding the secret string
         device (Device): Braket device backend
-        shots (Optional[int]) : Number of measurement shots (default is None).
+        shots (int | None) : Number of measurement shots (default is None).
             The default number of shots is set to twice the arity of the oracle.
             shots must be a strictly positive integer.
 
@@ -108,14 +106,14 @@ def run_simons_algorithm(
     return task
 
 
-def get_simons_algorithm_results(task: QuantumTask) -> Dict[str, Any]:
+def get_simons_algorithm_results(task: QuantumTask) -> dict[str, Any]:
     """Get and print classically post-processed results from Simon's algorithm execution.
 
     Args:
         task (QuantumTask): Task for Simon's algorithm.
 
     Returns:
-        Dict[str, Any]: Dict containing the secret string and marginalized output states
+        dict[str, Any]: Dict containing the secret string and marginalized output states
     """
 
     task_result = task.result()
@@ -138,7 +136,7 @@ def get_simons_algorithm_results(task: QuantumTask) -> Dict[str, Any]:
     return output
 
 
-def _get_secret_string(measurement_counts: Counter) -> Tuple[str, Counter]:
+def _get_secret_string(measurement_counts: Counter) -> tuple[str, Counter]:
     """Classical post-processing to recover the secret string.
 
     The measurement counter contains k bitstrings which correspond to k equations:
@@ -150,7 +148,7 @@ def _get_secret_string(measurement_counts: Counter) -> Tuple[str, Counter]:
         measurement_counts (Counter): Counter with all measured bistrings
 
     Returns:
-        Tuple[str, Counter]: the secret string and the marginalized output states
+        tuple[str, Counter]: the secret string and the marginalized output states
     """
     nb_base_qubits = len(list(measurement_counts.keys())[0]) // 2
 

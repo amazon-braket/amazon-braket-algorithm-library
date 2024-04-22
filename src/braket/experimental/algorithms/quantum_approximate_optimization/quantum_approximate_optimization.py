@@ -11,9 +11,6 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-
-from typing import List
-
 import numpy as np
 from braket.circuits import Circuit, FreeParameter, Observable, circuit
 from braket.devices import Device
@@ -25,7 +22,7 @@ def cost_function(
     device: Device,
     circ: Circuit,
     coeffs: np.ndarray,
-    cost_history: List[float],
+    cost_history: list[float],
     shots: int = 0,
 ) -> float:
     """Cost function and append to loss history list.
@@ -35,7 +32,7 @@ def cost_function(
         device (Device): Braket device to run on.
         circ (Circuit): QAOA circuit to run.
         coeffs (ndarray): The coefficients of the cost Hamiltonian.
-        cost_history (List[float]): History of cost evaluations.
+        cost_history (list[float]): History of cost evaluations.
         shots (int): Number of shots. Defaults to 0.
 
     Returns:

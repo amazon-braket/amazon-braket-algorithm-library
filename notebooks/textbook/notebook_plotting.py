@@ -12,7 +12,6 @@
 # language governing permissions and limitations under the License.
 
 import math
-from typing import Dict, List
 
 import matplotlib.pyplot as plt
 
@@ -20,13 +19,13 @@ import matplotlib.pyplot as plt
 # deutsch jozsa
 # bernstein vazirani
 def plot_bitstrings(
-    probabilities: Dict[str, float],
+    probabilities: dict[str, float],
     title: str = None,
 ) -> None:
     """Plot the measurement results.
 
     Args:
-        probabilities (Dict[str, float]): Measurement probabilities.
+        probabilities (dict[str, float]): Measurement probabilities.
         title (str): Title for the plot.
         xlabel (str): xlabel for the plot.
         ylabel (str): ylabel for the plot.
@@ -39,11 +38,11 @@ def plot_bitstrings(
 
 
 # grovers and quantum fourier transform
-def plot_bitstrings_formatted(probabilities: List[float]) -> None:
+def plot_bitstrings_formatted(probabilities: list[float]) -> None:
     """Format the bistring and plot the measure results.
 
     Args:
-        probabilities (List[float]): Probabilities of measuring each bitstring.
+        probabilities (list[float]): Probabilities of measuring each bitstring.
     """
     num_qubits = int(math.log2(len(probabilities)))
     format_bitstring = "{0:0" + str(num_qubits) + "b}"

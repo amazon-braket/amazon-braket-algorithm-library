@@ -1,7 +1,6 @@
 import inspect
 import math
 import random
-from typing import List, Optional
 
 from braket.circuits import Circuit, Gate, Instruction
 from braket.circuits.gates import CNot, H, S, T
@@ -10,8 +9,8 @@ from braket.circuits.gates import CNot, H, S, T
 def random_circuit(
     num_qubits: int,
     num_gates: int,
-    gate_set: Optional[List[Gate]] = None,
-    seed: Optional[int] = None,
+    gate_set: list[Gate] | None = None,
+    seed: int | None = None,
 ) -> Circuit:
     """
     Generates a random quantum circuit.
@@ -19,9 +18,9 @@ def random_circuit(
     Args:
         num_qubits (int): Number of qubits in the circuit.
         num_gates (int): Number of instructions (gates) in the circuit.
-        gate_set (Optional[List[Gate]]): List of basis gates for the random circuit
+        gate_set (list[Gate] | None): List of basis gates for the random circuit
             (default is None).
-        seed (Optional[int]): Random seed for reproducibility (default is None).
+        seed (int | None): Random seed for reproducibility (default is None).
 
     Returns:
         Circuit: random quantum circuit.
