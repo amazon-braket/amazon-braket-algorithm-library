@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.12 (2024-06-28)
+
+### Bug Fixes and Other Changes
+
+ * Remove oqc
+
 ## v1.4.11 (2024-04-22)
 
 ### Bug Fixes and Other Changes
