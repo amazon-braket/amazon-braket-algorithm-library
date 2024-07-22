@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.13 (2024-07-22)
+
+### Bug Fixes and Other Changes
+
+ * Pin sympy<1.13
+
 ## v1.4.12 (2024-06-28)
 
 ### Bug Fixes and Other Changes
