@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.13.post0 (2024-09-23)
+
+### Documentation Changes
+
+ * Create CODEOWNERS file
+
 ## v1.4.13 (2024-07-22)
 
 ### Bug Fixes and Other Changes
