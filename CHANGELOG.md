@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.0 (2024-09-27)
+
+### Features
+
+ * remove Aspen-M-3, replace with Ankaa-2
+
 ## v1.4.13.post0 (2024-09-23)
 
 ### Documentation Changes
