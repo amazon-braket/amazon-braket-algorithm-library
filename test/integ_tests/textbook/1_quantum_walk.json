@@ -1021,7 +1021,7 @@
     },
     "id": "arn:aws:braket:us-west-1:000000000000:quantum-task/b3f1c380-a889-4bd2-aab0-7f20637dba00",
     "shots": 1000,
-    "deviceId": "arn:aws:braket:us-west-1::device/qpu/rigetti/Aspen-M-3",
+    "deviceId": "arn:aws:braket:us-west-1::device/qpu/rigetti/Ankaa-2",
     "deviceParameters": {
       "braketSchemaHeader": {
         "name": "braket.device_schema.rigetti.rigetti_device_parameters",
