@@ -37,14 +37,11 @@ setup(
     ],
     extras_require={
         "test": [
-            "black>=22.3.0",
-            "flake8<=5.0.4",
-            "flake8-rst-docstrings",
-            "isort",
             "pytest",
             "pytest-cov",
             "pytest-rerunfailures",
             "pytest-xdist",
+            "ruff",
             "sphinx",
             "sphinx-rtd-theme",
             "sphinxcontrib-apidoc",

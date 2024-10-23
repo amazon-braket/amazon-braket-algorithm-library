@@ -268,7 +268,7 @@ def chemistry_preparation(
         h2e = np.tensordot(h2e, mol.mo_coefficients, axes=1).transpose(3, 0, 1, 2)
     eri = h2e.transpose(0, 2, 3, 1)
 
-    lamb, g, one_body_correction, residue = low_rank_two_body_decomposition(eri, spin_basis=False)
+    lamb, g, one_body_correction, _residue = low_rank_two_body_decomposition(eri, spin_basis=False)
     v_0 = np.kron(h1e, np.eye(2)) + 0.5 * one_body_correction
     h_chem = copy.deepcopy(v_0)
     num_spin_orbitals = int(h_chem.shape[0])
@@ -335,7 +335,7 @@ def propagate_walker(
     Returns:
         ndarray: new walker for next time step
     """
-    num_spin_orbitals, num_electrons = trial.shape
+    num_spin_orbitals, _num_electrons = trial.shape
     num_fields = len(v_gamma)
 
     v_expectation = np.array([])
