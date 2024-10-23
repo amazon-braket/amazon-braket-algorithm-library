@@ -16,6 +16,7 @@ from collections import Counter
 from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
+
 from braket.circuits import Circuit, circuit
 from braket.circuits.qubit_set import QubitSetInput
 from braket.devices import Device

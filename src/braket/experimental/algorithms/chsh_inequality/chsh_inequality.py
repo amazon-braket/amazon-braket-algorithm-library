@@ -15,13 +15,13 @@ from collections import Counter
 from typing import List, Tuple
 
 import numpy as np
+
 from braket.circuits import Circuit, Qubit
 from braket.devices import Device
-from braket.tasks import QuantumTask
-
 from braket.experimental.algorithms.bells_inequality.bells_inequality import (
     bell_singlet_rotated_basis,
 )
+from braket.tasks import QuantumTask
 
 
 def create_chsh_inequality_circuits(

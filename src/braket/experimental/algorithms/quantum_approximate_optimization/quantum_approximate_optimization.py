@@ -15,6 +15,7 @@
 from typing import List
 
 import numpy as np
+
 from braket.circuits import Circuit, FreeParameter, Observable, circuit
 from braket.devices import Device
 from braket.tasks import QuantumTask

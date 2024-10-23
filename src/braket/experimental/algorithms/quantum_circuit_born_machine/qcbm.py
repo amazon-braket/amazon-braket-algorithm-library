@@ -15,6 +15,7 @@
 from typing import List, Tuple
 
 import numpy as np
+
 from braket.circuits import Circuit, FreeParameter, circuit
 from braket.devices import Device
 
@@ -164,7 +165,7 @@ def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0
     """
     x = np.arange(len(px))
     y = np.arange(len(py))
-    K = sum(np.exp(-np.abs(x[:, None] - y[None, :]) ** 2 / (2 * s**2)) for s in sigma_list)
+    K = sum(np.exp(-(np.abs(x[:, None] - y[None, :]) ** 2) / (2 * s**2)) for s in sigma_list)
     kernel = px @ K @ py
     return kernel
 

@@ -14,6 +14,7 @@ from collections import Counter
 from typing import List, Tuple
 
 import numpy as np
+
 from braket.circuits import Circuit, Qubit, circuit
 from braket.devices import Device
 from braket.tasks import QuantumTask

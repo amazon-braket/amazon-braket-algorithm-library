@@ -1,6 +1,7 @@
 from typing import Any, Dict
 
 import numpy as np
+
 from braket.circuits import Circuit
 from braket.devices import Device
 

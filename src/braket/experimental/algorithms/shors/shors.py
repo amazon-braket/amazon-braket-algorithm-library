@@ -17,6 +17,7 @@ from fractions import Fraction
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+
 from braket.circuits import Circuit, circuit
 from braket.circuits.qubit_set import QubitSetInput
 from braket.devices import Device

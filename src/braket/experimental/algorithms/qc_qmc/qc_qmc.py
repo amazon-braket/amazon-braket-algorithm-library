@@ -173,7 +173,7 @@ def imag_time_propogator_qaee(
         new_weight: new weight for the next time step
     """
     # First compute the bias force using the expectation value of L operators
-    num_spin_orbitals, num_electrons = trial.shape
+    num_spin_orbitals, _num_electrons = trial.shape
     num_fields = len(prop.v_gamma)
     np.identity(num_spin_orbitals)
     # compute the overlap integral
@@ -244,7 +244,7 @@ def local_energy_quantum(  # noqa: C901
         complex: energy
     """
     energy = 0.0 + 0.0j
-    num_qubits, num_particles = walker.shape
+    num_qubits, _num_particles = walker.shape
 
     # one-body term assuming diagonal form already
     Id = np.identity(num_qubits)
@@ -347,7 +347,7 @@ def circuit_second_half_real(q_state: np.ndarray, trial_state_circuit: Callable)
         q_state (ndarray): orthonormalized walker state
         trial_state_circuit (Callable): quantum trial state
     """
-    num_qubits, num_particles = q_state.shape
+    _num_qubits, num_particles = q_state.shape
     qml.adjoint(trial_state_circuit)()
 
     for i in range(1, num_particles)[::-1]:
@@ -361,7 +361,7 @@ def circuit_second_half_imag(q_state: np.ndarray, trial_state_circuit: Callable)
         q_state (ndarray): orthonormalized walker state
         trial_state_circuit (Callable): quantum trial state
     """
-    num_qubits, num_particles = q_state.shape
+    _num_qubits, num_particles = q_state.shape
     qml.adjoint(trial_state_circuit)()
 
     for i in range(1, num_particles)[::-1]:
@@ -407,7 +407,7 @@ def amplitude_estimate(
     Returns:
         complex128: amplitude
     """
-    num_qubits, num_particles = q_state.shape
+    num_qubits, _num_particles = q_state.shape
 
     @qml.qnode(dev, interface=None, diff_method=None)
     def __compute_real(q_state, trial_state_circuit):
@@ -517,7 +517,7 @@ def pauli_estimate(
     Returns:
         float: expectation value
     """
-    num_qubits, num_particles = q_state.shape
+    num_qubits, _num_particles = q_state.shape
 
     @qml.qnode(dev, interface=None, diff_method=None)
     def __compute_real(q_state, trial_state_circuit, u_matrix, pauli):
