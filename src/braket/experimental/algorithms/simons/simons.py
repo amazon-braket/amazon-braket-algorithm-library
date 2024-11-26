@@ -15,10 +15,11 @@ from collections import Counter
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
+from sympy import Matrix
+
 from braket.circuits import Circuit
 from braket.devices import Device
 from braket.tasks import QuantumTask
-from sympy import Matrix
 
 
 def simons_oracle(secret_string: str) -> Circuit:

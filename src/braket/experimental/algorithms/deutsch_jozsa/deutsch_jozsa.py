@@ -13,6 +13,7 @@
 from typing import Dict
 
 import numpy as np
+
 from braket.circuits import Circuit, circuit
 from braket.tasks import QuantumTask
 
