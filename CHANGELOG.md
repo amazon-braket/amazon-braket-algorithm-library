@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.5.2 (2025-06-19)
+
+### Bug Fixes and Other Changes
+
+ * correct typo 'am' to 'an' in Quantum_Fourier_Transform.ipynb
+ * update PennyLane usage
+
 ## v1.5.1 (2024-11-25)
 
 ### Bug Fixes and Other Changes
