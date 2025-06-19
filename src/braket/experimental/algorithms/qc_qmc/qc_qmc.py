@@ -27,7 +27,7 @@ def qc_qmc(
     trial: np.ndarray,
     prop: ChemicalProperties,
     trial_state_circuit: Callable,
-    dev: qml.Device,
+    dev: qml.devices.Device,
     max_pool: int = 8,
 ) -> Tuple[List[float], List[float]]:
     """Quantum assisted Auxiliary-Field Quantum Monte Carlo.
@@ -40,7 +40,7 @@ def qc_qmc(
         trial (ndarray): Trial wavefunction.
         prop (ChemicalProperties): Chemical properties.
         trial_state_circuit (Callable): quantum trial state as a pennylane quantum function
-        dev (qml.Device): Pennylane device to run circuits on.
+        dev (qml.devices.Device): Pennylane device to run circuits on.
         max_pool (int): Max workers. Defaults to 8.
 
     Returns:
@@ -97,7 +97,7 @@ def q_full_imag_time_evolution(
     walker: np.ndarray,
     weight: float,
     trial_state_circuit: Callable,
-    dev: qml.Device,
+    dev: qml.devices.Device,
 ) -> Tuple[List[float], List[float], List[float], List[float]]:
     """Imaginary time evolution of a single walker.
 
@@ -112,7 +112,7 @@ def q_full_imag_time_evolution(
         walker (ndarray): normalized walker state as np.ndarray, others are the same as trial
         weight (float): weight for sampling.
         trial_state_circuit (Callable): quantum trial state
-        dev (qml.Device): `qml.device('lightning.qubit', wires=wires)` for simulator;
+        dev (qml.devices.Device): `qml.device('lightning.qubit', wires=wires)` for simulator;
             or `qml.device('braket.aws.qubit', device_arn=device_arn, wires=wires, shots=shots)`
             for quantum device;
 
@@ -149,7 +149,7 @@ def imag_time_propogator_qaee(
     prop: ChemicalProperties,
     e_shift: float,
     trial_state_circuit: Callable,
-    dev: qml.Device,
+    dev: qml.devices.Device,
 ) -> Tuple[float, float, float, np.ndarray, float]:
     """Imaginary time propogator with quantum energy evaluations.
 
@@ -162,7 +162,7 @@ def imag_time_propogator_qaee(
         prop (ChemicalProperties): Chemical properties.
         e_shift (float): Reference energy, i.e. Hartree-Fock energy
         trial_state_circuit (Callable): quantum trial state
-        dev (qml.Device): Pennylane device
+        dev (qml.devices.Device): Pennylane device
 
     Returns:
         Tuple[float, float, float, ndarray, float]: propogatpr results
