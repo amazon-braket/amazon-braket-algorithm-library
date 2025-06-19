@@ -30,7 +30,7 @@ setup(
         "amazon-braket-sdk>=1.35.1",
         "numpy",
         "openfermion>=1.5.1",
-        "pennylane>=0.29.1",
+        "pennylane>=0.34.0",
         "scipy>=1.5.2",
         # Sympy 1.13 produces different results for Simon's algorithm
         "sympy<1.13",
