@@ -1,4 +1,3 @@
-import matplotlib
 import pytest
 import networkx as nx
 import unittest
@@ -59,6 +58,9 @@ def test_commute_function():
     assert commute("IXYZ", "IXYI", qwc=False) == True
     # Even number of differences
     assert commute("XY", "YX", qwc=False) == True
+
+    with pytest.raises(ValueError):
+        commute("XY", "YXY", qwc=False)
 
 
 def test_partial_commute_functions():
