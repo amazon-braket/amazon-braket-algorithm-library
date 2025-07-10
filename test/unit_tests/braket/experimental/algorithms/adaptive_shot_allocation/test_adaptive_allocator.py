@@ -1,11 +1,14 @@
+import matplotlib
 import pytest
 import networkx as nx
+import unittest
 
 from braket.experimental.algorithms.adaptive_shot_allocation.adaptive_allocator import (
     commute, qwc_commute, gen_commute,
     term_variance_estimate, terms_covariance_estimate,
     AdaptiveShotAllocator
 )
+from unittest.mock import patch
 
 # Fixtures for common test setups
 
@@ -300,49 +303,51 @@ def test_shots_from_measurements():
     assert len(shots) == len(allocator.cliq)
     assert shots[0] == 10  # First clique should have 10 shots
 
+class WorkflowTest(unittest.TestCase):
+    @patch('matplotlib.pyplot.show')
+    def test_full_workflow(*args):
+        """Test the full workflow of the AdaptiveShotAllocator"""
+        # Initialize with simple Pauli terms
+        paulis = ["XX", "XY", "ZI"]
+        coeffs = [0.5, 0.3, -0.2]
+        allocator = AdaptiveShotAllocator(paulis, coeffs)
+        allocator.visualize_graph()
 
-def test_full_workflow():
-    """Test the full workflow of the AdaptiveShotAllocator"""
-    # Initialize with simple Pauli terms
-    paulis = ["XX", "XY", "ZI"]
-    coeffs = [0.5, 0.3, -0.2]
-    allocator = AdaptiveShotAllocator(paulis, coeffs)
+        # Check initial state
+        assert allocator.shots is None
 
-    # Check initial state
-    assert allocator.shots is None
+        # Allocate some shots
+        allocation = allocator.incremental_shot_allocation(30)
+        assert sum(allocation) == 30
 
-    # Allocate some shots
-    allocation = allocator.incremental_shot_allocation(30)
-    assert sum(allocation) == 30
+        # Create mock measurements based on allocation
+        mock_measurements = []
+        for i in range(len(paulis)):
+            row = []
+            for j in range(len(paulis)):
+                if i == j:
+                    # Diagonal elements
+                    row.append({(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4})
+                else:
+                    # Off-diagonal elements
+                    row.append({(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0})
+            mock_measurements.append(row)
 
-    # Create mock measurements based on allocation
-    mock_measurements = []
-    for i in range(len(paulis)):
-        row = []
-        for j in range(len(paulis)):
-            if i == j:
-                # Diagonal elements
-                row.append({(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4})
-            else:
-                # Off-diagonal elements
-                row.append({(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0})
-        mock_measurements.append(row)
+        # Update with measurements
+        allocator.update_measurements(mock_measurements)
 
-    # Update with measurements
-    allocator.update_measurements(mock_measurements)
+        # Check that shots were updated
+        assert allocator.shots is not None
 
-    # Check that shots were updated
-    assert allocator.shots is not None
+        # Calculate expectation value
+        expectation = allocator.expectation_from_measurements()
+        assert isinstance(expectation, float)
 
-    # Calculate expectation value
-    expectation = allocator.expectation_from_measurements()
-    assert isinstance(expectation, float)
+        # Calculate error estimate
+        error = allocator.error_estimate()
+        assert isinstance(error, float)
+        assert error > 0
 
-    # Calculate error estimate
-    error = allocator.error_estimate()
-    assert isinstance(error, float)
-    assert error > 0
-
-    # Allocate more shots
-    more_allocation = allocator.incremental_shot_allocation(10)
-    assert sum(more_allocation) == 10
+        # Allocate more shots
+        more_allocation = allocator.incremental_shot_allocation(10)
+        assert sum(more_allocation) == 10
