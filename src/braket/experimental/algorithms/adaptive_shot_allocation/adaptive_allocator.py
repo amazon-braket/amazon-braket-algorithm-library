@@ -1,14 +1,12 @@
-from functools import partial
-
-import numpy as np
-import networkx as nx
-from networkx.algorithms import approximation
-
-from typing import Callable, List, Union, Dict, TypeAlias, Tuple
-
-import matplotlib.pyplot as plt
 import random
 import warnings
+from functools import partial
+from typing import Callable, Dict, List, Tuple, TypeAlias, Union
+
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+from networkx.algorithms import approximation
 
 # Type alias for measurement data structure (see AdaptiveShotAllocator.measurements)
 MeasurementData: TypeAlias = List[List[Dict[Tuple[int, int], int]]]

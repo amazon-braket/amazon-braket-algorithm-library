@@ -1,14 +1,15 @@
 
+from typing import List, Union
+
 import numpy as np
 
-from braket.circuits import Circuit, Observable
-from typing import List, Union
-from braket.devices import LocalSimulator
 from braket.aws import AwsDevice
-
+from braket.circuits import Circuit, Observable
+from braket.devices import LocalSimulator
 from braket.experimental.algorithms.adaptive_shot_allocation.adaptive_allocator import (
-                                                                AdaptiveShotAllocator, 
-                                                                MeasurementData)
+    AdaptiveShotAllocator,
+    MeasurementData,
+)
 
 """
 Utilities for creating and manipulating quantum circuits.
