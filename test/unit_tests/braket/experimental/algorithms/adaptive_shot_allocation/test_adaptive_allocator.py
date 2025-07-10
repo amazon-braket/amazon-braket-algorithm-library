@@ -314,6 +314,7 @@ class WorkflowTest(unittest.TestCase):
         coeffs = [0.5, 0.3, -0.2]
         allocator = AdaptiveShotAllocator(paulis, coeffs)
         allocator.visualize_graph()
+        allocator.visualize_graph(show_cliques=False)
 
         # Check initial state
         assert allocator.shots is None
