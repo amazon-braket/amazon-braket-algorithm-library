@@ -249,12 +249,11 @@ class AdaptiveShotAllocator:
         if show_cliques:
             el = []
             ec = []
-            for e in self.graph.edges:
-                for i in range(len(self.cliq)):
+            for i in range(len(self.cliq)):
+                for e in self.graph.edges:
                     if (e[0] in self.cliq[i]) and (e[1] in self.cliq[i]):
                         el.append(e)
-                        ec.append(cliq_colors[i])
-                        break
+                        ec.append(cliq_colors[i]) 
         else:
             el = list(self.graph.edges)
             # Use gray for all edges when showing full graph
@@ -422,10 +421,10 @@ class AdaptiveShotAllocator:
             # Calculate expectation for this term
             term_shots = measurements[i][i][(
                 1, 1)] + measurements[i][i][(-1, -1)]
-            if term_shots:
-                term_expect = (
-                    measurements[i][i][(1, 1)] - measurements[i][i][(-1, -1)]) / term_shots
-                expectation += self.coeffs[i] * term_expect
+            term_shots = term_shots if term_shots else 1
+            term_expect = (
+                measurements[i][i][(1, 1)] - measurements[i][i][(-1, -1)]) / term_shots
+            expectation += self.coeffs[i] * term_expect
 
         return expectation
 
@@ -447,8 +446,7 @@ class AdaptiveShotAllocator:
         Raises:
             AssertionError: If any validation check fails
         """
-        assert len(
-            measurements) == self.num_terms, "Wrong number of measurement records"
+        assert len(measurements) == self.num_terms, "Wrong number of measurement records"
 
         for c in self.cliq:
             # Get total shots for this clique
