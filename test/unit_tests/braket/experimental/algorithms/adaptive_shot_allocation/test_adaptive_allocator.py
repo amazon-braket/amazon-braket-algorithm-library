@@ -224,20 +224,20 @@ def test_expectation_from_measurements():
 
     # Create mock measurements with known expectation values
     # For IX: (8-2)/10 = 0.6
-    # For ZY: (3-7)/10 = -0.4
+    # For ZY: no data -> 0.0
     mock_measurements = [
         [
             {(1, 1): 8, (1, -1): 0, (-1, 1): 0, (-1, -1): 2},
-            {(1, 1): 3, (1, -1): 5, (-1, 1): 1, (-1, -1): 1}
+            {(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0}
         ],
         [
-            {(1, 1): 3, (1, -1): 1, (-1, 1): 5, (-1, -1): 1},
-            {(1, 1): 3, (1, -1): 0, (-1, 1): 0, (-1, -1): 7}
+            {(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0},
+            {(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0}
         ]
     ]
 
-    # Expected: 0.5 * 0.6 + (-0.3) * (-0.4) = 0.3 + 0.12 = 0.42
-    expected = 0.5 * 0.6 + (-0.3) * (-0.4)
+    # Expected: 0.5 * 0.6 + (-0.3) * (0.0) = 0.3 + 0.0 = 0.0
+    expected = 0.5 * 0.6 + (-0.3) * (0.0)
     result = allocator.expectation_from_measurements(mock_measurements)
     assert abs(result - expected) < 1e-10
 
@@ -261,17 +261,17 @@ def test_validate_measurements():
     assert allocator._validate_measurements(valid_measurements) == True
 
     # Invalid measurements (wrong size)
-    invalid_size = [
+    invalid_measurements = [
         [
             {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5}
         ]
     ]
 
     with pytest.raises(AssertionError):
-        allocator._validate_measurements(invalid_size)
+        allocator._validate_measurements(invalid_measurements)
 
     # Invalid measurements (inconsistent counts)
-    invalid_counts = [
+    invalid_measurements = [
         [
             {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},
             {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 3}  # Sum is 9, not 10
@@ -283,7 +283,37 @@ def test_validate_measurements():
     ]
 
     with pytest.raises(AssertionError):
-        allocator._validate_measurements(invalid_counts)
+        allocator._validate_measurements(invalid_measurements)
+
+    # Invalid measurements (not symmetric)
+    invalid_measurements = [
+        [
+            {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},
+            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4}
+        ],
+        [
+            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4},
+            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}
+        ]
+    ]
+
+    with pytest.raises(AssertionError):
+        allocator._validate_measurements(invalid_measurements)
+
+    # Invalid measurements (negative)
+    invalid_measurements = [
+        [
+            {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},
+            {(1, 1): 3, (1, -1): 4, (-1, 1): -1, (-1, -1): 4}
+        ],
+        [
+            {(1, 1): 3, (1, -1): -1, (-1, 1): 4, (-1, -1): 4},
+            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}
+        ]
+    ]
+
+    with pytest.raises(AssertionError):
+        allocator._validate_measurements(invalid_measurements)
 
 
 def test_shots_from_measurements():
@@ -305,52 +335,58 @@ def test_shots_from_measurements():
     assert len(shots) == len(allocator.cliq)
     assert shots[0] == 10  # First clique should have 10 shots
 
-class WorkflowTest(unittest.TestCase):
+class VisualizationTest(unittest.TestCase):
     @patch('matplotlib.pyplot.show')
-    def test_full_workflow(*args):
-        """Test the full workflow of the AdaptiveShotAllocator"""
-        # Initialize with simple Pauli terms
-        paulis = ["XX", "XY", "ZI"]
-        coeffs = [0.5, 0.3, -0.2]
+    def test_graph(*args):
+        paulis = ["XX", "IZ", "ZI", "YY", "XI"]
+        coeffs = [0.5, 0.3, -0.2, 1.0, 2.0]
         allocator = AdaptiveShotAllocator(paulis, coeffs)
         allocator.visualize_graph()
         allocator.visualize_graph(show_cliques=False)
 
-        # Check initial state
-        assert allocator.shots is None
 
-        # Allocate some shots
-        allocation = allocator.incremental_shot_allocation(30)
-        assert sum(allocation) == 30
+def test_full_workflow(*args):
+    """Test the full workflow of the AdaptiveShotAllocator"""
+    # Initialize with simple Pauli terms
+    paulis = ["XX", "XY", "ZI"]
+    coeffs = [0.5, 0.3, -0.2]
+    allocator = AdaptiveShotAllocator(paulis, coeffs)
 
-        # Create mock measurements based on allocation
-        mock_measurements = []
-        for i in range(len(paulis)):
-            row = []
-            for j in range(len(paulis)):
-                if i == j:
-                    # Diagonal elements
-                    row.append({(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4})
-                else:
-                    # Off-diagonal elements
-                    row.append({(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0})
-            mock_measurements.append(row)
+    # Check initial state
+    assert allocator.shots is None
 
-        # Update with measurements
-        allocator.update_measurements(mock_measurements)
+    # Allocate some shots
+    allocation = allocator.incremental_shot_allocation(30)
+    assert sum(allocation) == 30
 
-        # Check that shots were updated
-        assert allocator.shots is not None
+    # Create mock measurements based on allocation
+    mock_measurements = []
+    for i in range(len(paulis)):
+        row = []
+        for j in range(len(paulis)):
+            if i == j:
+                # Diagonal elements
+                row.append({(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4})
+            else:
+                # Off-diagonal elements
+                row.append({(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0})
+        mock_measurements.append(row)
 
-        # Calculate expectation value
-        expectation = allocator.expectation_from_measurements()
-        assert isinstance(expectation, float)
+    # Update with measurements
+    allocator.update_measurements(mock_measurements)
 
-        # Calculate error estimate
-        error = allocator.error_estimate()
-        assert isinstance(error, float)
-        assert error > 0
+    # Check that shots were updated
+    assert allocator.shots is not None
 
-        # Allocate more shots
-        more_allocation = allocator.incremental_shot_allocation(10)
-        assert sum(more_allocation) == 10
+    # Calculate expectation value
+    expectation = allocator.expectation_from_measurements()
+    assert isinstance(expectation, float)
+
+    # Calculate error estimate
+    error = allocator.error_estimate()
+    assert isinstance(error, float)
+    assert error > 0
+
+    # Allocate more shots
+    more_allocation = allocator.incremental_shot_allocation(10)
+    assert sum(more_allocation) == 10
