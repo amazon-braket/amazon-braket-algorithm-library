@@ -2,6 +2,6 @@ Properly allocating shots to different terms of a Hamiltonian when calculating e
 
 <!--
 [metadata-name]: Adaptive Shot Allocation
-[metadata-tags]: Textbook
+[metadata-tags]: Advanced
 [metadata-url]: https://github.com/amazon-braket/amazon-braket-algorithm-library/tree/main/src/braket/experimental/algorithms/adaptive_shot_allocation
 -->
