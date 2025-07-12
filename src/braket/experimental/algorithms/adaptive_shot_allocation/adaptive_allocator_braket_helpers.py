@@ -65,7 +65,6 @@ def run_fixed_allocation(
                 for _ in range(len(estimator.paulis))]
                 for _ in range(len(estimator.paulis))]
         
-    
     while(tasks):
         task_to_process = None
         
@@ -92,7 +91,6 @@ def run_fixed_allocation(
                                         result.values[j_idx][s])] += 1
         # Remove task from the queue
         tasks.pop(task_to_process)
-
 
     return measurements
 
