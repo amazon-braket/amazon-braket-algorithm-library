@@ -30,7 +30,7 @@ Running notebooks locally requires additional dependencies located in [notebooks
 | ----- | ----- | ----- |
 | Quantum PCA | [Quantum_Principal_Component_Analysis.ipynb](notebooks/advanced_algorithms/Quantum_Principal_Component_Analysis.ipynb) | [He2022](https://ieeexplore.ieee.org/document/9669030) |
 | QMC | [Quantum_Computing_Quantum_Monte_Carlo.ipynb](notebooks/advanced_algorithms/Quantum_Computing_Quantum_Monte_Carlo.ipynb) | [Motta2018](https://wires.onlinelibrary.wiley.com/doi/10.1002/wcms.1364), [Peruzzo2014](https://www.nature.com/articles/ncomms5213) |
-| Adaptive Shot Allocation | [2_Adaptive_Shot_Allocation.ipynb](notebooks/advanced_algorithms/2_Adaptive_Shot_Allocation.ipynb) | [Shlosberg2023](https://doi.org/10.22331/q-2023-01-26-906) |
+| Adaptive Shot Allocation | [2_Adaptive_Shot_Allocation.ipynb](notebooks/advanced_algorithms/adaptive_shot_allocation/2_Adaptive_Shot_Allocation.ipynb) | [Shlosberg2023](https://doi.org/10.22331/q-2023-01-26-906) |
 
 
 | Auxiliary functions | Notebook |
