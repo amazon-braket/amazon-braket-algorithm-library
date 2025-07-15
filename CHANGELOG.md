@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.5.3 (2025-07-15)
+
+### Bug Fixes and Other Changes
+
+ * Fixing an URL in the README.
+ * Adaptive Shot Allocation Algorithm
+
 ## v1.5.2 (2025-06-19)
 
 ### Bug Fixes and Other Changes
