@@ -6,7 +6,7 @@ import numpy as np
 from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 from braket.experimental.algorithms.adaptive_shot_allocation.adaptive_allocator_braket_helpers import (
-    observable_from_string
+    observable_from_string,
 )
 
 """
