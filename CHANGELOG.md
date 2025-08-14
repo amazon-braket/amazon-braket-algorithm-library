@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.4 (2025-08-14)
+
+### Bug Fixes and Other Changes
+
+ * build(deps): bump actions/checkout from 4 to 5
+
 ## v1.5.3 (2025-07-15)
 
 ### Bug Fixes and Other Changes
