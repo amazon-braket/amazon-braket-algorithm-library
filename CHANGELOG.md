@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.6.0 (2025-08-22)
+
+### Features
+
+ * python version upgrade
+
 ## v1.5.4 (2025-08-14)
 
 ### Bug Fixes and Other Changes
