@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.6.1 (2025-09-03)
+
+### Bug Fixes and Other Changes
+
+ * Adaptive shot allocation
+
 ## v1.6.0 (2025-08-22)
 
 ### Features
