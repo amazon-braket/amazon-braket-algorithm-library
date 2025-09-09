@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.6.2 (2025-09-09)
+
+### Bug Fixes and Other Changes
+
+ * update to workflows
+ * build(deps): bump actions/setup-python from 5 to 6
+
 ## v1.6.1 (2025-09-03)
 
 ### Bug Fixes and Other Changes
