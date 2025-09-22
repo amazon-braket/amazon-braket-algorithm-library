@@ -6,8 +6,13 @@ on:
 
 jobs:
   build-and-publish:
-    name: Build and publish distribution to PyPi
+    name: Build and publish distribution to PyPI
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/amazon-braket-algorithm-library
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v5
       - name: Set up Python
@@ -23,6 +28,4 @@ jobs:
       - name: Build a binary wheel and a source tarball
         run: python setup.py sdist bdist_wheel
       - name: Publish distribution to PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.pypi_token }}
+        uses: pypa/gh-action-pypi-publish@release/v1
