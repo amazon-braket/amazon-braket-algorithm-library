@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7.1 (2026-02-03)
+
+### Bug Fixes and Other Changes
+
+ * build(deps): bump aws-actions/stale-issue-cleanup from 7.1.0 to 7.1.1
+
 ## v1.7.0 (2026-01-30)
 
 ### Deprecations and Removals
