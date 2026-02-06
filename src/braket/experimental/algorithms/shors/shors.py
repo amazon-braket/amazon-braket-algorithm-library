@@ -60,7 +60,10 @@ def shors_algorithm(integer_N: int, integer_a: int) -> Circuit:
     shors_circuit.x(aux_qubits[0])
 
     # Apply modular exponentiation
-    shors_circuit.modular_exponentiation_amod15(counting_qubits, aux_qubits, integer_a)
+    if integer_N == 33:
+        shors_circuit.modular_exponentiation_amod33(counting_qubits, aux_qubits, integer_a)
+    else:
+        shors_circuit.modular_exponentiation_amod15(counting_qubits, aux_qubits, integer_a)
 
     # Apply inverse QFT
     shors_circuit.inverse_qft_noswaps(counting_qubits)
@@ -177,6 +180,41 @@ def modular_exponentiation_amod15(
                     mod_exp_amod15.cnot(x, q)
 
     return mod_exp_amod15
+
+
+@circuit.subroutine(register=True)
+def modular_exponentiation_amod33(
+    counting_qubits: QubitSetInput, aux_qubits: QubitSetInput, integer_a: int
+) -> Circuit:
+    """
+    Construct a circuit object corresponding the modular exponentiation of a^x Mod 33
+
+    Args:
+        counting_qubits (QubitSetInput): Qubits defining the counting register
+        aux_qubits (QubitSetInput) : Qubits defining the auxilary register
+        integer_a (int) : Any integer that satisfies 1 < a < N and gcd(a, N) = 1.
+    Returns:
+        Circuit: Circuit object that implements the modular exponentiation of a^x Mod 33
+    """
+
+    # Instantiate circuit object
+    mod_exp_amod33 = Circuit()
+
+    for x in counting_qubits:
+        r = 2**x
+        if integer_a not in [10, 23]:
+            raise ValueError("integer 'a' must be 10 or 23 for N = 33")
+        for iteration in range(r):
+            if integer_a == 10:
+                mod_exp_amod33.cnot(x, aux_qubits[0])
+                mod_exp_amod33.cnot(x, aux_qubits[1])  
+                mod_exp_amod33.cnot(x, aux_qubits[3])  
+            if integer_a == 23:
+                mod_exp_amod33.cnot(x, aux_qubits[1])
+                mod_exp_amod33.cnot(x, aux_qubits[2])  
+                mod_exp_amod33.cnot(x, aux_qubits[4])        
+
+    return mod_exp_amod33
 
 
 def get_factors_from_results(
