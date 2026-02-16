@@ -1,4 +1,4 @@
-setuptools
+setuptools==0.81.0
 sphinx
 sphinx-rtd-theme
 sphinxcontrib-apidoc
