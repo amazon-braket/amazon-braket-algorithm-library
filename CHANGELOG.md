@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7.2 (2026-02-17)
+
+### Bug Fixes and Other Changes
+
+ * pin setuptools
+
 ## v1.7.1 (2026-02-03)
 
 ### Bug Fixes and Other Changes
