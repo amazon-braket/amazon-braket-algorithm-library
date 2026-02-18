@@ -12,6 +12,7 @@
 # language governing permissions and limitations under the License.
 
 import numpy as np
+from unittest.mock import MagicMock
 from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 
@@ -207,3 +208,25 @@ def test_counting_results_have_correct_keys():
         "search_space_size",
     }
     assert set(results.keys()) == expected_keys
+
+
+def test_get_quantum_counting_results_empty_counts():
+    """Test get_quantum_counting_results with empty measurement counts."""
+    # Mock task and result
+    mock_task = MagicMock()
+    mock_result = MagicMock()
+    mock_result.measurement_counts = {}
+    mock_task.result.return_value = mock_result
+
+    counting_qubits = [0, 1]
+    search_qubits = [2]
+    
+    # This should trigger the else block setting best_key and best_M to None
+    results = qc.get_quantum_counting_results(mock_task, counting_qubits, search_qubits)
+    
+    assert results["measurement_counts"] == {}
+    assert results["counting_register_results"] == {}
+    assert results["phases"] == []
+    assert results["estimated_counts"] == []
+    assert results["best_estimate"] is None
+
