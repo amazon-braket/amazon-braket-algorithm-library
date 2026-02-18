@@ -36,12 +36,11 @@ References:
 """
 
 import math
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
-from braket.circuits import Circuit, Instruction, circuit
-from braket.circuits.gates import Unitary
+from braket.circuits import Circuit, circuit
 from braket.circuits.qubit_set import QubitSetInput
 from braket.devices import Device
 from braket.tasks import QuantumTask
@@ -340,9 +339,7 @@ def _controlled_rotation(
             _add_controlled_ry(circ, clock_qubits[0], ancilla_qubit, theta)
         elif num_clock_qubits == 2:
             # Use both clock qubits as controls
-            _add_doubly_controlled_ry(
-                circ, clock_qubits[0], clock_qubits[1], ancilla_qubit, theta
-            )
+            _add_doubly_controlled_ry(circ, clock_qubits[0], clock_qubits[1], ancilla_qubit, theta)
         else:
             # General case: use multi-controlled approach
             _add_multi_controlled_ry(circ, clock_qubits, ancilla_qubit, theta)
@@ -355,9 +352,7 @@ def _controlled_rotation(
     return circ
 
 
-def _add_controlled_ry(
-    circ: Circuit, control: int, target: int, theta: float
-) -> None:
+def _add_controlled_ry(circ: Circuit, control: int, target: int, theta: float) -> None:
     """Add a controlled-Ry gate to the circuit.
 
     Decomposition: C-Ry(theta) = Ry(theta/2) . CNOT . Ry(-theta/2) . CNOT
@@ -458,7 +453,7 @@ def _inverse_qpe_for_hhl(
 
         # Construct explicit Controlled-Unitary
         cu_matrix_inv = _construct_controlled_unitary_matrix(unitary_inv)
-        
+
         # Apply CUinv
         circ.unitary(matrix=cu_matrix_inv, targets=[clock_qubit, input_qubit], display_name="CU†")
 
@@ -640,7 +635,6 @@ def get_hhl_results(
     """
     result = task.result()
     measurement_counts = result.measurement_counts
-    total_num_qubits = num_clock_qubits + 2  # clock + input + ancilla
 
     # Compute classical solution for comparison
     b_norm = np.linalg.norm(b_vector)
@@ -678,10 +672,12 @@ def get_hhl_results(
     success_probability = success_shots / total_shots if total_shots > 0 else 0.0
 
     # Compute fidelity between quantum result and classical solution
-    quantum_probs = np.array([
-        solution_state_probs.get("0", 0.0),
-        solution_state_probs.get("1", 0.0),
-    ])
+    quantum_probs = np.array(
+        [
+            solution_state_probs.get("0", 0.0),
+            solution_state_probs.get("1", 0.0),
+        ]
+    )
     classical_probs = np.abs(classical_solution_normalized) ** 2
 
     # Fidelity F = (sum sqrt(p_i * q_i))^2
@@ -704,9 +700,7 @@ def get_hhl_results(
         print(f"Matrix A:\n{matrix}")
         print(f"\nVector b: {b_vector}")
         print(f"\nClassical solution x = A^(-1)b: {classical_solution}")
-        print(
-            f"Classical solution (normalized): {classical_solution_normalized}"
-        )
+        print(f"Classical solution (normalized): {classical_solution_normalized}")
         print(f"Classical probabilities |x_i|^2: {classical_probs}")
         print(f"\nTotal measurement shots: {total_shots}")
         print(f"Post-selection success shots: {success_shots}")

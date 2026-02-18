@@ -12,7 +12,7 @@
 # language governing permissions and limitations under the License.
 
 from braket.experimental.algorithms.hhl.hhl import (  # noqa: F401,E501
+    get_hhl_results,
     hhl_circuit,
     run_hhl,
-    get_hhl_results,
 )

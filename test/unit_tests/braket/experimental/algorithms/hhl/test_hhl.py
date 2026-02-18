@@ -160,9 +160,7 @@ def test_get_hhl_results():
     device = LocalSimulator()
     task = hhl_module.run_hhl(circ, device, shots=1000)
 
-    results = hhl_module.get_hhl_results(
-        task, matrix, b_vector, num_clock_qubits=2, verbose=True
-    )
+    results = hhl_module.get_hhl_results(task, matrix, b_vector, num_clock_qubits=2, verbose=True)
 
     assert "measurement_counts" in results
     assert "post_selected_counts" in results
@@ -192,9 +190,7 @@ def test_hhl_custom_scaling():
     matrix = np.array([[1, 0], [0, 2]], dtype=complex)
     b_vector = np.array([1, 0], dtype=complex)
 
-    circ = hhl_module.hhl_circuit(
-        matrix, b_vector, num_clock_qubits=2, scaling_factor=np.pi
-    )
+    circ = hhl_module.hhl_circuit(matrix, b_vector, num_clock_qubits=2, scaling_factor=np.pi)
     assert circ is not None
 
 
