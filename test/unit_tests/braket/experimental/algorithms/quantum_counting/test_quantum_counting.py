@@ -106,9 +106,7 @@ def test_count_1_of_4():
     device = LocalSimulator()
     task = qc.run_quantum_counting(circ, device, shots=1000)
 
-    results = qc.get_quantum_counting_results(
-        task, counting_qubits, search_qubits, verbose=True
-    )
+    results = qc.get_quantum_counting_results(task, counting_qubits, search_qubits, verbose=True)
 
     # Best estimate should be close to 1
     assert results["best_estimate"] is not None
@@ -129,9 +127,7 @@ def test_count_0_of_4():
     device = LocalSimulator()
     task = qc.run_quantum_counting(circ, device, shots=1000)
 
-    results = qc.get_quantum_counting_results(
-        task, counting_qubits, search_qubits, verbose=True
-    )
+    results = qc.get_quantum_counting_results(task, counting_qubits, search_qubits, verbose=True)
 
     # With no marked items, the most common measurement should yield M ≈ 0
     assert results["best_estimate"] is not None
@@ -151,9 +147,7 @@ def test_count_4_of_4():
     device = LocalSimulator()
     task = qc.run_quantum_counting(circ, device, shots=1000)
 
-    results = qc.get_quantum_counting_results(
-        task, counting_qubits, search_qubits, verbose=True
-    )
+    results = qc.get_quantum_counting_results(task, counting_qubits, search_qubits, verbose=True)
 
     # With all items marked, M should be ≈ 4
     assert results["best_estimate"] is not None
@@ -173,9 +167,7 @@ def test_count_2_of_8():
     device = LocalSimulator()
     task = qc.run_quantum_counting(circ, device, shots=2000)
 
-    results = qc.get_quantum_counting_results(
-        task, counting_qubits, search_qubits, verbose=True
-    )
+    results = qc.get_quantum_counting_results(task, counting_qubits, search_qubits, verbose=True)
 
     # Best estimate should be close to 2
     assert results["best_estimate"] is not None

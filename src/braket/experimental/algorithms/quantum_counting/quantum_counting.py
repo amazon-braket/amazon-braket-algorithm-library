@@ -33,7 +33,6 @@ from braket.devices import Device
 from braket.tasks import QuantumTask
 
 
-
 def build_oracle_matrix(n_qubits: int, marked_states: List[int]) -> np.ndarray:
     """Build a diagonal oracle matrix that flips the phase of marked states.
 
@@ -209,7 +208,6 @@ def quantum_counting(
     qc_circ.h(search_qubits)
 
     # Controlled-G^(2^k)
-    n_counting = len(counting_qubits)
     for ii, qubit in enumerate(reversed(counting_qubits)):
         power = 2**ii
         g_power = np.linalg.matrix_power(grover_matrix, power)
@@ -279,8 +277,7 @@ def get_quantum_counting_results(
         for key in measurement_counts.keys():
             counting_bits = key[:n_counting]
             counting_register_results[counting_bits] = (
-                counting_register_results.get(counting_bits, 0)
-                + measurement_counts[key]
+                counting_register_results.get(counting_bits, 0) + measurement_counts[key]
             )
 
     # Convert counting register bitstrings to phase estimates and M estimates
