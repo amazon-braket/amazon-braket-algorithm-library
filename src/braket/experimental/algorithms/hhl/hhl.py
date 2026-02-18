@@ -74,59 +74,7 @@ def _compute_eigendecomposition(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndar
     return eigenvalues, eigenvectors
 
 
-def _compute_rotation_angles(
-    eigenvalues: np.ndarray,
-    num_clock_qubits: int,
-    scaling_factor: float,
-) -> Dict[int, float]:
-    """Compute the rotation angles for the controlled rotation step.
 
-    For each eigenvalue lambda_j, the rotation angle is:
-        theta_j = 2 * arcsin(C / lambda_j)
-
-    where C is a normalization constant chosen so that C/lambda_j <= 1
-    for all eigenvalues.
-
-    Args:
-        eigenvalues (np.ndarray): Eigenvalues of the matrix A.
-        num_clock_qubits (int): Number of clock qubits in QPE.
-        scaling_factor (float): Scaling factor for eigenvalue encoding.
-
-    Returns:
-        Dict[int, float]: Mapping from clock register state (int) to rotation angle.
-    """
-    # The QPE maps eigenvalues to phases: lambda_j -> 2*pi*phi_j
-    # For a 2x2 system with 2 clock qubits, we have 4 possible states (0,1,2,3).
-    # The eigenvalue lambda_j is encoded as phi_j = lambda_j * t0 / (2*pi)
-
-    num_states = 2**num_clock_qubits
-    rotation_angles = {}
-
-    for eigenval in eigenvalues:
-        # Map eigenvalue to the corresponding clock register integer
-        # Phase = eigenval * scaling_factor / (2 * pi)
-        phase = (eigenval * scaling_factor) / (2 * np.pi)
-        # Wrap to [0, 1)
-        phase = phase % 1.0
-        clock_state = int(round(phase * num_states)) % num_states
-
-        if clock_state == 0:
-            continue  # Skip the zero eigenvalue case
-
-        # C / lambda relationship
-        # Reconstruct the eigenvalue from the clock_state
-        reconstructed_eigenval = (2 * np.pi * clock_state) / (scaling_factor * num_states)
-
-        # Rotation angle: theta = 2 * arcsin(C / lambda)
-        # C is chosen as the minimum eigenvalue magnitude (in absolute value)
-        c_value = min(abs(ev) for ev in eigenvalues if abs(ev) > 1e-10)
-        ratio = c_value / abs(reconstructed_eigenval)
-        ratio = min(ratio, 1.0)  # Clamp to prevent arcsin domain errors
-
-        theta = 2 * np.arcsin(ratio)
-        rotation_angles[clock_state] = theta
-
-    return rotation_angles
 
 
 @circuit.subroutine(register=True)
