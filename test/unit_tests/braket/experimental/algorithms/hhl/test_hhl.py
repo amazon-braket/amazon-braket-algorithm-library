@@ -1,23 +1,11 @@
-# Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License"). You
-# may not use this file except in compliance with the License. A copy of
-# the License is located at
-#
-#     http://aws.amazon.com/apache2.0/
-#
-# or in the "license" file accompanying this file. This file is
-# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-# ANY KIND, either express or implied. See the License for the specific
-# language governing permissions and limitations under the License.
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
-from braket.devices import LocalSimulator
 
-from braket.experimental.algorithms.hhl import hhl as hhl_module
-from unittest.mock import MagicMock
 from braket.circuits import Circuit
+from braket.devices import LocalSimulator
+from braket.experimental.algorithms.hhl import hhl as hhl_module
 
 
 # Test with a simple diagonal 2x2 matrix
@@ -120,7 +108,7 @@ def test_hamiltonian_simulation_t0():
 def test_eigendecomposition():
     """Test eigendecomposition of a known matrix."""
     matrix = np.array([[2, 1], [1, 2]], dtype=complex)
-    eigenvalues, eigenvectors = hhl_module._compute_eigendecomposition(matrix)
+    eigenvalues, eigenvectors = np.linalg.eigh(matrix)
 
     # Known eigenvalues for [[2,1],[1,2]] are 1 and 3
     assert np.allclose(sorted(eigenvalues), [1, 3], atol=1e-10)
@@ -213,9 +201,9 @@ def test_prepare_state_b_complex_vector():
     """Test state preparation with complex amplitudes."""
     circ = Circuit()
     # Normalized complex vector: [1/sqrt(2), i/sqrt(2)]
-    b_vector = np.array([1/np.sqrt(2), 1j/np.sqrt(2)], dtype=complex)
+    b_vector = np.array([1 / np.sqrt(2), 1j / np.sqrt(2)], dtype=complex)
     circ = hhl_module._prepare_state_b(circ, 0, b_vector)
-    
+
     # Check if Rz gate is applied (indicates complex path taken)
     assert any(instruction.operator.name == "Rz" for instruction in circ.instructions)
 
@@ -227,8 +215,8 @@ def test_prepare_state_b_negative_component():
     # This triggers the `if np.real(b_vector[1]) < 0` branch
     b_vector = np.array([0, -1], dtype=float)
     circ = hhl_module._prepare_state_b(circ, 0, b_vector)
-    
-    # We can check specific rotation angle if needed, 
+
+    # We can check specific rotation angle if needed,
     # but mainly we care that it runs without error.
     assert circ is not None
 
@@ -236,8 +224,8 @@ def test_prepare_state_b_negative_component():
 def test_prepare_state_b_unnormalized_raises():
     """Test that unnormalized b_vector raises ValueError."""
     circ = Circuit()
-    b_vector = np.array([1, 1], dtype=float) # Norm is sqrt(2)
-    
+    b_vector = np.array([1, 1], dtype=float)  # Norm is sqrt(2)
+
     with pytest.raises(ValueError, match="normalized"):
         hhl_module._prepare_state_b(circ, 0, b_vector)
 
@@ -246,9 +234,9 @@ def test_hhl_1_clock_qubit():
     """Test HHL with 1 clock qubit."""
     matrix = np.array([[1, 0], [0, 2]], dtype=complex)
     b_vector = np.array([1, 0], dtype=complex)
-    
+
     circ = hhl_module.hhl_circuit(matrix, b_vector, num_clock_qubits=1)
-    
+
     # Check controlled rotation structure usage
     # With 1 clock qubit, it uses _add_controlled_ry
     # We can inspect the circuit instruction count or similar
@@ -261,9 +249,9 @@ def test_hhl_3_clock_qubits():
     """Test HHL with 3 clock qubits (triggering multi-controlled logic)."""
     matrix = np.array([[1, 0], [0, 2]], dtype=complex)
     b_vector = np.array([1, 0], dtype=complex)
-    
+
     circ = hhl_module.hhl_circuit(matrix, b_vector, num_clock_qubits=3)
-    
+
     # With 3 clock qubits, it uses _add_multi_controlled_ry
     assert circ is not None
     # 3 clock + 1 input + 1 ancilla = 5 qubits
@@ -281,7 +269,7 @@ def test_get_hhl_results_no_success():
     """Test get_hhl_results when no shots succeed (no post-selection)."""
     matrix = np.array([[1, 0], [0, 2]], dtype=complex)
     b_vector = np.array([1, 0], dtype=complex)
-    
+
     # Mock task and result
     mock_task = MagicMock()
     mock_result = MagicMock()
@@ -290,9 +278,9 @@ def test_get_hhl_results_no_success():
     # e.g., "00" + "0" + "0"
     mock_result.measurement_counts = {"0000": 100}
     mock_task.result.return_value = mock_result
-    
+
     results = hhl_module.get_hhl_results(mock_task, matrix, b_vector, num_clock_qubits=2)
-    
+
     assert results["success_shots"] == 0
     assert results["success_probability"] == 0.0
     # Should handle empty dict locally
@@ -303,7 +291,7 @@ def test_get_hhl_results_multiple_post_selection():
     """Test get_hhl_results aggregating counts correctly."""
     matrix = np.array([[1, 0], [0, 2]], dtype=complex)
     b_vector = np.array([1, 0], dtype=complex)
-    
+
     # Mock task and result
     mock_task = MagicMock()
     mock_result = MagicMock()
@@ -311,14 +299,14 @@ def test_get_hhl_results_multiple_post_selection():
     # "00" + "0" + "1" -> input 0
     # "00" + "1" + "1" -> input 1
     mock_result.measurement_counts = {
-        "0001": 30, # input 0, success
-        "0011": 20, # input 1, success
-        "1100": 50  # fail
+        "0001": 30,  # input 0, success
+        "0011": 20,  # input 1, success
+        "1100": 50,  # fail
     }
     mock_task.result.return_value = mock_result
-    
+
     results = hhl_module.get_hhl_results(mock_task, matrix, b_vector, num_clock_qubits=2)
-    
+
     assert results["success_shots"] == 50
     assert results["post_selected_counts"]["0"] == 30
     assert results["post_selected_counts"]["1"] == 20
@@ -331,10 +319,10 @@ def test_post_selected_counts_accumulation():
     matrix = np.array([[1, 0], [0, 2]], dtype=complex)
     b_vector = np.array([1, 0], dtype=complex)
     num_clock = 2
-    
+
     mock_task = MagicMock()
     mock_result = MagicMock()
-    # To hit line `post_selected_counts[input_bit] += count`, 
+    # To hit line `post_selected_counts[input_bit] += count`,
     # we need multiple bitstrings mapping to same input_bit.
     # Standard format: clock(2) | input(1) | ancilla(1)
     # If we have extra "hidden" bits at the end, get_hhl_results relies on indices.
@@ -342,7 +330,7 @@ def test_post_selected_counts_accumulation():
     # Ancilla is bitstring[-1].
     # Clock is bitstring[:num_clock].
     # Input is bitstring[num_clock].
-    
+
     # Let's say we have bitstrings "0001A" and "0001B" where both pass.
     # This requires string length > 4.
     mock_result.measurement_counts = {
@@ -355,9 +343,9 @@ def test_post_selected_counts_accumulation():
         "000X1": 30,  # "00" clock, input "0", ancilla "1"
     }
     mock_task.result.return_value = mock_result
-    
+
     results = hhl_module.get_hhl_results(mock_task, matrix, b_vector, num_clock_qubits=num_clock)
-    
+
     # Both "00011" and "000X1" map to input "0".
     # Total count for "0" should be 20 + 30 = 50.
     assert results["success_shots"] == 50
@@ -369,12 +357,10 @@ def test_controlled_rotation_zeros():
     circ = Circuit()
     # If eigenvalues are all "zero" (filtered by 1e-10)
     eigenvalues = np.array([0.0, 1e-11], dtype=float)
-    
+
     # Should return empty circuit immediately (line 308)
-    res_circ = hhl_module._controlled_rotation(
-        [0, 1], 2, eigenvalues, 2, 1.0
-    )
-    
+    res_circ = hhl_module._controlled_rotation([0, 1], 2, eigenvalues, 2, 1.0)
+
     assert len(res_circ.instructions) == 0
 
 
@@ -384,11 +370,11 @@ def test_add_multi_controlled_ry_base_case():
     controls = [0]
     target = 1
     theta = np.pi
-    
+
     # Directly call the internal function
     hhl_module._add_multi_controlled_ry(circ, controls, target, theta)
-    
-    # Should produce instructions (calls _add_controlled_ry)
+
+    # Should produce instructions (uses built-in controlled Ry)
     assert len(circ.instructions) > 0
 
 
@@ -398,7 +384,7 @@ def test_hhl_small_ratio_skip():
     # Both eigenvalues > 1e-10 so c_value is valid.
     matrix = np.array([[1e-8, 0], [0, 1e8]], dtype=complex)
     b_vector = np.array([1, 0], dtype=complex)
-    
+
     # This should trigger the continue statement in _controlled_rotation
     # for the max eigenvalue component (reconstructed ~ 1e8, c ~ 1e-8)
     circ = hhl_module.hhl_circuit(matrix, b_vector, num_clock_qubits=2)

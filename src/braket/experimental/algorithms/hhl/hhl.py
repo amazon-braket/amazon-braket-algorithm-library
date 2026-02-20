@@ -1,25 +1,13 @@
-# Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License"). You
-# may not use this file except in compliance with the License. A copy of
-# the License is located at
-#
-#     http://aws.amazon.com/apache2.0/
-#
-# or in the "license" file accompanying this file. This file is
-# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-# ANY KIND, either express or implied. See the License for the specific
-# language governing permissions and limitations under the License.
-
 """Harrow-Hassidim-Lloyd (HHL) Algorithm for Solving Linear Systems of Equations.
 
 The HHL algorithm is a quantum algorithm for solving systems of linear equations
 of the form Ax = b. Given an N x N Hermitian matrix A and a unit vector b, the
 algorithm produces a quantum state |x> proportional to A^{-1}|b>.
 
-The algorithm achieves an exponential speedup over classical methods for certain
-classes of problems (sparse, well-conditioned matrices) when only summary statistics
-of the solution are needed (e.g., <x|M|x> for some operator M).
+For certain classes of problems (sparse, well-conditioned matrices), and when only
+summary statistics of the solution are needed (e.g., <x|M|x> for some operator M),
+HHL can offer a speedup over classical methods. However, the overall advantage
+depends on the efficiency of state preparation and readout.
 
 This implementation provides a simplified version of HHL suitable for small systems
 (2x2 matrices), illustrating the core concepts:
@@ -35,427 +23,25 @@ References:
     [2] Wikipedia: https://en.wikipedia.org/wiki/HHL_algorithm
 """
 
-import math
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 import numpy as np
 
 from braket.circuits import Circuit, circuit
 from braket.circuits.qubit_set import QubitSetInput
 from braket.devices import Device
+from braket.experimental.algorithms.quantum_fourier_transform.quantum_fourier_transform import (
+    iqft,
+    qft,
+)
 from braket.tasks import QuantumTask
 
-
-def _validate_hermitian_2x2(matrix: np.ndarray) -> None:
-    """Validate that the input is a 2x2 Hermitian matrix.
-
-    Args:
-        matrix (np.ndarray): The matrix to validate.
-
-    Raises:
-        ValueError: If the matrix is not 2x2 or not Hermitian.
-    """
-    if matrix.shape != (2, 2):
-        raise ValueError(f"Matrix must be 2x2, got shape {matrix.shape}")
-    if not np.allclose(matrix, matrix.conj().T, atol=1e-10):
-        raise ValueError("Matrix must be Hermitian (A = A†)")
-
-
-def _compute_eigendecomposition(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """Compute eigenvalues and eigenvectors of a Hermitian matrix.
-
-    Args:
-        matrix (np.ndarray): A Hermitian matrix.
-
-    Returns:
-        Tuple[np.ndarray, np.ndarray]: eigenvalues and eigenvectors.
-    """
-    eigenvalues, eigenvectors = np.linalg.eigh(matrix)
-    return eigenvalues, eigenvectors
-
-
-
+# =============================================================================
+# Public API
+# =============================================================================
 
 
 @circuit.subroutine(register=True)
-def _qpe_for_hhl(
-    clock_qubits: QubitSetInput,
-    input_qubit: int,
-    matrix: np.ndarray,
-    scaling_factor: float,
-) -> Circuit:
-    """Quantum Phase Estimation subroutine for HHL.
-
-    Applies the QPE circuit to estimate eigenvalues of the Hermitian matrix A.
-    Uses Hamiltonian simulation via e^{iAt} for a 2x2 system.
-
-    Args:
-        clock_qubits (QubitSetInput): Clock register qubits.
-        input_qubit (int): The input qubit encoding |b>.
-        matrix (np.ndarray): The 2x2 Hermitian matrix A.
-        scaling_factor (float): Time parameter for Hamiltonian simulation.
-
-    Returns:
-        Circuit: QPE circuit.
-    """
-    circ = Circuit()
-    num_clock = len(clock_qubits)
-
-    # Apply Hadamard to clock qubits
-    circ.h(clock_qubits)
-
-    # Apply controlled-U^(2^k) operations
-    # U = e^{iA * scaling_factor / num_states}
-    # For clock qubit k, apply U^(2^k)
-    for k, clock_qubit in enumerate(reversed(clock_qubits)):
-        power = 2**k
-        # Compute U^power = e^{i * A * scaling_factor * power / (2^num_clock)}
-        t = scaling_factor * power / (2**num_clock)
-        unitary = _compute_hamiltonian_simulation(matrix, t)
-
-        # Apply controlled unitary
-        # Construct explicit Controlled-Unitary (CU) to workaround simulator limitations
-        # with Instruction(..., control=...)
-        cu_matrix = _construct_controlled_unitary_matrix(unitary)
-
-        # Apply CU to [clock_qubit, input_qubit]
-        # The control qubit is the first qubit in the 'targets' list
-        circ.unitary(matrix=cu_matrix, targets=[clock_qubit, input_qubit], display_name="CU")
-
-    # Apply inverse QFT to clock register
-    circ = _add_inverse_qft(circ, clock_qubits)
-
-    return circ
-
-
-def _compute_hamiltonian_simulation(matrix: np.ndarray, t: float) -> np.ndarray:
-    """Compute the unitary e^{iAt} for the Hamiltonian simulation.
-
-    Args:
-        matrix (np.ndarray): The Hermitian matrix A.
-        t (float): The time parameter.
-
-    Returns:
-        np.ndarray: The unitary matrix e^{iAt}.
-    """
-    # Use eigendecomposition for exact computation
-    eigenvalues, eigenvectors = np.linalg.eigh(matrix)
-    # e^{iAt} = V * diag(e^{i*lambda_j*t}) * V†
-    phases = np.exp(1j * eigenvalues * t)
-    unitary = eigenvectors @ np.diag(phases) @ eigenvectors.conj().T
-    return unitary
-
-
-def _construct_controlled_unitary_matrix(unitary: np.ndarray) -> np.ndarray:
-    """Construct the Controlled-U matrix from U for a single control and single target.
-
-    Args:
-        unitary (np.ndarray): The 2x2 unitary matrix U.
-
-    Returns:
-        np.ndarray: The 4x4 Controlled-U matrix.
-    """
-    if unitary.shape != (2, 2):
-        raise ValueError("Only 2x2 unitaries supported for explicit control construction")
-
-    # Projector onto |0> (P0) and |1> (P1) for control qubit
-    p0 = np.array([[1, 0], [0, 0]], dtype=complex)
-    p1 = np.array([[0, 0], [0, 1]], dtype=complex)
-
-    # Target identity
-    eye = np.eye(2, dtype=complex)
-
-    # CU = P0 (x) I + P1 (x) U
-    # This assumes the control qubit is the first qubit in the register
-    return np.kron(p0, eye) + np.kron(p1, unitary)
-
-
-def _add_inverse_qft(circ: Circuit, qubits: QubitSetInput) -> Circuit:
-    """Add inverse Quantum Fourier Transform to the circuit.
-
-    Args:
-        circ (Circuit): The circuit to add inverse QFT to.
-        qubits (QubitSetInput): The qubits to apply inverse QFT on.
-
-    Returns:
-        Circuit: Circuit with inverse QFT appended.
-    """
-    num_qubits = len(qubits)
-
-    # SWAP to reverse qubit order
-    for i in range(math.floor(num_qubits / 2)):
-        circ.swap(qubits[i], qubits[-i - 1])
-
-    # Apply inverse QFT gates
-    for k in reversed(range(num_qubits)):
-        for j in reversed(range(1, num_qubits - k)):
-            angle = -2 * math.pi / (2 ** (j + 1))
-            circ.cphaseshift(qubits[k + j], qubits[k], angle)
-        circ.h(qubits[k])
-
-    return circ
-
-
-def _add_qft(circ: Circuit, qubits: QubitSetInput) -> Circuit:
-    """Add forward Quantum Fourier Transform to the circuit.
-
-    Args:
-        circ (Circuit): The circuit to add QFT to.
-        qubits (QubitSetInput): The qubits to apply QFT on.
-
-    Returns:
-        Circuit: Circuit with QFT appended.
-    """
-    num_qubits = len(qubits)
-
-    for k in range(num_qubits):
-        circ.h(qubits[k])
-        for j in range(1, num_qubits - k):
-            angle = 2 * math.pi / (2 ** (j + 1))
-            circ.cphaseshift(qubits[k + j], qubits[k], angle)
-
-    # SWAP to reverse qubit order
-    for i in range(math.floor(num_qubits / 2)):
-        circ.swap(qubits[i], qubits[-i - 1])
-
-    return circ
-
-
-@circuit.subroutine(register=True)
-def _controlled_rotation(
-    clock_qubits: QubitSetInput,
-    ancilla_qubit: int,
-    eigenvalues: np.ndarray,
-    num_clock_qubits: int,
-    scaling_factor: float,
-) -> Circuit:
-    """Apply controlled rotations to encode C/lambda into the ancilla qubit.
-
-    For each eigenvalue lambda_j, performs a controlled-Ry rotation on the
-    ancilla qubit conditioned on the clock register containing |lambda_j>.
-    After rotation, the ancilla is in state:
-        sqrt(1 - C^2/lambda_j^2)|0> + C/lambda_j|1>
-
-    Measuring |1> on the ancilla post-selects the desired solution.
-
-    Args:
-        clock_qubits (QubitSetInput): Clock register qubits.
-        ancilla_qubit (int): The ancilla qubit for post-selection.
-        eigenvalues (np.ndarray): Eigenvalues of matrix A.
-        num_clock_qubits (int): Number of clock qubits.
-        scaling_factor (float): Scaling factor for eigenvalue encoding.
-
-    Returns:
-        Circuit: Circuit with controlled rotations.
-    """
-    circ = Circuit()
-    num_states = 2**num_clock_qubits
-
-    # Compute the constant C (normalization)
-    abs_eigenvalues = np.abs(eigenvalues[np.abs(eigenvalues) > 1e-10])
-    if len(abs_eigenvalues) == 0:
-        return circ
-    c_value = np.min(abs_eigenvalues)
-
-    # For each possible clock register state, apply a controlled rotation
-    for clock_state in range(1, num_states):
-        # Reconstruct the eigenvalue from the clock state
-        reconstructed_eigenval = (2 * np.pi * clock_state) / (scaling_factor * num_states)
-
-        # Compute rotation angle
-        ratio = c_value / abs(reconstructed_eigenval)
-        ratio = min(ratio, 1.0)
-        theta = 2 * np.arcsin(ratio)
-
-        if abs(theta) < 1e-12:
-            continue
-
-        # Apply multi-controlled Ry rotation
-        # Condition on clock register being in state |clock_state>
-        # Convert clock_state to binary to determine which clock qubits are |0> vs |1>
-        binary_rep = format(clock_state, f"0{num_clock_qubits}b")
-
-        # Apply X gates to select the correct clock state
-        for i, bit in enumerate(binary_rep):
-            if bit == "0":
-                circ.x(clock_qubits[i])
-
-        # Apply multi-controlled Ry
-        # For 2 clock qubits, this is a Toffoli-like construction
-        if num_clock_qubits == 1:
-            # Simple controlled-Ry
-            _add_controlled_ry(circ, clock_qubits[0], ancilla_qubit, theta)
-        elif num_clock_qubits == 2:
-            # Use both clock qubits as controls
-            _add_doubly_controlled_ry(circ, clock_qubits[0], clock_qubits[1], ancilla_qubit, theta)
-        else:
-            # General case: use multi-controlled approach
-            _add_multi_controlled_ry(circ, clock_qubits, ancilla_qubit, theta)
-
-        # Undo X gates
-        for i, bit in enumerate(binary_rep):
-            if bit == "0":
-                circ.x(clock_qubits[i])
-
-    return circ
-
-
-def _add_controlled_ry(circ: Circuit, control: int, target: int, theta: float) -> None:
-    """Add a controlled-Ry gate to the circuit.
-
-    Decomposition: C-Ry(theta) = Ry(theta/2) . CNOT . Ry(-theta/2) . CNOT
-
-    Args:
-        circ (Circuit): The circuit.
-        control (int): Control qubit.
-        target (int): Target qubit.
-        theta (float): Rotation angle.
-    """
-    circ.ry(target, theta / 2)
-    circ.cnot(control, target)
-    circ.ry(target, -theta / 2)
-    circ.cnot(control, target)
-
-
-def _add_doubly_controlled_ry(
-    circ: Circuit, control1: int, control2: int, target: int, theta: float
-) -> None:
-    """Add a doubly-controlled Ry gate (CCRy) to the circuit.
-
-    Uses the decomposition: CCRy(theta) via two CRy(theta/2) and a CNOT.
-
-    Args:
-        circ (Circuit): The circuit.
-        control1 (int): First control qubit.
-        control2 (int): Second control qubit.
-        target (int): Target qubit.
-        theta (float): Rotation angle.
-    """
-    # Decompose CC-Ry using standard decomposition
-    _add_controlled_ry(circ, control2, target, theta / 2)
-    circ.cnot(control1, control2)
-    _add_controlled_ry(circ, control2, target, -theta / 2)
-    circ.cnot(control1, control2)
-    _add_controlled_ry(circ, control1, target, theta / 2)
-
-
-def _add_multi_controlled_ry(
-    circ: Circuit, controls: QubitSetInput, target: int, theta: float
-) -> None:
-    """Add a multi-controlled Ry gate to the circuit.
-
-    For simplicity, this uses a recursive decomposition.
-
-    Args:
-        circ (Circuit): The circuit.
-        controls (QubitSetInput): Control qubits.
-        target (int): Target qubit.
-        theta (float): Rotation angle.
-    """
-    if len(controls) == 1:
-        _add_controlled_ry(circ, controls[0], target, theta)
-    elif len(controls) == 2:
-        _add_doubly_controlled_ry(circ, controls[0], controls[1], target, theta)
-    else:
-        # Recursive decomposition for more controls
-        _add_controlled_ry(circ, controls[-1], target, theta / 2)
-        # Apply multi-controlled NOT with remaining controls
-        for i in range(len(controls) - 1):
-            circ.cnot(controls[i], controls[-1])
-        _add_controlled_ry(circ, controls[-1], target, -theta / 2)
-        for i in range(len(controls) - 1):
-            circ.cnot(controls[i], controls[-1])
-        _add_multi_controlled_ry(circ, controls[:-1], target, theta / 2)
-
-
-@circuit.subroutine(register=True)
-def _inverse_qpe_for_hhl(
-    clock_qubits: QubitSetInput,
-    input_qubit: int,
-    matrix: np.ndarray,
-    scaling_factor: float,
-) -> Circuit:
-    """Inverse QPE subroutine to uncompute the clock register.
-
-    Args:
-        clock_qubits (QubitSetInput): Clock register qubits.
-        input_qubit (int): The input qubit.
-        matrix (np.ndarray): The 2x2 Hermitian matrix A.
-        scaling_factor (float): Time parameter for Hamiltonian simulation.
-
-    Returns:
-        Circuit: Inverse QPE circuit.
-    """
-    circ = Circuit()
-    num_clock = len(clock_qubits)
-
-    # Apply forward QFT to clock register (inverse of inverse QFT)
-    circ = _add_qft(circ, clock_qubits)
-
-    # Apply inverse controlled-U^(2^k) operations (in reverse order)
-    for k, clock_qubit in enumerate(reversed(clock_qubits)):
-        power = 2**k
-        t = scaling_factor * power / (2**num_clock)
-        # Inverse unitary: (e^{iAt})† = e^{-iAt}
-        unitary_inv = _compute_hamiltonian_simulation(matrix, -t)
-
-        # Construct explicit Controlled-Unitary
-        cu_matrix_inv = _construct_controlled_unitary_matrix(unitary_inv)
-
-        # Apply CUinv
-        circ.unitary(matrix=cu_matrix_inv, targets=[clock_qubit, input_qubit], display_name="CU†")
-
-    # Apply Hadamard to clock qubits
-    circ.h(clock_qubits)
-
-    return circ
-
-
-def _prepare_state_b(circ: Circuit, input_qubit: int, b_vector: np.ndarray) -> Circuit:
-    """Prepare the quantum state |b> on the input qubit.
-
-    For a 2-element vector b = [b0, b1], prepares the state:
-        |b> = b0|0> + b1|1>
-
-    The vector must be normalized (|b0|^2 + |b1|^2 = 1).
-
-    Args:
-        circ (Circuit): The circuit to add state preparation to.
-        input_qubit (int): The qubit to prepare the state on.
-        b_vector (np.ndarray): The normalized 2-element vector b.
-
-    Returns:
-        Circuit: Circuit with state preparation.
-
-    Raises:
-        ValueError: If b_vector is not a normalized 2-element vector.
-    """
-    if len(b_vector) != 2:
-        raise ValueError(f"b_vector must have 2 elements, got {len(b_vector)}")
-
-    norm = np.linalg.norm(b_vector)
-    if not np.isclose(norm, 1.0, atol=1e-10):
-        raise ValueError(f"b_vector must be normalized, got norm={norm}")
-
-    # Compute the rotation angle to prepare |b> = cos(theta/2)|0> + sin(theta/2)|1>
-    # For real b_vector: b0 = cos(theta/2), b1 = sin(theta/2)
-    theta = 2 * np.arccos(np.clip(np.real(b_vector[0]), -1, 1))
-
-    # Handle the phase if b_vector has complex components
-    if np.isreal(b_vector).all():
-        if np.real(b_vector[1]) < 0:
-            theta = -theta
-        circ.ry(input_qubit, theta)
-    else:
-        # General state preparation for complex amplitudes
-        # |b> = cos(theta/2)|0> + e^{i*phi}*sin(theta/2)|1>
-        phi = np.angle(b_vector[1]) - np.angle(b_vector[0])
-        circ.ry(input_qubit, theta)
-        circ.rz(input_qubit, phi)
-
-    return circ
-
-
 def hhl_circuit(
     matrix: np.ndarray,
     b_vector: np.ndarray,
@@ -496,14 +82,15 @@ def hhl_circuit(
     b_normalized = b_vector / b_norm
 
     # Compute eigenvalues for scaling
-    eigenvalues, _ = _compute_eigendecomposition(matrix)
+    eigenvalues, _ = np.linalg.eigh(matrix)
 
     # Determine scaling factor if not provided
     if scaling_factor is None:
-        # Choose scaling_factor so eigenvalues map to distinct QPE states
+        # Map the full range of eigenvalues into the QPE register
         max_eigenval = max(abs(ev) for ev in eigenvalues)
         num_states = 2**num_clock_qubits
-        # Scale so that the largest eigenvalue maps close to the Nyquist limit
+        # Scale so that eigenvalues map to distinct, well-separated QPE states
+        # using the eigenvalue range to ensure all eigenvalues are representable
         scaling_factor = 2 * np.pi * (num_states - 1) / (max_eigenval * num_states)
 
     # Define qubit registers
@@ -658,3 +245,281 @@ def get_hhl_results(
         print(f"\nFidelity with classical solution: {fidelity:.4f}")
 
     return aggregate_results
+
+
+# =============================================================================
+# Private helpers
+# =============================================================================
+
+
+def _validate_hermitian_2x2(matrix: np.ndarray) -> None:
+    """Validate that the input is a 2x2 Hermitian matrix.
+
+    Args:
+        matrix (np.ndarray): The matrix to validate.
+
+    Raises:
+        ValueError: If the matrix is not 2x2 or not Hermitian.
+    """
+    if matrix.shape != (2, 2):
+        raise ValueError(f"Matrix must be 2x2, got shape {matrix.shape}")
+    if not np.allclose(matrix, matrix.conj().T, atol=1e-10):
+        raise ValueError("Matrix must be Hermitian (A = A†)")
+
+
+def _qpe_for_hhl(
+    clock_qubits: QubitSetInput,
+    input_qubit: int,
+    matrix: np.ndarray,
+    scaling_factor: float,
+) -> Circuit:
+    """Quantum Phase Estimation subroutine for HHL.
+
+    Applies the QPE circuit to estimate eigenvalues of the Hermitian matrix A.
+    Uses Hamiltonian simulation via e^{iAt} for a 2x2 system.
+
+    Args:
+        clock_qubits (QubitSetInput): Clock register qubits.
+        input_qubit (int): The input qubit encoding |b>.
+        matrix (np.ndarray): The 2x2 Hermitian matrix A.
+        scaling_factor (float): Time parameter for Hamiltonian simulation.
+
+    Returns:
+        Circuit: QPE circuit.
+    """
+    circ = Circuit()
+    num_clock = len(clock_qubits)
+
+    # Apply Hadamard to clock qubits
+    circ.h(clock_qubits)
+
+    # Apply controlled-U^(2^k) operations
+    # U = e^{iA * scaling_factor / num_states}
+    # For clock qubit k, apply U^(2^k)
+    for k, clock_qubit in enumerate(reversed(clock_qubits)):
+        power = 2**k
+        # Compute U^power = e^{i * A * scaling_factor * power / (2^num_clock)}
+        t = scaling_factor * power / (2**num_clock)
+        unitary = _compute_hamiltonian_simulation(matrix, t)
+
+        # Apply controlled unitary
+        cu_matrix = _construct_controlled_unitary_matrix(unitary)
+        circ.unitary(matrix=cu_matrix, targets=[clock_qubit, input_qubit], display_name="CU")
+
+    # Apply inverse QFT to clock register using the library's iqft
+    circ.add(iqft(clock_qubits))
+
+    return circ
+
+
+def _compute_hamiltonian_simulation(matrix: np.ndarray, t: float) -> np.ndarray:
+    """Compute the unitary e^{iAt} for the Hamiltonian simulation.
+
+    For a 2x2 Hermitian matrix, uses eigendecomposition for exact computation.
+
+    Args:
+        matrix (np.ndarray): The Hermitian matrix A.
+        t (float): The time parameter.
+
+    Returns:
+        np.ndarray: The unitary matrix e^{iAt}.
+    """
+    eigenvalues, eigenvectors = np.linalg.eigh(matrix)
+    # e^{iAt} = V * diag(e^{i*lambda_j*t}) * V†
+    phases = np.exp(1j * eigenvalues * t)
+    unitary = eigenvectors @ np.diag(phases) @ eigenvectors.conj().T
+    return unitary
+
+
+def _construct_controlled_unitary_matrix(unitary: np.ndarray) -> np.ndarray:
+    """Construct the Controlled-U matrix from U for a single control and single target.
+
+    Args:
+        unitary (np.ndarray): The 2x2 unitary matrix U.
+
+    Returns:
+        np.ndarray: The 4x4 Controlled-U matrix.
+    """
+    if unitary.shape != (2, 2):
+        raise ValueError("Only 2x2 unitaries supported for explicit control construction")
+
+    # CU = |0><0| ⊗ I + |1><1| ⊗ U
+    p0 = np.array([[1, 0], [0, 0]], dtype=complex)
+    p1 = np.array([[0, 0], [0, 1]], dtype=complex)
+    eye = np.eye(2, dtype=complex)
+
+    return np.kron(p0, eye) + np.kron(p1, unitary)
+
+
+def _controlled_rotation(
+    clock_qubits: QubitSetInput,
+    ancilla_qubit: int,
+    eigenvalues: np.ndarray,
+    num_clock_qubits: int,
+    scaling_factor: float,
+) -> Circuit:
+    """Apply controlled rotations to encode C/lambda into the ancilla qubit.
+
+    For each eigenvalue lambda_j, performs a controlled-Ry rotation on the
+    ancilla qubit conditioned on the clock register containing |lambda_j>.
+    After rotation, the ancilla is in state:
+        sqrt(1 - C^2/lambda_j^2)|0> + C/lambda_j|1>
+
+    Measuring |1> on the ancilla post-selects the desired solution.
+
+    Args:
+        clock_qubits (QubitSetInput): Clock register qubits.
+        ancilla_qubit (int): The ancilla qubit for post-selection.
+        eigenvalues (np.ndarray): Eigenvalues of matrix A.
+        num_clock_qubits (int): Number of clock qubits.
+        scaling_factor (float): Scaling factor for eigenvalue encoding.
+
+    Returns:
+        Circuit: Circuit with controlled rotations.
+    """
+    circ = Circuit()
+    num_states = 2**num_clock_qubits
+
+    # Compute the constant C (normalization)
+    abs_eigenvalues = np.abs(eigenvalues[np.abs(eigenvalues) > 1e-10])
+    if len(abs_eigenvalues) == 0:
+        return circ
+    c_value = np.min(abs_eigenvalues)
+
+    # For each possible clock register state, apply a controlled rotation
+    for clock_state in range(1, num_states):
+        # Reconstruct the eigenvalue from the clock state
+        reconstructed_eigenval = (2 * np.pi * clock_state) / (scaling_factor * num_states)
+
+        # Compute rotation angle
+        ratio = c_value / abs(reconstructed_eigenval)
+        ratio = min(ratio, 1.0)
+        theta = 2 * np.arcsin(ratio)
+
+        if abs(theta) < 1e-12:
+            continue
+
+        # Convert clock_state to binary to determine which clock qubits are |0> vs |1>
+        binary_rep = format(clock_state, f"0{num_clock_qubits}b")
+
+        # Apply X gates to select the correct clock state
+        for i, bit in enumerate(binary_rep):
+            if bit == "0":
+                circ.x(clock_qubits[i])
+
+        # Apply multi-controlled Ry using Braket's built-in control mechanism
+        _add_multi_controlled_ry(circ, list(clock_qubits), ancilla_qubit, theta)
+
+        # Undo X gates
+        for i, bit in enumerate(binary_rep):
+            if bit == "0":
+                circ.x(clock_qubits[i])
+
+    return circ
+
+
+def _add_multi_controlled_ry(circ: Circuit, controls: list, target: int, theta: float) -> None:
+    """Add a multi-controlled Ry gate to the circuit.
+
+    Uses Braket's built-in control mechanism for the Ry gate.
+
+    Args:
+        circ (Circuit): The circuit.
+        controls (list): Control qubits.
+        target (int): Target qubit.
+        theta (float): Rotation angle.
+    """
+    if len(controls) == 1:
+        # Use Braket's built-in controlled Ry
+        circ.ry(target, theta, control=controls[0])
+    else:
+        # For multiple controls, decompose recursively:
+        # C^n-Ry(theta) = C^(n-1)-Ry(theta/2) . CNOT . C^(n-1)-Ry(-theta/2) . CNOT . ...
+        _add_multi_controlled_ry(circ, controls[1:], target, theta / 2)
+        circ.cnot(controls[0], controls[-1])
+        _add_multi_controlled_ry(circ, controls[1:], target, -theta / 2)
+        circ.cnot(controls[0], controls[-1])
+        _add_multi_controlled_ry(circ, controls[:-1], target, theta / 2)
+
+
+def _inverse_qpe_for_hhl(
+    clock_qubits: QubitSetInput,
+    input_qubit: int,
+    matrix: np.ndarray,
+    scaling_factor: float,
+) -> Circuit:
+    """Inverse QPE subroutine to uncompute the clock register.
+
+    Args:
+        clock_qubits (QubitSetInput): Clock register qubits.
+        input_qubit (int): The input qubit.
+        matrix (np.ndarray): The 2x2 Hermitian matrix A.
+        scaling_factor (float): Time parameter for Hamiltonian simulation.
+
+    Returns:
+        Circuit: Inverse QPE circuit.
+    """
+    circ = Circuit()
+    num_clock = len(clock_qubits)
+
+    # Apply forward QFT to clock register (inverse of inverse QFT)
+    circ.add(qft(clock_qubits))
+
+    # Apply inverse controlled-U^(2^k) operations (in reverse order)
+    for k, clock_qubit in enumerate(reversed(clock_qubits)):
+        power = 2**k
+        t = scaling_factor * power / (2**num_clock)
+        # Inverse unitary: (e^{iAt})† = e^{-iAt}
+        unitary_inv = _compute_hamiltonian_simulation(matrix, -t)
+
+        cu_matrix_inv = _construct_controlled_unitary_matrix(unitary_inv)
+        circ.unitary(matrix=cu_matrix_inv, targets=[clock_qubit, input_qubit], display_name="CU†")
+
+    # Apply Hadamard to clock qubits
+    circ.h(clock_qubits)
+
+    return circ
+
+
+def _prepare_state_b(circ: Circuit, input_qubit: int, b_vector: np.ndarray) -> Circuit:
+    """Prepare the quantum state |b> on the input qubit.
+
+    For a 2-element vector b = [b0, b1], prepares the state:
+        |b> = b0|0> + b1|1>
+
+    The vector must be normalized (|b0|^2 + |b1|^2 = 1).
+
+    Args:
+        circ (Circuit): The circuit to add state preparation to.
+        input_qubit (int): The qubit to prepare the state on.
+        b_vector (np.ndarray): The normalized 2-element vector b.
+
+    Returns:
+        Circuit: Circuit with state preparation.
+
+    Raises:
+        ValueError: If b_vector is not a normalized 2-element vector.
+    """
+    if len(b_vector) != 2:
+        raise ValueError(f"b_vector must have 2 elements, got {len(b_vector)}")
+
+    norm = np.linalg.norm(b_vector)
+    if not np.isclose(norm, 1.0, atol=1e-10):
+        raise ValueError(f"b_vector must be normalized, got norm={norm}")
+
+    # Compute the rotation angle to prepare |b> = cos(theta/2)|0> + sin(theta/2)|1>
+    theta = 2 * np.arccos(np.clip(np.real(b_vector[0]), -1, 1))
+
+    # Handle the phase if b_vector has complex components
+    if np.isreal(b_vector).all():
+        if np.real(b_vector[1]) < 0:
+            theta = -theta
+        circ.ry(input_qubit, theta)
+    else:
+        # General state preparation for complex amplitudes
+        # |b> = cos(theta/2)|0> + e^{i*phi}*sin(theta/2)|1>
+        phi = np.angle(b_vector[1]) - np.angle(b_vector[0])
+        circ.ry(input_qubit, theta)
+        circ.rz(input_qubit, phi)
+
+    return circ
