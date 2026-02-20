@@ -12,10 +12,8 @@
 # language governing permissions and limitations under the License.
 
 from braket.experimental.algorithms.quantum_counting.quantum_counting import (  # noqa: F401, E501
-    build_diffusion_matrix,
-    build_grover_matrix,
-    build_oracle_matrix,
+    build_grover_circuit,
+    build_oracle_circuit,
     get_quantum_counting_results,
     quantum_counting_circuit,
-    run_quantum_counting,
 )

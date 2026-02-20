@@ -1,16 +1,3 @@
-# Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License"). You
-# may not use this file except in compliance with the License. A copy of
-# the License is located at
-#
-#     http://aws.amazon.com/apache2.0/
-#
-# or in the "license" file accompanying this file. This file is
-# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-# ANY KIND, either express or implied. See the License for the specific
-# language governing permissions and limitations under the License.
-
 """Quantum Counting Algorithm implementation using the Amazon Braket SDK.
 
 The quantum counting algorithm combines Grover's search operator with Quantum
@@ -27,71 +14,80 @@ from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
-from braket.circuits import Circuit, circuit
+from braket.circuits import Circuit
 from braket.circuits.qubit_set import QubitSetInput
-from braket.devices import Device
-from braket.tasks import QuantumTask
+from braket.experimental.algorithms.grovers_search.grovers_search import amplify, build_oracle
 
 
-def build_oracle_matrix(n_qubits: int, marked_states: List[int]) -> np.ndarray:
-    """Build a diagonal oracle matrix that flips the phase of marked states.
+def build_oracle_circuit(
+    n_qubits: int,
+    marked_states: List[int],
+    decompose_ccnot: bool = False,
+) -> Circuit:
+    """Build an oracle circuit that flips the phase of marked states.
 
-    The oracle acts as O|x> = -|x> for marked x, and O|x> = |x> otherwise.
+    Composes individual oracle circuits from grovers_search.build_oracle
+    for each marked state. Each call flips the phase of one basis state,
+    and their composition marks all specified states.
 
     Args:
         n_qubits (int): Number of qubits in the search register.
         marked_states (List[int]): Indices of marked computational-basis states.
+        decompose_ccnot (bool): Whether to decompose CCNOT (Toffoli) gates.
 
     Returns:
-        np.ndarray: The 2^n × 2^n diagonal oracle matrix.
+        Circuit: Oracle circuit that flips the phase of all marked states.
 
     Raises:
         ValueError: If a marked state index is out of range.
     """
     dim = 2**n_qubits
-    oracle = np.eye(dim)
     for state in marked_states:
         if state < 0 or state >= dim:
             raise ValueError(
                 f"Marked state {state} is out of range for {n_qubits} qubits "
                 f"(must be in [0, {dim - 1}])."
             )
-        oracle[state, state] = -1
-    return oracle
+
+    oracle_circ = Circuit()
+    for state in marked_states:
+        bitstring = format(state, f"0{n_qubits}b")
+        oracle_circ.add_circuit(build_oracle(bitstring, decompose_ccnot))
+    return oracle_circ
 
 
-def build_diffusion_matrix(n_qubits: int) -> np.ndarray:
-    """Build the Grover diffusion matrix D = 2|s><s| - I.
+def build_grover_circuit(
+    n_qubits: int,
+    marked_states: List[int],
+    decompose_ccnot: bool = False,
+) -> Circuit:
+    """Build the Grover operator G = D · O as a circuit.
 
-    |s> = H^{⊗n}|0>^{⊗n} is the uniform superposition state.
+    Uses circuit primitives from grovers_search: build_oracle for the phase
+    oracle and amplify for the diffusion operator (H · oracle_0 · H).
 
-    Args:
-        n_qubits (int): Number of qubits in the search register.
-
-    Returns:
-        np.ndarray: The 2^n × 2^n diffusion matrix.
-    """
-    dim = 2**n_qubits
-    s = np.ones(dim) / np.sqrt(dim)
-    return 2 * np.outer(s, s) - np.eye(dim)
-
-
-def build_grover_matrix(n_qubits: int, marked_states: List[int]) -> np.ndarray:
-    """Build the Grover operator G = D · O.
+    Note:
+        The MCZ ancilla decomposition introduces a global phase of -1
+        relative to the ideal Grover matrix.  This is accounted for
+        in get_quantum_counting_results during phase correction.
 
     Args:
         n_qubits (int): Number of qubits in the search register.
         marked_states (List[int]): Indices of marked states.
+        decompose_ccnot (bool): Whether to decompose CCNOT (Toffoli) gates.
 
     Returns:
-        np.ndarray: The 2^n × 2^n Grover operator matrix.
+        Circuit: Circuit implementing the Grover operator G.
     """
-    oracle = build_oracle_matrix(n_qubits, marked_states)
-    diffusion = build_diffusion_matrix(n_qubits)
-    return diffusion @ oracle
+    oracle_circ = build_oracle_circuit(n_qubits, marked_states, decompose_ccnot)
+    diffusion_circ = amplify(n_qubits, decompose_ccnot)
+
+    grover_circ = Circuit()
+    grover_circ.add_circuit(oracle_circ)
+    grover_circ.add_circuit(diffusion_circ)
+    return grover_circ
 
 
-@circuit.subroutine(register=True)
 def inverse_qft_for_counting(qubits: QubitSetInput) -> Circuit:
     """Inverse Quantum Fourier Transform applied to the given qubits.
 
@@ -118,7 +114,6 @@ def inverse_qft_for_counting(qubits: QubitSetInput) -> Circuit:
     return qft_circ
 
 
-@circuit.subroutine(register=True)
 def controlled_grover(
     control: int, target_qubits: QubitSetInput, grover_unitary: np.ndarray
 ) -> Circuit:
@@ -129,12 +124,8 @@ def controlled_grover(
 
     Args:
         control (int): Index of the control qubit.
-        target_qubits (QubitSetInput): Indices of target (search) qubits.
-        grover_unitary (np.ndarray): The Grover operator matrix.
-
-    Returns:
-        Circuit: Circuit implementing the controlled Grover operator.
-    """
+        target_qubits (QubitSetInput): Indices of target (search and ancilla) qubits.
+     """
     circ = Circuit()
 
     # Build controlled unitary: |0><0| ⊗ I + |1><1| ⊗ U
@@ -153,37 +144,50 @@ def quantum_counting_circuit(
     counting_circ: Circuit,
     counting_qubits: QubitSetInput,
     search_qubits: QubitSetInput,
-    grover_matrix: np.ndarray,
+    marked_states: List[int],
+    decompose_ccnot: bool = False,
 ) -> Circuit:
     """Create the full quantum counting circuit with result types.
 
-    Builds the quantum counting circuit comprising:
-      1. Hadamard gates on all counting and search qubits
-      2. Controlled-G^(2^k) for each counting qubit k
-      3. Inverse QFT on the counting qubits
-      4. Probability result type on all qubits
+    Builds the Grover operator as a circuit from grovers_search primitives
+    (build_oracle + amplify), extracts its unitary, and applies QPE.
 
     Args:
         counting_circ (Circuit): Initial circuit (may contain setup operations).
         counting_qubits (QubitSetInput): Qubits for the counting (precision) register.
         search_qubits (QubitSetInput): Qubits for the search register.
-        grover_matrix (np.ndarray): The Grover operator matrix G.
+        marked_states (List[int]): Indices of marked computational-basis states.
+        decompose_ccnot (bool): Whether to decompose CCNOT (Toffoli) gates.
 
     Returns:
         Circuit: The complete quantum counting circuit with result types.
     """
-    return counting_circ.quantum_counting(
-        counting_qubits, search_qubits, grover_matrix
-    ).probability()
+    counting_circ.add_circuit(
+        quantum_counting(
+            counting_qubits, search_qubits, marked_states, decompose_ccnot
+        )
+    )
+    return counting_circ.probability(counting_qubits)
 
 
-@circuit.subroutine(register=True)
 def quantum_counting(
     counting_qubits: QubitSetInput,
     search_qubits: QubitSetInput,
-    grover_matrix: np.ndarray,
+    marked_states: List[int],
+    decompose_ccnot: bool = False,
 ) -> Circuit:
     """Build the core quantum counting circuit using QPE on the Grover operator.
+
+    Constructs the Grover operator as a gate-level circuit from grovers_search
+    primitives (build_oracle for the phase oracle, amplify for the diffusion
+    operator), extracts its unitary via Circuit.to_unitary(), and applies
+    controlled-G^(2^k) for QPE.
+
+    Note:
+        The MCZ ancilla decomposition in grovers_search introduces a global
+        phase of -1 on the Grover operator relative to the ideal matrix.
+        This shifts QPE phase estimates by 0.5. The correction is applied
+        in get_quantum_counting_results.
 
     The circuit structure:
       1. Apply H to all counting qubits
@@ -194,11 +198,26 @@ def quantum_counting(
     Args:
         counting_qubits (QubitSetInput): Qubits for the counting (precision) register.
         search_qubits (QubitSetInput): Qubits for the search register.
-        grover_matrix (np.ndarray): The Grover operator matrix G.
+        marked_states (List[int]): Indices of marked computational-basis states.
+        decompose_ccnot (bool): Whether to decompose CCNOT (Toffoli) gates.
 
     Returns:
         Circuit: Circuit implementing the quantum counting algorithm.
     """
+    n_search = len(search_qubits)
+
+    # Build the Grover operator circuit from grovers_search primitives
+    grover_circ = build_grover_circuit(n_search, marked_states, decompose_ccnot)
+    grover_unitary = grover_circ.to_unitary()
+
+    # Determine ancilla qubits introduced by the circuit decomposition
+    n_ancilla = grover_circ.qubit_count - n_search
+    ancilla_qubits = [
+        max(list(counting_qubits) + list(search_qubits)) + 1 + i
+        for i in range(n_ancilla)
+    ]
+    all_grover_qubits = list(search_qubits) + ancilla_qubits
+
     qc_circ = Circuit()
 
     # Hadamard on counting qubits
@@ -210,35 +229,18 @@ def quantum_counting(
     # Controlled-G^(2^k)
     for ii, qubit in enumerate(reversed(counting_qubits)):
         power = 2**ii
-        g_power = np.linalg.matrix_power(grover_matrix, power)
-        qc_circ.controlled_grover(qubit, search_qubits, g_power)
+        g_power = np.linalg.matrix_power(grover_unitary, power)
+        qc_circ.add_circuit(controlled_grover(qubit, all_grover_qubits, g_power))
 
     # Inverse QFT on counting qubits
-    qc_circ.inverse_qft_for_counting(counting_qubits)
+    qc_circ.add_circuit(inverse_qft_for_counting(counting_qubits))
 
     return qc_circ
 
 
-def run_quantum_counting(
-    circuit: Circuit,
-    device: Device,
-    shots: int = 1000,
-) -> QuantumTask:
-    """Run the quantum counting circuit on the given device.
-
-    Args:
-        circuit (Circuit): The quantum counting circuit.
-        device (Device): Braket device backend.
-        shots (int): Number of measurement shots (default 1000).
-
-    Returns:
-        QuantumTask: Task from running the quantum counting circuit.
-    """
-    return device.run(circuit, shots=shots)
-
 
 def get_quantum_counting_results(
-    task: QuantumTask,
+    task,
     counting_qubits: QubitSetInput,
     search_qubits: QubitSetInput,
     verbose: bool = False,
@@ -281,13 +283,17 @@ def get_quantum_counting_results(
             )
 
     # Convert counting register bitstrings to phase estimates and M estimates
+    # The MCZ ancilla decomposition introduces a global phase of -1 on the
+    # Grover operator, shifting QPE phase estimates by 0.5. We correct by
+    # computing: corrected_phase = |raw_phase - 0.5|
     phases, estimated_counts = _get_counting_estimates(counting_register_results, n_counting, N)
 
     # Best estimate from most frequent outcome
     if counting_register_results:
         best_key = max(counting_register_results, key=counting_register_results.get)
         best_y = int(best_key, 2)
-        best_phase = best_y / (2**n_counting)
+        raw_phase = best_y / (2**n_counting)
+        best_phase = abs(raw_phase - 0.5)
         best_M = N * (np.sin(np.pi * best_phase) ** 2)
     else:
         best_key = None
@@ -303,12 +309,20 @@ def get_quantum_counting_results(
     }
 
     if verbose:
-        print(f"Measurement counts: {measurement_counts}")
-        print(f"Counting register results: {counting_register_results}")
-        print(f"Phase estimates: {phases}")
-        print(f"Estimated item counts: {estimated_counts}")
-        print(f"Best estimate of M: {best_M}")
-        print(f"Search space size N: {N}")
+        print(f"Search space size N = {N}")
+        sorted_cr = sorted(
+            counting_register_results.items(), key=lambda x: x[1], reverse=True
+        )
+        print("\nCounting register distribution (top outcomes):")
+        for bitstring, count in sorted_cr[:6]:
+            y_val = int(bitstring, 2)
+            raw_ph = y_val / (2**n_counting)
+            ph = abs(raw_ph - 0.5)
+            m_est = N * (np.sin(np.pi * ph) ** 2)
+            print(f"  |{bitstring}>: {count} counts  ->  phase = {ph:.4f},  M ~ {m_est:.4f}")
+        if len(sorted_cr) > 6:
+            print(f"  ... ({len(sorted_cr) - 6} more outcomes)")
+        print(f"\nBest estimate of M: {best_M}")
 
     return aggregate_results
 
@@ -334,7 +348,9 @@ def _get_counting_estimates(
 
     for bitstring in counting_register_results:
         y = int(bitstring, 2)
-        phase = y / (2**n_counting)
+        raw_phase = y / (2**n_counting)
+        # Correct for -1 global phase from MCZ decomposition
+        phase = abs(raw_phase - 0.5)
         M_est = N * (np.sin(np.pi * phase) ** 2)
         phases.append(phase)
         estimated_counts.append(M_est)
