@@ -24,7 +24,7 @@ Running notebooks locally requires additional dependencies located in [notebooks
 | Quantum Walk | [Quantum_Walk.ipynb](notebooks/textbook/Quantum_Walk.ipynb) | [Childs2002](https://arxiv.org/abs/quant-ph/0209131) |
 |Shor's| [Shors_Algorithm.ipynb](notebooks/textbook/Shors_Algorithm.ipynb) | [Shor1998](https://arxiv.org/abs/quant-ph/9508027) |
 | Simon's | [Simons_Algorithm.ipynb](notebooks/textbook/Simons_Algorithm.ipynb) | [Simon1997](https://epubs.siam.org/doi/10.1137/S0097539796298637) |
-
+| Sweeping | [Sweeping.ipynb](notebooks/textbook/Sweeping.ipynb) | [Rudolph2022](https://arxiv.org/abs/2209.00595) |
 
 | Advanced algorithms | Notebook | References |
 | ----- | ----- | ----- |
