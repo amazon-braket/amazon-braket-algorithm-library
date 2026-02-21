@@ -18,6 +18,7 @@ Running notebooks locally requires additional dependencies located in [notebooks
 | CHSH Inequality | [CHSH_Inequality.ipynb](notebooks/textbook/CHSH_Inequality.ipynb) | [Clauser1970](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.23.880) |
 | Deutsch-Jozsa | [Deutsch_Jozsa_Algorithm.ipynb](notebooks/textbook/Deutsch_Jozsa_Algorithm.ipynb) | [Deutsch1992](https://royalsocietypublishing.org/doi/10.1098/rspa.1992.0167) |
 | Grover's Search | [Grovers_Search.ipynb](notebooks/textbook/Grovers_Search.ipynb) | [Figgatt2017](https://www.nature.com/articles/s41467-017-01904-7), [Baker2019](https://arxiv.org/abs/1904.01671) |
+| MPS Encoding | [MPS_Encoding.ipynb](notebooks/textbook/MPS_Encoding.ipynb) | [Ran2019](https://arxiv.org/abs/1908.07958), [Rudolph2022](https://arxiv.org/abs/2209.00595) |
 | QAOA | [Quantum_Approximate_Optimization_Algorithm.ipynb](notebooks/textbook/Quantum_Approximate_Optimization_Algorithm.ipynb) | [Farhi2014](https://arxiv.org/abs/1411.4028) |
 | Quantum Circuit Born Machine | [Quantum_Circuit_Born_Machine.ipynb](notebooks/textbook/Quantum_Circuit_Born_Machine.ipynb) | [Benedetti2019](https://www.nature.com/articles/s41534-019-0157-8),  [Liu2018](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.98.062324) | 
 | QFT | [Quantum_Fourier_Transform.ipynb](notebooks/textbook/Quantum_Fourier_Transform.ipynb) | [Coppersmith2002](https://arxiv.org/abs/quant-ph/0201067) | 
