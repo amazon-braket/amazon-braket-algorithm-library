@@ -1,5 +1,6 @@
 # Amazon Braket Algorithm Library
 [![Build](https://github.com/amazon-braket/amazon-braket-algorithm-library/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/amazon-braket/amazon-braket-algorithm-library/actions/workflows/build.yml)
+[![Documentation Status](https://img.shields.io/readthedocs/amazon-braket-algorithm-library?logo=read-the-docs)](https://amazon-braket-algorithm-library.readthedocs.io)
 
 The Braket Algorithm Library provides Amazon Braket customers with pre-built implementations of prominent quantum algorithms and experimental workloads as ready-to-run example notebooks.
 
