@@ -80,15 +80,10 @@ class MPSSequential:
     This approach allows for approximately encoding an area-law entangled state
     using O(N) circuit depth, where N is the number of qubits by leveraging the MPS structure
     as an intermediate representation. This is an exponential improvement over the
-    standard method of encoding arbitrary states, which typically requires O(2^N) depth.
+    exact method of encoding arbitrary states, which typically requires O(2^N) depth.
 
     The analytical decomposition is based on the approach presented in:
     [arXiv:1908.07958](https://arxiv.org/abs/1908.07958){:.external}
-
-    Further improvements for future include using sweeping techniques from tensor network
-    literature to iteratively improve the fidelity of the encoding with a fixed number of
-    layers. The algorithm is described in detail in the following paper:
-    [arXiv:2209.00595](https://arxiv.org/abs/2209.00595){:.external}
     """
 
     def __init__(self, max_fidelity_threshold: float = 0.95) -> None:
