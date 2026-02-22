@@ -21,6 +21,7 @@ Running notebooks locally requires additional dependencies located in [notebooks
 | QAOA | [Quantum_Approximate_Optimization_Algorithm.ipynb](notebooks/textbook/Quantum_Approximate_Optimization_Algorithm.ipynb) | [Farhi2014](https://arxiv.org/abs/1411.4028) |
 | Quantum Circuit Born Machine | [Quantum_Circuit_Born_Machine.ipynb](notebooks/textbook/Quantum_Circuit_Born_Machine.ipynb) | [Benedetti2019](https://www.nature.com/articles/s41534-019-0157-8),  [Liu2018](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.98.062324) | 
 | QFT | [Quantum_Fourier_Transform.ipynb](notebooks/textbook/Quantum_Fourier_Transform.ipynb) | [Coppersmith2002](https://arxiv.org/abs/quant-ph/0201067) | 
+| Quantum Counting | [Quantum_Counting.ipynb](notebooks/textbook/Quantum_Counting.ipynb) | [Brassard2000](https://arxiv.org/abs/quant-ph/0005055) |
 | QPE | [Quantum_Phase_Estimation_Algorithm.ipynb](notebooks/textbook/Quantum_Phase_Estimation_Algorithm.ipynb) | [Kitaev1995](https://arxiv.org/abs/quant-ph/9511026) |
 | Quantum Walk | [Quantum_Walk.ipynb](notebooks/textbook/Quantum_Walk.ipynb) | [Childs2002](https://arxiv.org/abs/quant-ph/0209131) |
 |Shor's| [Shors_Algorithm.ipynb](notebooks/textbook/Shors_Algorithm.ipynb) | [Shor1998](https://arxiv.org/abs/quant-ph/9508027) |
