@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import quimb.tensor as qtn
+from qiskit_braket_provider import to_braket
 
 from braket.circuits import Circuit
 
@@ -203,7 +204,7 @@ class MPSSequential:
         # After a few layers we are adequately close to |00...0> state
         # after which we can simply reverse the layers (no inverse) and apply them
         # to the |00...0> state to obtain the MPS state
-        for layer_index in range(max_num_layers):
+        for _ in range(max_num_layers):
             # Compress the MPS from the previous layer to a maximum bond dimension of 2,
             # |ψ_k> -> |ψ'_k>
             compressed_mps = disentangled_mps.copy(deep=True)
@@ -212,13 +213,12 @@ class MPSSequential:
             compressed_mps.normalize()
             compressed_mps.compress(form="left", max_bond=2)
 
-            unitary_layer = self.generate_layer(compressed_mps)
-            unitary_layers.append(unitary_layer)
+            unitary_layers.append(self.generate_layer(compressed_mps))
 
             # To update the MPS definition, apply the inverse of U_k to disentangle |ψ_k>,
             # |ψ_(k+1)> = inv(U_k) @ |ψ_k>
-            for i, _ in enumerate(unitary_layer):
-                inverse = unitary_layer[-(i + 1)][1].conj().T
+            for i, (_, U) in enumerate(reversed(unitary_layers[-1])):
+                inverse = U.conj().T
 
                 if inverse.shape[0] == 4:
                     disentangled_mps.gate_split_(inverse, (i - 1, i))
@@ -260,7 +260,7 @@ class MPSSequential:
 
                 circuit.unitary(matrix=unitary, targets=qubits)
 
-        return circuit
+        return to_braket(circuit, add_measurements=False, basis_gates=["u3", "cx", "global_phase"])
 
     def __call__(
         self, statevector: npt.NDArray[np.complex128], max_num_layers: int = 10

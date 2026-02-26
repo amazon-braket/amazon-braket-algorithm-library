@@ -35,6 +35,7 @@ setup(
         # Sympy 1.13 produces different results for Simon's algorithm
         "sympy<1.13",
         "quimb",
+        "qiskit_braket_provider",
     ],
     extras_require={
         "test": [
