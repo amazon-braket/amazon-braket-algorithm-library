@@ -5,4 +5,4 @@ lint.isort = { known-first-party = [
   "braket",
 ] }
 lint.extend-select = ["I", "PERF"]
-lint.preview = true
+lint.preview = false #TODO: set back to true

@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.7.3 (2026-02-20)
+
+### Bug Fixes and Other Changes
+
+ * change lint rules
+
+### Documentation Changes
+
+ * Add doc badge to README
+
 ## v1.7.2 (2026-02-17)
 
 ### Bug Fixes and Other Changes
