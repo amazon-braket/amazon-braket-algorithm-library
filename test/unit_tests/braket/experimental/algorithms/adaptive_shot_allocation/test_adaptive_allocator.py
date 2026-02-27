@@ -1,13 +1,17 @@
-import pytest
-import networkx as nx
 import unittest
+from unittest.mock import patch
+
+import networkx as nx
+import pytest
 
 from braket.experimental.algorithms.adaptive_shot_allocation.adaptive_allocator import (
-    commute, qwc_commute, gen_commute,
-    term_variance_estimate, terms_covariance_estimate,
-    AdaptiveShotAllocator
+    AdaptiveShotAllocator,
+    commute,
+    gen_commute,
+    qwc_commute,
+    term_variance_estimate,
+    terms_covariance_estimate,
 )
-from unittest.mock import patch
 
 # Fixtures for common test setups
 
@@ -30,13 +34,14 @@ def mock_measurements_2terms():
     return [
         [
             {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},
-            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4}
+            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4},
         ],
         [
             {(1, 1): 3, (1, -1): 1, (-1, 1): 2, (-1, -1): 4},
-            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}
-        ]
+            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4},
+        ],
     ]
+
 
 # 1. Tests for Helper Functions
 
@@ -77,13 +82,12 @@ def test_partial_commute_functions():
 def test_term_variance_estimate():
     # Test with no measurements (prior only)
     # With no measurements, the formula gives 4*(1*1)/(2*3) = 4/6 = 2/3
-    assert abs(term_variance_estimate(0) - 2/3) < 1e-10
+    assert abs(term_variance_estimate(0) - 2 / 3) < 1e-10
 
     # Test with mock measurements
     mock_measurements = [[{(1, 1): 10, (1, -1): 0, (-1, 1): 0, (-1, -1): 5}]]
-    expected_variance = 4 * ((10+1) * (5+1)) / ((10+5+2) * (10+5+3))
-    assert abs(term_variance_estimate(
-        0, mock_measurements) - expected_variance) < 1e-10
+    expected_variance = 4 * ((10 + 1) * (5 + 1)) / ((10 + 5 + 2) * (10 + 5 + 3))
+    assert abs(term_variance_estimate(0, mock_measurements) - expected_variance) < 1e-10
 
 
 def test_terms_covariance_estimate():
@@ -94,18 +98,17 @@ def test_terms_covariance_estimate():
     # Test with mock measurements
     mock_measurements = [
         [{(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5}],
-        [{(1, 1): 7, (1, -1): 0, (-1, 1): 0, (-1, -1): 3}]
+        [{(1, 1): 7, (1, -1): 0, (-1, 1): 0, (-1, -1): 3}],
     ]
     # Add cross-measurements
-    mock_measurements[0].append(
-        {(1, 1): 4, (1, -1): 1, (-1, 1): 2, (-1, -1): 3})
-    mock_measurements[1].insert(
-        0, {(1, 1): 4, (1, -1): 2, (-1, 1): 1, (-1, -1): 3})
+    mock_measurements[0].append({(1, 1): 4, (1, -1): 1, (-1, 1): 2, (-1, -1): 3})
+    mock_measurements[1].insert(0, {(1, 1): 4, (1, -1): 2, (-1, 1): 1, (-1, -1): 3})
 
     # Calculate covariance
     result = terms_covariance_estimate(0, 1, mock_measurements)
     assert isinstance(result, float)
     assert -1.0 <= result <= 1.0  # Covariance should be in this range
+
 
 # 2. Tests for AdaptiveShotAllocator Class
 
@@ -139,9 +142,11 @@ def test_reset_method(simple_allocator):
     # Reset and check state
     simple_allocator.reset()
     assert simple_allocator.shots is None
-    assert all(all(outcome == 0 for outcome in simple_allocator.measurements[i][j].values())
-               for i in range(simple_allocator.num_terms)
-               for j in range(simple_allocator.num_terms))
+    assert all(
+        all(outcome == 0 for outcome in simple_allocator.measurements[i][j].values())
+        for i in range(simple_allocator.num_terms)
+        for j in range(simple_allocator.num_terms)
+    )
 
 
 def test_generate_graph():
@@ -163,8 +168,7 @@ def test_generate_graph():
 
 def test_partition_graph():
     # Create a simple graph with known clique structure
-    allocator = AdaptiveShotAllocator(
-        ["II", "IX", "IZ", "ZI"], [1.0, 1.0, 1.0, 1.0])
+    allocator = AdaptiveShotAllocator(["II", "IX", "IZ", "ZI"], [1.0, 1.0, 1.0, 1.0])
 
     # II, IX, ZI should form one clique (all commute with each other)
     # IZ should be in a separate clique
@@ -195,8 +199,7 @@ def test_error_estimate(simple_allocator):
     simple_allocator.shots = [10, 15]
 
     # Mock measurements to update graph weights
-    mock_measurements = [
-        [{(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}] * 2] * 2
+    mock_measurements = [[{(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}] * 2] * 2
     simple_allocator.update_measurements(mock_measurements)
 
     # Calculate error estimate
@@ -228,12 +231,12 @@ def test_expectation_from_measurements():
     mock_measurements = [
         [
             {(1, 1): 8, (1, -1): 0, (-1, 1): 0, (-1, -1): 2},
-            {(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0}
+            {(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0},
         ],
         [
             {(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0},
-            {(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0}
-        ]
+            {(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0},
+        ],
     ]
 
     # Expected: 0.5 * 0.6 + (-0.3) * (0.0) = 0.3 + 0.0 = 0.0
@@ -250,22 +253,18 @@ def test_validate_measurements():
     valid_measurements = [
         [
             {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},
-            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4}
+            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4},
         ],
         [
             {(1, 1): 3, (1, -1): 1, (-1, 1): 2, (-1, -1): 4},
-            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}
-        ]
+            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4},
+        ],
     ]
 
     assert allocator._validate_measurements(valid_measurements) == True
 
     # Invalid measurements (wrong size)
-    invalid_measurements = [
-        [
-            {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5}
-        ]
-    ]
+    invalid_measurements = [[{(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5}]]
 
     with pytest.raises(AssertionError):
         allocator._validate_measurements(invalid_measurements)
@@ -274,12 +273,12 @@ def test_validate_measurements():
     invalid_measurements = [
         [
             {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},
-            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 3}  # Sum is 9, not 10
+            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 3},  # Sum is 9, not 10
         ],
         [
             {(1, 1): 3, (1, -1): 1, (-1, 1): 2, (-1, -1): 4},
-            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}
-        ]
+            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4},
+        ],
     ]
 
     with pytest.raises(AssertionError):
@@ -289,12 +288,12 @@ def test_validate_measurements():
     invalid_measurements = [
         [
             {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},
-            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4}
+            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4},
         ],
         [
             {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4},
-            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}
-        ]
+            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4},
+        ],
     ]
 
     with pytest.raises(AssertionError):
@@ -304,12 +303,12 @@ def test_validate_measurements():
     invalid_measurements = [
         [
             {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},
-            {(1, 1): 3, (1, -1): 4, (-1, 1): -1, (-1, -1): 4}
+            {(1, 1): 3, (1, -1): 4, (-1, 1): -1, (-1, -1): 4},
         ],
         [
             {(1, 1): 3, (1, -1): -1, (-1, 1): 4, (-1, -1): 4},
-            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}
-        ]
+            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4},
+        ],
     ]
 
     with pytest.raises(AssertionError):
@@ -323,20 +322,21 @@ def test_shots_from_measurements():
     mock_measurements = [
         [
             {(1, 1): 5, (1, -1): 0, (-1, 1): 0, (-1, -1): 5},  # 10 shots
-            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4}
+            {(1, 1): 3, (1, -1): 2, (-1, 1): 1, (-1, -1): 4},
         ],
         [
             {(1, 1): 3, (1, -1): 1, (-1, 1): 2, (-1, -1): 4},
-            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4}   # 10 shots
-        ]
+            {(1, 1): 6, (1, -1): 0, (-1, 1): 0, (-1, -1): 4},  # 10 shots
+        ],
     ]
 
     shots = allocator.shots_from_measurements(mock_measurements)
     assert len(shots) == len(allocator.cliq)
     assert shots[0] == 10  # First clique should have 10 shots
 
+
 class VisualizationTest(unittest.TestCase):
-    @patch('matplotlib.pyplot.show')
+    @patch("matplotlib.pyplot.show")
     def test_graph(*args):
         paulis = ["XX", "IZ", "ZI", "YY", "XI"]
         coeffs = [0.5, 0.3, -0.2, 1.0, 2.0]

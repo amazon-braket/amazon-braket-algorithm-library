@@ -33,7 +33,7 @@ def commute(a: str, b: str, qwc: bool = True) -> bool:
     Raises:
         ValueError: If the Pauli strigns are of different length.
     """
-    if len(a)!=len(b):
+    if len(a) != len(b):
         raise ValueError("Pauli strings must be of the same length.")
     count = 0
     for i in zip(a, b):
@@ -42,15 +42,17 @@ def commute(a: str, b: str, qwc: bool = True) -> bool:
 
 
 # Partial functions for specific commutation checks
-qwc_commute = partial(commute, qwc=True)   # Qubit-wise commutation
-gen_commute = partial(commute, qwc=False)   # General commutation
+qwc_commute = partial(commute, qwc=True)  # Qubit-wise commutation
+gen_commute = partial(commute, qwc=False)  # General commutation
 
 # BAYESIAN STATISTICS (closed formulas from Appendix B of arXiv:2110.15339v6)
 
 
-def term_variance_estimate(term_idx: int, measurements: Union[MeasurementData, None] = None) -> float:
+def term_variance_estimate(
+    term_idx: int, measurements: Union[MeasurementData, None] = None
+) -> float:
     """
-    Estimate variance for a single Pauli term. 
+    Estimate variance for a single Pauli term.
     See Eq 14 in Appendix B of "Adaptive Estimation of Quantum Observables (arXiv:2110.15339v6)
 
     Args:
@@ -64,10 +66,12 @@ def term_variance_estimate(term_idx: int, measurements: Union[MeasurementData, N
     if measurements:
         x0 = measurements[term_idx][term_idx][(1, 1)]
         x1 = measurements[term_idx][term_idx][(-1, -1)]
-    return 4*((x0+1)*(x1+1))/((x0+x1+2)*(x0+x1+3))
+    return 4 * ((x0 + 1) * (x1 + 1)) / ((x0 + x1 + 2) * (x0 + x1 + 3))
 
 
-def terms_covariance_estimate(i: int, j: int, measurements: Union[MeasurementData, None] = None) -> float:
+def terms_covariance_estimate(
+    i: int, j: int, measurements: Union[MeasurementData, None] = None
+) -> float:
     """
     Estimate covariance between two Pauli terms.
     See Eq 25-6 in Appendix B of "Adaptive Estimation of Quantum Observables (arXiv:2110.15339v6)
@@ -93,14 +97,17 @@ def terms_covariance_estimate(i: int, j: int, measurements: Union[MeasurementDat
         xy11 = measurements[i][j][(-1, -1)]
 
     # Calculate prior probabilities
-    p00 = 4*((x0+1)*(y0+1))/((x0+x1+2)*(y0+y1+2))
-    p01 = 4*((x0+1)*(y1+1))/((x0+x1+2)*(y0+y1+2))
-    p10 = 4*((x1+1)*(y0+1))/((x0+x1+2)*(y0+y1+2))
-    p11 = 4*((x1+1)*(y1+1))/((x0+x1+2)*(y0+y1+2))
+    p00 = 4 * ((x0 + 1) * (y0 + 1)) / ((x0 + x1 + 2) * (y0 + y1 + 2))
+    p01 = 4 * ((x0 + 1) * (y1 + 1)) / ((x0 + x1 + 2) * (y0 + y1 + 2))
+    p10 = 4 * ((x1 + 1) * (y0 + 1)) / ((x0 + x1 + 2) * (y0 + y1 + 2))
+    p11 = 4 * ((x1 + 1) * (y1 + 1)) / ((x0 + x1 + 2) * (y0 + y1 + 2))
 
     # Return Bayesian covariance estimate
-    return 4*((xy00+p00)*(xy11+p11) - (xy01+p01)*(xy10+p10)) / \
-        ((xy00+xy01+xy10+xy11+4)*(xy00+xy01+xy10+xy11+5))
+    return (
+        4
+        * ((xy00 + p00) * (xy11 + p11) - (xy01 + p01) * (xy10 + p10))
+        / ((xy00 + xy01 + xy10 + xy11 + 4) * (xy00 + xy01 + xy10 + xy11 + 5))
+    )
 
 
 class AdaptiveShotAllocator:
@@ -156,11 +163,10 @@ class AdaptiveShotAllocator:
             raise ValueError("Number of Paulis must match coefficients")
 
         # Validate Pauli strings
-        valid_chars = set('IXYZ')
+        valid_chars = set("IXYZ")
         for pauli in paulis:
             if not set(pauli).issubset(valid_chars):
-                raise ValueError(
-                    f"Invalid Pauli string: {pauli}. Must only contain I, X, Y, or Z")
+                raise ValueError(f"Invalid Pauli string: {pauli}. Must only contain I, X, Y, or Z")
         self.paulis = paulis
         self.coeffs = coeffs
         self.graph = self._generate_graph()
@@ -179,9 +185,10 @@ class AdaptiveShotAllocator:
         - Updates graph weights to initial values
         """
         # Initialize measurement counts for all term pairs
-        self.measurements = [[{(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0}
-                              for _ in range(self.num_terms)]
-                             for _ in range(self.num_terms)]
+        self.measurements = [
+            [{(1, 1): 0, (1, -1): 0, (-1, 1): 0, (-1, -1): 0} for _ in range(self.num_terms)]
+            for _ in range(self.num_terms)
+        ]
         self.shots = None  # Clear shot allocation history
         self._update_graph_weights()  # Reset graph weights
 
@@ -201,7 +208,9 @@ class AdaptiveShotAllocator:
             Edges are added between terms that commute according to the provided function.
         """
         if commute != qwc_commute:
-            warnings.warn("Braket only supports simultaneous measurement of qubit-wise commuting operators.")
+            warnings.warn(
+                "Braket only supports simultaneous measurement of qubit-wise commuting operators."
+            )
 
         # Create graph and add nodes with Pauli string labels
         self.graph = nx.Graph()
@@ -229,8 +238,9 @@ class AdaptiveShotAllocator:
         _, cliq = approximation.clique_removal(self.graph)
         self.cliq = [sorted(i) for i in cliq]  # Sort cliques for consistency
 
-    def visualize_graph(self, node_size: int = 1230, font_size: int = 10,
-                        show_cliques: bool = True) -> None:
+    def visualize_graph(
+        self, node_size: int = 1230, font_size: int = 10, show_cliques: bool = True
+    ) -> None:
         """
         Visualize the graph with colored edges based on clique membership.
 
@@ -242,15 +252,17 @@ class AdaptiveShotAllocator:
         """
 
         # Generate random colors for each clique
-        cliq_colors = ["#"+"".join([hex(random.randint(0, 255))[2:].zfill(2)
-                                   for _ in range(3)]) for _ in self.cliq]
+        cliq_colors = [
+            "#" + "".join([hex(random.randint(0, 255))[2:].zfill(2) for _ in range(3)])
+            for _ in self.cliq
+        ]
 
         # Build edge list and colors
         if show_cliques:
             el = []
             ec = []
             for e in self.graph.edges:
-                for i,c in enumerate(self.cliq):
+                for i, c in enumerate(self.cliq):
                     if (e[0] in c) and (e[1] in c):
                         el.append(e)
                         ec.append(cliq_colors[i])
@@ -258,23 +270,32 @@ class AdaptiveShotAllocator:
         else:
             el = list(self.graph.edges)
             # Use gray for all edges when showing full graph
-            ec = ['gray' for _ in el]
+            ec = ["gray" for _ in el]
 
         # Create layout
         pos = nx.circular_layout(self.graph)
 
         # Draw the graph
         plt.figure(figsize=(10, 10))
-        nx.draw(self.graph, pos=pos, with_labels=False,
-                node_color='white', node_size=node_size,
-                edgelist=el, edge_color=ec)
+        nx.draw(
+            self.graph,
+            pos=pos,
+            with_labels=False,
+            node_color="white",
+            node_size=node_size,
+            edgelist=el,
+            edge_color=ec,
+        )
 
         # Add labels
-        nx.draw_networkx_labels(self.graph, pos,
-                                labels=nx.get_node_attributes(
-                                    self.graph, 'label'),
-                                font_size=font_size, font_color="black",
-                                font_family="Times")
+        nx.draw_networkx_labels(
+            self.graph,
+            pos,
+            labels=nx.get_node_attributes(self.graph, "label"),
+            font_size=font_size,
+            font_color="black",
+            font_family="Times",
+        )
 
         # Set edge colors
         ax = plt.gca()
@@ -299,9 +320,12 @@ class AdaptiveShotAllocator:
             # Base weight from coefficients
             weight = self.coeffs[i] * self.coeffs[j]
             # Multiply by variance/covariance estimate
-            weight *= (term_variance_estimate(i, measurements) if i == j
-                       else terms_covariance_estimate(i, j, measurements))
-            self.graph[i][j]['weight'] = weight
+            weight *= (
+                term_variance_estimate(i, measurements)
+                if i == j
+                else terms_covariance_estimate(i, j, measurements)
+            )
+            self.graph[i][j]["weight"] = weight
 
     def incremental_shot_allocation(self, num_shots: int) -> List[int]:
         """
@@ -337,13 +361,14 @@ class AdaptiveShotAllocator:
         current_shots = self.shots if self.shots else [0 for c in self.cliq]
 
         # Calculate weighted covariance matrix for error estimates
-        weighted_covariance = nx.adjacency_matrix(
-            self.graph, weight="weight").toarray()
+        weighted_covariance = nx.adjacency_matrix(self.graph, weight="weight").toarray()
 
         # Initialize error estimates for each clique using current shots
         # Error = sqrt(sum of covariances) / number of shots
-        clique_error = [np.sqrt(weighted_covariance[c, c].sum())/(current_shots[e] or not current_shots[e])
-                        for e, c in enumerate(self.cliq)]
+        clique_error = [
+            np.sqrt(weighted_covariance[c, c].sum()) / (current_shots[e] or not current_shots[e])
+            for e, c in enumerate(self.cliq)
+        ]
 
         # Allocate shots one at a time
         for _ in range(num_shots):
@@ -356,8 +381,7 @@ class AdaptiveShotAllocator:
             # Update error estimate for the chosen clique
             # New error = Old error * (n/(n+1)) where n+1 is the updated shot count.
             total_shots = current_shots[cliq_id] + proposed_allocation[cliq_id]
-            clique_error[cliq_id] *= ((total_shots-1)
-                                      or not (total_shots-1))/(total_shots)
+            clique_error[cliq_id] *= ((total_shots - 1) or not (total_shots - 1)) / (total_shots)
 
         return proposed_allocation
 
@@ -379,18 +403,23 @@ class AdaptiveShotAllocator:
             ValueError: If graph weights have not been properly initialized
         """
         # Get weighted covariance matrix
-        weighted_covariance = nx.adjacency_matrix(
-            self.graph, weight="weight").toarray()
+        weighted_covariance = nx.adjacency_matrix(self.graph, weight="weight").toarray()
 
         # Sum variance contributions from each clique
-        variance_estimate = sum([(weighted_covariance[c, c].sum())/(self.shots[e] or not self.shots[e])
-                                 for e, c in enumerate(self.cliq)])
+        variance_estimate = sum(
+            [
+                (weighted_covariance[c, c].sum()) / (self.shots[e] or not self.shots[e])
+                for e, c in enumerate(self.cliq)
+            ]
+        )
 
         return np.sqrt(variance_estimate)
 
-    def expectation_from_measurements(self, measurements: Union[MeasurementData, None] = None) -> float:
+    def expectation_from_measurements(
+        self, measurements: Union[MeasurementData, None] = None
+    ) -> float:
         """
-        Calculate the energy expectation value from measurement results 
+        Calculate the energy expectation value from measurement results
         for the different Pauli string observables.
 
         For each Pauli term, computes <P> = (N++ - N--)/N_total where:
@@ -414,17 +443,15 @@ class AdaptiveShotAllocator:
         expectation = 0.0
         for i in range(len(self.coeffs)):
             # Verify no invalid measurements
-            assert measurements[i][i][(
-                1, -1)] == 0, "Invalid measurement detected: (+1,-1)"
-            assert measurements[i][i][(-1, 1)
-                                      ] == 0, "Invalid measurement detected: (-1,+1)"
+            assert measurements[i][i][(1, -1)] == 0, "Invalid measurement detected: (+1,-1)"
+            assert measurements[i][i][(-1, 1)] == 0, "Invalid measurement detected: (-1,+1)"
 
             # Calculate expectation for this term
-            term_shots = measurements[i][i][(
-                1, 1)] + measurements[i][i][(-1, -1)]
+            term_shots = measurements[i][i][(1, 1)] + measurements[i][i][(-1, -1)]
             if term_shots:
                 term_expect = (
-                    measurements[i][i][(1, 1)] - measurements[i][i][(-1, -1)]) / term_shots
+                    measurements[i][i][(1, 1)] - measurements[i][i][(-1, -1)]
+                ) / term_shots
                 expectation += self.coeffs[i] * term_expect
 
         return expectation
@@ -447,13 +474,11 @@ class AdaptiveShotAllocator:
         Raises:
             AssertionError: If any validation check fails
         """
-        assert len(
-            measurements) == self.num_terms, "Wrong number of measurement records"
+        assert len(measurements) == self.num_terms, "Wrong number of measurement records"
 
         for c in self.cliq:
             # Get total shots for this clique
-            m_cliq = (measurements[c[0]][c[0]][(1, 1)] +
-                      measurements[c[0]][c[0]][(-1, -1)])
+            m_cliq = measurements[c[0]][c[0]][(1, 1)] + measurements[c[0]][c[0]][(-1, -1)]
 
             # Check consistency within clique
             for i in c:
@@ -463,25 +488,31 @@ class AdaptiveShotAllocator:
                         assert v >= 0, "Measurement counts should not be negative"
 
                     # Measurements should be symmetric
-                    assert measurements[i][j][(1,1)]==measurements[j][i][(1,1)],\
-                         "Measurement should be symmetric"
-                    assert measurements[i][j][(-1,-1)]==measurements[j][i][(-1,-1)],\
-                         "Measurement should be symmetric"
-                    assert measurements[i][j][(1,-1)]==measurements[j][i][(-1,1)],\
-                         "Measurement should be symmetric"
-                    assert measurements[i][j][(-1,1)]==measurements[j][i][(1,-1)],\
-                         "Measurement should be symmetric"
+                    assert measurements[i][j][(1, 1)] == measurements[j][i][(1, 1)], (
+                        "Measurement should be symmetric"
+                    )
+                    assert measurements[i][j][(-1, -1)] == measurements[j][i][(-1, -1)], (
+                        "Measurement should be symmetric"
+                    )
+                    assert measurements[i][j][(1, -1)] == measurements[j][i][(-1, 1)], (
+                        "Measurement should be symmetric"
+                    )
+                    assert measurements[i][j][(-1, 1)] == measurements[j][i][(1, -1)], (
+                        "Measurement should be symmetric"
+                    )
 
                     # All pairs in clique should have same total measurements
-                    assert m_cliq == sum(measurements[i][j].values()), \
-                        (f"The number of times {i} and {j} were measured together should be "
-                         "equal to the number of measurements of their clique.")
+                    assert m_cliq == sum(measurements[i][j].values()), (
+                        f"The number of times {i} and {j} were measured together should be "
+                        "equal to the number of measurements of their clique."
+                    )
 
                     # Diagonal elements should not have invalid combinations
                     if i == j:
-                        assert measurements[i][i][(1, -1)] == measurements[i][i][(-1, 1)] == 0, \
-                            ("A measurement of a single term can only contribute to the "
-                            "(1,1) or (-1,-1) counts.")
+                        assert measurements[i][i][(1, -1)] == measurements[i][i][(-1, 1)] == 0, (
+                            "A measurement of a single term can only contribute to the "
+                            "(1,1) or (-1,-1) counts."
+                        )
         return True
 
     def shots_from_measurements(self, measurements: MeasurementData) -> List[int]:
