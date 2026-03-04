@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7.4 (2026-03-02)
+
+### Bug Fixes and Other Changes
+
+ * Add Quantum Counting algorithm implementation
+
 ## v1.7.3 (2026-02-20)
 
 ### Bug Fixes and Other Changes
