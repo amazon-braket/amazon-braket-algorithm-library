@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7.5 (2026-03-05)
+
+### Bug Fixes and Other Changes
+
+ * Add Harrow-Hassidim-Lloyd (HHL) algorithm
+
 ## v1.7.4 (2026-03-02)
 
 ### Bug Fixes and Other Changes
