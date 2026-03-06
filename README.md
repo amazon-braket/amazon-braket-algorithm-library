@@ -24,6 +24,7 @@ Running notebooks locally requires additional dependencies located in [notebooks
 | QPE | [Quantum_Phase_Estimation_Algorithm.ipynb](notebooks/textbook/Quantum_Phase_Estimation_Algorithm.ipynb) | [Kitaev1995](https://arxiv.org/abs/quant-ph/9511026) |
 | Quantum Counting | [Quantum_Counting_Algorithm.ipynb](notebooks/textbook/Quantum_Counting_Algorithm.ipynb) | [Brassard1998](https://arxiv.org/abs/quant-ph/9805082) |
 | Quantum Walk | [Quantum_Walk.ipynb](notebooks/textbook/Quantum_Walk.ipynb) | [Childs2002](https://arxiv.org/abs/quant-ph/0209131) |
+|Rabi Oscillations| [Rabi_Oscillations.ipynb](notebooks/textbook/Rabi_Oscillations.ipynb) | [Rabi1937](https://journals.aps.org/pr/abstract/10.1103/PhysRev.51.652) |
 |Shor's| [Shors_Algorithm.ipynb](notebooks/textbook/Shors_Algorithm.ipynb) | [Shor1998](https://arxiv.org/abs/quant-ph/9508027) |
 | Simon's | [Simons_Algorithm.ipynb](notebooks/textbook/Simons_Algorithm.ipynb) | [Simon1997](https://epubs.siam.org/doi/10.1137/S0097539796298637) |
 
