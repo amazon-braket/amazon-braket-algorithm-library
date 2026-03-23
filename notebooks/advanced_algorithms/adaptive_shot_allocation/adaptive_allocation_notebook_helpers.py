@@ -1,4 +1,3 @@
-
 from typing import List
 
 import numpy as np
@@ -14,6 +13,7 @@ Utilities for creating and manipulating quantum circuits.
 """
 
 _localSim = LocalSimulator()
+
 
 def create_random_state(num_qubits: int = 4) -> Circuit:
     """
@@ -33,7 +33,7 @@ def create_random_state(num_qubits: int = 4) -> Circuit:
 
     # Entangling layer
     for i in range(num_qubits - 1):
-        circ.cnot(control=i, target=i+1)
+        circ.cnot(control=i, target=i + 1)
 
     # Second layer of rotations
     for i in range(num_qubits):
@@ -73,9 +73,11 @@ def get_exact_expectation(circuit: Circuit, paulis: List[str], coeffs: List[floa
         e_exact += c * result.values[0]
     return e_exact
 
+
 """
 Utilities for allocating measurement shots across different measurement groups.
 """
+
 
 def get_uniform_shots(num_groups: int, total_shots: int) -> List[int]:
     """
@@ -132,4 +134,3 @@ def get_weighted_shots(cliq: List[List[int]], coeffs: List[float], total_shots: 
     for i in range(remainder):
         shots[i] += 1
     return shots.tolist()
-

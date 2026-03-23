@@ -11,9 +11,10 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-"""Version information.
-
-Version number (major.minor.patch[-label])
-"""
-
-__version__ = "1.7.6.dev0"
+from braket.experimental.algorithms.quantum_counting.quantum_counting import (  # noqa: F401, E501
+    build_grover_circuit,
+    build_oracle_circuit,
+    get_quantum_counting_results,
+    quantum_counting_circuit,
+    run_quantum_counting,
+)
