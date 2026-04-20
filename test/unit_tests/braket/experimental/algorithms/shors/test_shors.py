@@ -50,6 +50,16 @@ def test_shors_algorithm():
     assert aggregate_results["guessed_factors"] == {3, 5}
 
 
+def test_shors_algorithm_for_33():
+    integer_N = 33
+    integer_a = 10
+    shor = shors_algorithm(integer_N, integer_a)
+    local_simulator = LocalSimulator()
+    output = run_shors_algorithm(shor, local_simulator)
+    aggregate_results = get_factors_from_results(output, integer_N, integer_a, False)
+    assert aggregate_results["guessed_factors"] == {3, 11}
+
+
 def test_all_valid_a():
     local_simulator = LocalSimulator()
     integer_N = 15
@@ -58,6 +68,16 @@ def test_all_valid_a():
         output = run_shors_algorithm(shor, local_simulator)
         aggregate_results = get_factors_from_results(output, integer_N, integer_a, True)
         assert aggregate_results["guessed_factors"] == {3, 5}
+
+
+def test_all_valid_a_for_33():
+    local_simulator = LocalSimulator()
+    integer_N = 33
+    for integer_a in [10, 23]:
+        shor = shors_algorithm(integer_N, integer_a)
+        output = run_shors_algorithm(shor, local_simulator)
+        aggregate_results = get_factors_from_results(output, integer_N, integer_a, True)
+        assert aggregate_results["guessed_factors"] == {3, 11}
 
 
 def test_no_counts():
