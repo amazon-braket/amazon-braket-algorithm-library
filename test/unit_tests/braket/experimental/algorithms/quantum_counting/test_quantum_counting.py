@@ -266,10 +266,8 @@ def test_count_with_marked_initial_state():
 
     # Controlled-G^(2^k) using gate-level circuit
     for ii, qubit in enumerate(reversed(counting_qubits)):
-        power = 2 ** ii
-        circ.add_circuit(
-            qc.controlled_grover_circuit(qubit, search_qubits, marked_states, power)
-        )
+        power = 2**ii
+        circ.add_circuit(qc.controlled_grover_circuit(qubit, search_qubits, marked_states, power))
 
     # Inverse QFT on counting qubits
     circ.add_circuit(qc.inverse_qft_for_counting(counting_qubits))
