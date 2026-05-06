@@ -1,8 +1,96 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "amazon-braket-algorithm-library"
+dynamic = ["version"]
+description = "An open source library of quantum computing algorithms implemented on Amazon Braket"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">= 3.11"
+authors = [
+    { name = "Amazon Web Services" },
+]
+keywords = ["Amazon", "AWS", "Quantum"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "amazon-braket-sdk>=1.35.1",
+    "numpy",
+    "openfermion>=1.5.1",
+    "pennylane>=0.34.0",
+    "scipy>=1.5.2",
+    # Sympy 1.13 produces different results for Simon's algorithm
+    "sympy<1.13",
+    "qiskit-braket-provider",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-rerunfailures",
+    "pytest-xdist",
+    "ruff",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-apidoc",
+    "tox",
+]
+
+[project.urls]
+Homepage = "https://github.com/amazon-braket/amazon-braket-algorithm-library"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["test"]
+
+[tool.setuptools.dynamic]
+version = { attr = "braket._algos._version.__version__" }
+
+[tool.setuptools.package-data]
+"*" = ["*.md"]
+
+[tool.pytest.ini_options]
+xfail_strict = true
+# removing pytest-xdist config currently since that conflicts with -s option in --mock-level=LEAST tests
+addopts = "--verbose -n auto --durations=0 --durations-min=1"
+testpaths = ["test/unit_tests"]
+
+[tool.coverage.run]
+parallel = true
+branch = true
+source = ["braket.experimental"]
+
+[tool.coverage.paths]
+source = [
+    "src/braket",
+    ".tox/*/lib/python*/site-packages/braket",
+]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.coverage.html]
+directory = "build/coverage"
+
+[tool.coverage.xml]
+output = "build/coverage/coverage.xml"
+
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-lint.isort = { known-first-party = [
-  "braket",
-] }
-lint.extend-select = ["I", "PERF"]
-lint.preview = false #TODO: set back to true
+
+[tool.ruff.lint]
+extend-select = ["I", "PERF"]
+preview = false #TODO: set back to true
+
+[tool.ruff.lint.isort]
+known-first-party = ["braket"]

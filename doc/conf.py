@@ -2,11 +2,11 @@
 
 import datetime
 
-import pkg_resources
+from importlib.metadata import version as pkg_version
 
 # Sphinx configuration below.
 project = "amazon-braket-algorithm-library"
-version = pkg_resources.require(project)[0].version
+version = pkg_version(project)
 release = version
 copyright = f"{datetime.datetime.now().year}, Amazon.com"
 
