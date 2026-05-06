@@ -235,9 +235,7 @@ def controlled_grover_circuit(
         )
 
         # Controlled diffusion
-        circ.add_circuit(
-            _controlled_diffusion_circuit(control, search_qubits, decompose_ccnot)
-        )
+        circ.add_circuit(_controlled_diffusion_circuit(control, search_qubits, decompose_ccnot))
 
     return circ
 
@@ -292,9 +290,7 @@ def quantum_counting_circuit(
     """
     new_circuit = Circuit().add_circuit(counting_circ)
     new_circuit.add_circuit(
-        quantum_counting(
-            counting_qubits, search_qubits, marked_states, decompose_ccnot
-        )
+        quantum_counting(counting_qubits, search_qubits, marked_states, decompose_ccnot)
     )
     return new_circuit.probability(counting_qubits)
 
@@ -338,9 +334,7 @@ def quantum_counting(
     for ii, qubit in enumerate(reversed(counting_qubits)):
         power = 2**ii
         qc_circ.add_circuit(
-            controlled_grover_circuit(
-                qubit, search_qubits, marked_states, power, decompose_ccnot
-            )
+            controlled_grover_circuit(qubit, search_qubits, marked_states, power, decompose_ccnot)
         )
 
     # Inverse QFT on counting qubits
@@ -436,9 +430,7 @@ def get_quantum_counting_results(
 
     if verbose:
         print(f"Search space size N = {N}")
-        sorted_cr = sorted(
-            counting_register_results.items(), key=lambda x: x[1], reverse=True
-        )
+        sorted_cr = sorted(counting_register_results.items(), key=lambda x: x[1], reverse=True)
         print("\nCounting register distribution (top outcomes):")
         for bitstring, count in sorted_cr[:6]:
             y_val = int(bitstring, 2)
