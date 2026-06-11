@@ -6,6 +6,12 @@
 
  * build(deps): bump codecov/codecov-action from 6 to 7
 
+## v1.7.7 (2026-06-11)
+
+### Bug Fixes and Other Changes
+
+ * build(deps): bump codecov/codecov-action from 6 to 7
+
 ## v1.7.7 (2026-06-10)
 
 ### Bug Fixes and Other Changes
