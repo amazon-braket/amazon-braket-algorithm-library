@@ -12,8 +12,6 @@
 # language governing permissions and limitations under the License.
 
 
-from typing import List, Tuple
-
 import numpy as np
 
 from braket.circuits import Circuit, FreeParameter, circuit
@@ -149,7 +147,7 @@ class QCBM:
         return grad
 
 
-def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]) -> float:
+def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: list[float] = [0.1, 1]) -> float:
     r"""Gaussian radial basis function (RBF) kernel.
 
     .. math::
@@ -170,7 +168,7 @@ def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0
     return kernel
 
 
-def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1]) -> float:
+def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: list[float] = [0.1, 1]) -> float:
     r"""Maximum Mean Discrepancy loss (MMD).
 
     MMD determines if two distributions are equal by looking at the difference between
@@ -205,7 +203,7 @@ def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: List[float] = [0.1, 1])
 
 @circuit.subroutine(register=True)
 def qcbm_layers(
-    neighbors: List[Tuple[int, int]], parameters: List[List[List[FreeParameter]]]
+    neighbors: list[tuple[int, int]], parameters: list[list[list[FreeParameter]]]
 ) -> Circuit:
     """QCBM layers.
 
@@ -228,7 +226,7 @@ def qcbm_layers(
 
 
 @circuit.subroutine(register=True)
-def entangler(neighbors: List[Tuple[int, int]]) -> Circuit:
+def entangler(neighbors: list[tuple[int, int]]) -> Circuit:
     """Add CNot gates to circuit.
 
     Args:
@@ -244,7 +242,7 @@ def entangler(neighbors: List[Tuple[int, int]]) -> Circuit:
 
 
 @circuit.subroutine(register=True)
-def rotation_layer(parameters: List[List[FreeParameter]]) -> Circuit:
+def rotation_layer(parameters: list[list[FreeParameter]]) -> Circuit:
     """Add rotation layers  to circuit.
 
     Args:

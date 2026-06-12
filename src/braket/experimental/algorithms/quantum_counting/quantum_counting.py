@@ -10,7 +10,7 @@ Reference:
 """
 
 import math
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -23,7 +23,7 @@ from braket.tasks import QuantumTask
 
 def build_oracle_circuit(
     n_qubits: int,
-    marked_states: List[int],
+    marked_states: list[int],
     decompose_ccnot: bool = False,
 ) -> Circuit:
     """Build an oracle circuit that flips the phase of marked states.
@@ -60,7 +60,7 @@ def build_oracle_circuit(
 
 def build_grover_circuit(
     n_qubits: int,
-    marked_states: List[int],
+    marked_states: list[int],
     decompose_ccnot: bool = False,
 ) -> Circuit:
     """Build the Grover operator G = D · O as a circuit.
@@ -88,7 +88,7 @@ def build_grover_circuit(
 def _controlled_oracle_circuit(
     control: int,
     search_qubits: QubitSetInput,
-    marked_states: List[int],
+    marked_states: list[int],
     decompose_ccnot: bool = False,
 ) -> Circuit:
     """Build a controlled oracle circuit using gate-level primitives.
@@ -202,7 +202,7 @@ def _add_controlled_h(circ: Circuit, control: int, target: int) -> None:
 def controlled_grover_circuit(
     control: int,
     search_qubits: QubitSetInput,
-    marked_states: List[int],
+    marked_states: list[int],
     power: int = 1,
     decompose_ccnot: bool = False,
 ) -> Circuit:
@@ -270,7 +270,7 @@ def quantum_counting_circuit(
     counting_circ: Circuit,
     counting_qubits: QubitSetInput,
     search_qubits: QubitSetInput,
-    marked_states: List[int],
+    marked_states: list[int],
     decompose_ccnot: bool = False,
 ) -> Circuit:
     """Create the full quantum counting circuit with result types.
@@ -298,7 +298,7 @@ def quantum_counting_circuit(
 def quantum_counting(
     counting_qubits: QubitSetInput,
     search_qubits: QubitSetInput,
-    marked_states: List[int],
+    marked_states: list[int],
     decompose_ccnot: bool = False,
 ) -> Circuit:
     """Build the core quantum counting circuit using QPE on the Grover operator.
@@ -367,7 +367,7 @@ def get_quantum_counting_results(
     counting_qubits: QubitSetInput,
     search_qubits: QubitSetInput,
     verbose: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Post-process quantum counting results to estimate the number of marked items.
 
     After measuring the counting qubits, the most likely outcome y gives
@@ -397,7 +397,7 @@ def get_quantum_counting_results(
     N = 2**n_search
 
     # Aggregate results on counting register (trace out search qubits)
-    counting_register_results: Dict[str, int] = {}
+    counting_register_results: dict[str, int] = {}
     if measurement_counts:
         for key in measurement_counts.keys():
             counting_bits = key[:n_counting]
@@ -446,10 +446,10 @@ def get_quantum_counting_results(
 
 
 def _get_counting_estimates(
-    counting_register_results: Dict[str, int],
+    counting_register_results: dict[str, int],
     n_counting: int,
     N: int,
-) -> Tuple[List[float], List[float]]:
+) -> tuple[list[float], list[float]]:
     """Convert counting register bitstrings to phase and count estimates.
 
     Args:

@@ -11,7 +11,6 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 from collections import Counter
-from typing import List, Tuple
 
 import numpy as np
 
@@ -26,7 +25,7 @@ def create_bell_inequality_circuits(
     angle_A: float = 0,
     angle_B: float = np.pi / 3,
     angle_C: float = 2 * np.pi / 3,
-) -> List[Circuit]:
+) -> list[Circuit]:
     """Create the three circuits for Bell's inequality. Default angles will give maximum violation
     of Bell's inequality.
 
@@ -48,10 +47,10 @@ def create_bell_inequality_circuits(
 
 
 def run_bell_inequality(
-    circuits: List[Circuit],
+    circuits: list[Circuit],
     device: Device,
     shots: int = 1_000,
-) -> List[QuantumTask]:
+) -> list[QuantumTask]:
     """Submit three Bell circuits to a device.
 
     Args:
@@ -67,8 +66,8 @@ def run_bell_inequality(
 
 
 def get_bell_inequality_results(
-    tasks: List[QuantumTask], verbose: bool = True
-) -> Tuple[List[Counter], float, float, float]:
+    tasks: list[QuantumTask], verbose: bool = True
+) -> tuple[list[Counter], float, float, float]:
     """Return Bell task results after post-processing.
 
     Args:

@@ -23,7 +23,7 @@ References:
     [2] Wikipedia: https://en.wikipedia.org/wiki/HHL_algorithm
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 from qiskit.circuit import QuantumCircuit
@@ -47,7 +47,7 @@ def hhl_circuit(
     matrix: np.ndarray,
     b_vector: np.ndarray,
     num_clock_qubits: int = 2,
-    scaling_factor: Optional[float] = None,
+    scaling_factor: float | None = None,
 ) -> Circuit:
     """Construct the full HHL circuit for solving Ax = b.
 
@@ -147,7 +147,7 @@ def get_hhl_results(
     b_vector: np.ndarray,
     num_clock_qubits: int = 2,
     verbose: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Post-process results from an HHL run.
 
     Extracts the solution state by post-selecting on the ancilla qubit
@@ -330,7 +330,7 @@ def _compute_hamiltonian_simulation(matrix: np.ndarray, t: float) -> np.ndarray:
 
 def _decompose_controlled_unitary(
     unitary: np.ndarray,
-    targets: List[int],
+    targets: list[int],
 ) -> Circuit:
     """Decompose a controlled-U gate into native 1q/2q gates via Qiskit transpilation.
 

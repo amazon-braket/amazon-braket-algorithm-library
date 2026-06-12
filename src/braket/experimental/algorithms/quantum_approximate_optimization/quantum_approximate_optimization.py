@@ -12,8 +12,6 @@
 # language governing permissions and limitations under the License.
 
 
-from typing import List
-
 import numpy as np
 
 from braket.circuits import Circuit, FreeParameter, Observable, circuit
@@ -26,7 +24,7 @@ def cost_function(
     device: Device,
     circ: Circuit,
     coeffs: np.ndarray,
-    cost_history: List[float],
+    cost_history: list[float],
     shots: int = 0,
 ) -> float:
     """Cost function and append to loss history list.

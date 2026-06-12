@@ -1,8 +1,8 @@
 import copy
 import multiprocessing as mp
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, List, Tuple
 
 import pennylane as qml
 from openfermion.circuits.low_rank import low_rank_two_body_decomposition
@@ -17,11 +17,11 @@ class ChemicalProperties:
     nuclear_repulsion: float  # nuclear repulsion energy
     v_0: np.ndarray  # one-body term stored as np.ndarray with mean-field subtraction
     h_chem: np.ndarray  # one-body term stored as np.ndarray, without mean-field subtraction
-    v_gamma: List[np.ndarray]  # 1j * l_gamma
-    l_gamma: List[np.ndarray]  # Cholesky vector decomposed from two-body terms
+    v_gamma: list[np.ndarray]  # 1j * l_gamma
+    l_gamma: list[np.ndarray]  # Cholesky vector decomposed from two-body terms
     mf_shift: np.ndarray  # mean-field shift
-    lambda_l: List[np.ndarray]  # eigenvalues of Cholesky vectors
-    u_l: List[np.ndarray]  # eigenvectors of Cholesky vectors
+    lambda_l: list[np.ndarray]  # eigenvalues of Cholesky vectors
+    u_l: list[np.ndarray]  # eigenvectors of Cholesky vectors
 
 
 def classical_qmc(
@@ -31,7 +31,7 @@ def classical_qmc(
     trial: np.ndarray,
     prop: ChemicalProperties,
     max_pool: int = 8,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """Classical Auxiliary-Field Quantum Monte Carlo.
 
     Args:
@@ -82,7 +82,7 @@ def hartree_fock_energy(trial: np.ndarray, prop: ChemicalProperties) -> float:
     return e_hf
 
 
-def full_imag_time_evolution_wrapper(args: Tuple) -> Callable:
+def full_imag_time_evolution_wrapper(args: tuple) -> Callable:
     return full_imag_time_evolution(*args)
 
 
@@ -94,7 +94,7 @@ def full_imag_time_evolution(
     e_shift: float,
     walker: np.ndarray,
     weight: float,
-) -> Tuple[List[float], float]:
+) -> tuple[list[float], float]:
     """Imaginary time evolution of a single walker.
 
     Args:
@@ -128,7 +128,7 @@ def imag_time_propogator(
     weight: float,
     prop: ChemicalProperties,
     e_shift: float,
-) -> Tuple[float, np.ndarray, float]:
+) -> tuple[float, np.ndarray, float]:
     """Propagate a walker by one time step.
 
     Args:
@@ -203,7 +203,7 @@ def local_energy(h1e: np.ndarray, eri: np.ndarray, green_funcs: np.ndarray, enuc
     return e1 + e2 + enuc
 
 
-def reortho(A: np.ndarray) -> Tuple[np.ndarray, float]:
+def reortho(A: np.ndarray) -> tuple[np.ndarray, float]:
     """Reorthogonalise a MxN matrix A. Performs a QR decomposition of A. Note that for consistency
     elsewhere we want to preserve detR > 0 which is not guaranteed. We thus factor the signs of the
     diagonal of R into Q.
@@ -309,13 +309,13 @@ def chemistry_preparation(
 
 def propagate_walker(
     x: np.ndarray,
-    v_0: List[np.ndarray],
-    v_gamma: List[np.ndarray],
+    v_0: list[np.ndarray],
+    v_gamma: list[np.ndarray],
     mf_shift: np.ndarray,
     dtau: float,
     trial: np.ndarray,
     walker: np.ndarray,
-    green_funcs: List[np.ndarray],
+    green_funcs: list[np.ndarray],
 ) -> np.ndarray:
     r"""Update the walker forward in imaginary time.
 
