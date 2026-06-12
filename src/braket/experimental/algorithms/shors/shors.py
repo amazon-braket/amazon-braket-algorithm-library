@@ -14,7 +14,7 @@
 import math
 from collections import Counter
 from fractions import Fraction
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -71,8 +71,8 @@ def shors_algorithm(integer_N: int, integer_a: int) -> Circuit:
 def run_shors_algorithm(
     circuit: Circuit,
     device: Device,
-    shots: Optional[int] = 1000,
-) -> Dict[str, Any]:
+    shots: int | None = 1000,
+) -> dict[str, Any]:
     """
     Function to run Shor's algorithm and return measurement counts.
 
@@ -180,11 +180,11 @@ def modular_exponentiation_amod15(
 
 
 def get_factors_from_results(
-    results: Dict[str, Any],
+    results: dict[str, Any],
     integer_N: int,
     integer_a: int,
     verbose: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Function to postprocess dictionary returned by run_shors_algorithm
         and pretty print results
@@ -235,7 +235,7 @@ def get_factors_from_results(
     return aggregate_results
 
 
-def _get_phases(measurement_counts: Counter) -> List[float]:
+def _get_phases(measurement_counts: Counter) -> list[float]:
     """
     Get phase estimate from measurement_counts using top half qubits
 

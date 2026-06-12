@@ -89,7 +89,7 @@ target-version = "py311"
 line-length = 100
 
 [tool.ruff.lint]
-extend-select = ["I", "PERF"]
+extend-select = ["I", "PERF", "UP"]
 preview = false #TODO: set back to true
 
 [tool.ruff.lint.isort]

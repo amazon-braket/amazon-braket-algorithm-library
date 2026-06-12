@@ -13,7 +13,8 @@
 
 import math
 from collections import Counter
-from typing import Any, Callable, Dict, List, Tuple
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 
@@ -126,7 +127,7 @@ def get_quantum_phase_estimation_results(
     precision_qubits: QubitSetInput,
     query_qubits: QubitSetInput,
     verbose: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Function to postprocess results returned by run_quantum_phase_estimation and pretty print
     results.
 
@@ -211,7 +212,7 @@ def _binary_to_decimal(binary: str) -> float:
 
 def _get_quantum_phase_estimation_phases(
     measurement_counts: Counter, precision_qubits: QubitSetInput
-) -> Tuple[List[float], Dict[str, int]]:
+) -> tuple[list[float], dict[str, int]]:
     """Get Quantum Phase Estimates phase estimate from measurement_counts for given number of
     precision qubits.
 

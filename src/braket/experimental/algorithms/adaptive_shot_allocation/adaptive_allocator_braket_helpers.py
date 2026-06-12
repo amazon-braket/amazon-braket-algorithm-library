@@ -3,8 +3,6 @@ Helper functions to handle quantum measurements and adaptive shot allocation
 experiments on Amazon Braket.
 """
 
-from typing import List, Union
-
 from braket.aws import AwsDevice
 from braket.circuits import Circuit, Observable
 from braket.devices import LocalSimulator
@@ -29,10 +27,10 @@ def observable_from_string(pauli_string: str) -> Observable:
 
 
 def run_fixed_allocation(
-    device: Union[LocalSimulator, AwsDevice],
+    device: LocalSimulator | AwsDevice,
     circuit: Circuit,
     estimator: AdaptiveShotAllocator,
-    shot_allocation: List[int],
+    shot_allocation: list[int],
 ) -> MeasurementData:
     """
     Run experiment with a specific shot allocation.
@@ -96,7 +94,7 @@ def run_fixed_allocation(
 
 
 def run_adaptive_allocation(
-    device: Union[LocalSimulator, AwsDevice],
+    device: LocalSimulator | AwsDevice,
     circuit: Circuit,
     estimator: AdaptiveShotAllocator,
     shots_per_round: int,

@@ -1,7 +1,7 @@
 import random
 import warnings
+from collections.abc import Callable
 from functools import partial
-from typing import Callable, Dict, List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -9,7 +9,7 @@ import numpy as np
 from networkx.algorithms import approximation
 
 # Type alias for measurement data structure (see AdaptiveShotAllocator.measurements)
-MeasurementData = List[List[Dict[Tuple[int, int], int]]]
+MeasurementData = list[list[dict[tuple[int, int], int]]]
 
 """
 Helper functions for Pauli operator commutation and Bayesian statistics calculations.
@@ -48,9 +48,7 @@ gen_commute = partial(commute, qwc=False)  # General commutation
 # BAYESIAN STATISTICS (closed formulas from Appendix B of arXiv:2110.15339v6)
 
 
-def term_variance_estimate(
-    term_idx: int, measurements: Union[MeasurementData, None] = None
-) -> float:
+def term_variance_estimate(term_idx: int, measurements: MeasurementData | None = None) -> float:
     """
     Estimate variance for a single Pauli term.
     See Eq 14 in Appendix B of "Adaptive Estimation of Quantum Observables (arXiv:2110.15339v6)
@@ -69,9 +67,7 @@ def term_variance_estimate(
     return 4 * ((x0 + 1) * (x1 + 1)) / ((x0 + x1 + 2) * (x0 + x1 + 3))
 
 
-def terms_covariance_estimate(
-    i: int, j: int, measurements: Union[MeasurementData, None] = None
-) -> float:
+def terms_covariance_estimate(i: int, j: int, measurements: MeasurementData | None = None) -> float:
     """
     Estimate covariance between two Pauli terms.
     See Eq 25-6 in Appendix B of "Adaptive Estimation of Quantum Observables (arXiv:2110.15339v6)
@@ -139,14 +135,14 @@ class AdaptiveShotAllocator:
     """
 
     num_terms: int
-    paulis: List[str]
-    coeffs: List[float]
+    paulis: list[str]
+    coeffs: list[float]
     graph: nx.Graph
-    cliq: List[List[int]]
+    cliq: list[list[int]]
     measurements: MeasurementData
-    shots: Union[List[int], None]
+    shots: list[int] | None
 
-    def __init__(self, paulis: List[str], coeffs: List[float]) -> None:
+    def __init__(self, paulis: list[str], coeffs: list[float]) -> None:
         """
         Initialize the AdaptiveShotAllocator with Pauli terms and their coefficients.
 
@@ -327,7 +323,7 @@ class AdaptiveShotAllocator:
             )
             self.graph[i][j]["weight"] = weight
 
-    def incremental_shot_allocation(self, num_shots: int) -> List[int]:
+    def incremental_shot_allocation(self, num_shots: int) -> list[int]:
         """
         Propose allocation of measurement shots to cliques using greedy minimization of
         the estimated error.
@@ -415,9 +411,7 @@ class AdaptiveShotAllocator:
 
         return np.sqrt(variance_estimate)
 
-    def expectation_from_measurements(
-        self, measurements: Union[MeasurementData, None] = None
-    ) -> float:
+    def expectation_from_measurements(self, measurements: MeasurementData | None = None) -> float:
         """
         Calculate the energy expectation value from measurement results
         for the different Pauli string observables.
@@ -515,7 +509,7 @@ class AdaptiveShotAllocator:
                         )
         return True
 
-    def shots_from_measurements(self, measurements: MeasurementData) -> List[int]:
+    def shots_from_measurements(self, measurements: MeasurementData) -> list[int]:
         """
         Extract the number of shots allocated to each clique from measurement data.
 

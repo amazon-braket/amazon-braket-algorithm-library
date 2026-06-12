@@ -10,7 +10,6 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-from typing import Dict
 
 import numpy as np
 
@@ -109,7 +108,7 @@ def deutsch_jozsa(oracle: Circuit) -> Circuit:
     return circ
 
 
-def get_deutsch_jozsa_results(task: QuantumTask) -> Dict[str, float]:
+def get_deutsch_jozsa_results(task: QuantumTask) -> dict[str, float]:
     """Return the probabilities and corresponding bitstrings.
 
     Args:
