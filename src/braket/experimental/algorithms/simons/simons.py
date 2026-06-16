@@ -12,7 +12,7 @@
 # language governing permissions and limitations under the License.
 
 from collections import Counter
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import numpy as np
 from sympy import Matrix
@@ -81,9 +81,7 @@ def simons_algorithm(oracle: Circuit) -> Circuit:
     return Circuit().h(range(nb_base_qubits)).add(oracle).h(range(nb_base_qubits))
 
 
-def run_simons_algorithm(
-    oracle: Circuit, device: Device, shots: Optional[int] = None
-) -> QuantumTask:
+def run_simons_algorithm(oracle: Circuit, device: Device, shots: int | None = None) -> QuantumTask:
     """Function to run Simon's algorithm and return the secret string.
 
     Args:
@@ -109,7 +107,7 @@ def run_simons_algorithm(
     return task
 
 
-def get_simons_algorithm_results(task: QuantumTask) -> Dict[str, Any]:
+def get_simons_algorithm_results(task: QuantumTask) -> dict[str, Any]:
     """Get and print classically post-processed results from Simon's algorithm execution.
 
     Args:
@@ -139,7 +137,7 @@ def get_simons_algorithm_results(task: QuantumTask) -> Dict[str, Any]:
     return output
 
 
-def _get_secret_string(measurement_counts: Counter) -> Tuple[str, Counter]:
+def _get_secret_string(measurement_counts: Counter) -> tuple[str, Counter]:
     """Classical post-processing to recover the secret string.
 
     The measurement counter contains k bitstrings which correspond to k equations:

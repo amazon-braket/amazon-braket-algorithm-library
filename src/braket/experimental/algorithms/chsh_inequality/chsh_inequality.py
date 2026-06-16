@@ -12,7 +12,6 @@
 # language governing permissions and limitations under the License.
 
 from collections import Counter
-from typing import List, Tuple
 
 import numpy as np
 
@@ -32,7 +31,7 @@ def create_chsh_inequality_circuits(
     a2: float = 0,
     b1: float = np.pi / 4,
     b2: float = 3 * np.pi / 4,
-) -> List[Circuit]:
+) -> list[Circuit]:
     """Create the four circuits for CHSH inequality. Default angles will give maximum violation of
     the inequality.
 
@@ -55,10 +54,10 @@ def create_chsh_inequality_circuits(
 
 
 def run_chsh_inequality(
-    circuits: List[Circuit],
+    circuits: list[Circuit],
     device: Device,
     shots: int = 1_000,
-) -> List[QuantumTask]:
+) -> list[QuantumTask]:
     """Submit four CHSH circuits to a device.
 
     Args:
@@ -74,8 +73,8 @@ def run_chsh_inequality(
 
 
 def get_chsh_results(
-    tasks: List[QuantumTask], verbose: bool = True
-) -> Tuple[float, List[Counter], float, float, float]:
+    tasks: list[QuantumTask], verbose: bool = True
+) -> tuple[float, list[Counter], float, float, float]:
     """Return CHSH task results after post-processing.
 
     Args:

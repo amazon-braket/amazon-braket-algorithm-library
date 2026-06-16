@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 
@@ -108,7 +108,7 @@ def run_quantum_walk(
     circ: Circuit,
     device: Device,
     shots: int = 1000,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Function to run quantum random walk algorithm and return measurement counts.
 
     Args:

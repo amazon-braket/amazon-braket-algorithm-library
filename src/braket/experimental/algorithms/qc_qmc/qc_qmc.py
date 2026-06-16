@@ -1,6 +1,6 @@
 import multiprocessing as mp
 import os
-from typing import Callable, List, Tuple
+from collections.abc import Callable
 
 import numpy as np
 import pennylane as qml
@@ -29,7 +29,7 @@ def qc_qmc(
     trial_state_circuit: Callable,
     dev: qml.devices.Device,
     max_pool: int = 8,
-) -> Tuple[List[float], List[float]]:
+) -> tuple[list[float], list[float]]:
     """Quantum assisted Auxiliary-Field Quantum Monte Carlo.
 
     Args:
@@ -83,7 +83,7 @@ def qc_qmc(
     return quantum_energies, energies
 
 
-def q_full_imag_time_evolution_wrapper(args: Tuple) -> Callable:
+def q_full_imag_time_evolution_wrapper(args: tuple) -> Callable:
     return q_full_imag_time_evolution(*args)
 
 
@@ -98,7 +98,7 @@ def q_full_imag_time_evolution(
     weight: float,
     trial_state_circuit: Callable,
     dev: qml.devices.Device,
-) -> Tuple[List[float], List[float], List[float], List[float]]:
+) -> tuple[list[float], list[float], list[float], list[float]]:
     """Imaginary time evolution of a single walker.
 
     Args:
@@ -150,7 +150,7 @@ def imag_time_propogator_qaee(
     e_shift: float,
     trial_state_circuit: Callable,
     dev: qml.devices.Device,
-) -> Tuple[float, float, float, np.ndarray, float]:
+) -> tuple[float, float, float, np.ndarray, float]:
     """Imaginary time propogator with quantum energy evaluations.
 
     Args:
@@ -284,7 +284,7 @@ def local_energy_quantum(  # noqa: C901
     return energy
 
 
-def givens_block_circuit(givens: Tuple) -> None:
+def givens_block_circuit(givens: tuple) -> None:
     r"""This function defines the Givens rotation circuit from a single givens tuple.
 
     Args:
@@ -304,7 +304,7 @@ def givens_block_circuit(givens: Tuple) -> None:
     qml.CNOT(wires=[j, i])
 
 
-def prepare_slater_circuit(circuit_description: List[Tuple]) -> None:
+def prepare_slater_circuit(circuit_description: list[tuple]) -> None:
     """Creating Givens rotation circuit to prepare arbitrary Slater determinant.
 
     Args:
@@ -446,7 +446,7 @@ def u_circuit(u_matrix: np.ndarray) -> None:
 
 
 def pauli_real(
-    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: List[int]
+    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: list[int]
 ) -> Callable:
     """Construct the the vacuum reference circuit for measuring expectation value
         of a pauli real part
@@ -471,7 +471,7 @@ def pauli_real(
 
 
 def pauli_imag(
-    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: List[int]
+    q_state: np.ndarray, trial_state_circuit: Callable, u_matrix: np.ndarray, pauli: list[int]
 ) -> Callable:
     """Construct the the vacuum reference circuit for measuring expectation value
         of a pauli imaginary part
@@ -499,7 +499,7 @@ def pauli_estimate(
     q_state: np.ndarray,
     trial_state_circuit: Callable,
     u_matrix: np.ndarray,
-    pauli: List[int],
+    pauli: list[int],
     dev: qml.device,
 ) -> float:
     """This function returns the expectation value of $\\langle \\Psi_q_state|pauli|\\phi_l\rangle$.
