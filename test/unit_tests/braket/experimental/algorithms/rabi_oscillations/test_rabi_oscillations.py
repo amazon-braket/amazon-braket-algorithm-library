@@ -70,3 +70,44 @@ def test_excited_state_probability_returns_probability_of_one():
         rel_tol=0.0,
         abs_tol=1e-12,
     )
+
+def test_rabi_simulated_dynamics_stepwise_only_detuning():
+    circ = rabi_simulated_dynamics(
+        math.pi,
+        delta=0.3,
+        dtheta=0.5,
+    )
+
+    operator_names = [instruction.operator.name for instruction in circ.instructions]
+
+    assert "Rz" in operator_names
+    assert "AmplitudeDamping" not in operator_names
+    assert "PhaseDamping" not in operator_names
+
+
+def test_rabi_simulated_dynamics_stepwise_only_t1():
+    circ = rabi_simulated_dynamics(
+        math.pi,
+        gamma_t1=0.1,
+        dtheta=0.5,
+    )
+
+    operator_names = [instruction.operator.name for instruction in circ.instructions]
+
+    assert "AmplitudeDamping" in operator_names
+    assert "Rz" not in operator_names
+    assert "PhaseDamping" not in operator_names
+
+
+def test_rabi_simulated_dynamics_stepwise_only_t2():
+    circ = rabi_simulated_dynamics(
+        math.pi,
+        gamma_t2=0.1,
+        dtheta=0.5,
+    )
+
+    operator_names = [instruction.operator.name for instruction in circ.instructions]
+
+    assert "PhaseDamping" in operator_names
+    assert "Rz" not in operator_names
+    assert "AmplitudeDamping" not in operator_names
