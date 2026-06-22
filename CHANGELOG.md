@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.7.7 (2026-06-22)
+
+### Bug Fixes and Other Changes
+
+ * Python 3.11 syntax
+ * build(deps): bump codecov/codecov-action from 6 to 7
+
 ## v1.7.7 (2026-06-18)
 
 ### Bug Fixes and Other Changes
