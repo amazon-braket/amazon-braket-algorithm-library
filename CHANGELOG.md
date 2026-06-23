@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7.8 (2026-06-23)
+
+### Bug Fixes and Other Changes
+
+ * Python 3.11 syntax
+
 ## v1.7.7 (2026-06-23)
 
 ### Bug Fixes and Other Changes
