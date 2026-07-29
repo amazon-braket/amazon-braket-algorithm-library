@@ -1,4 +1,3 @@
-setuptools==83.0.0
 sphinx
 sphinx-rtd-theme
 sphinxcontrib-apidoc

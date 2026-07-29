@@ -399,7 +399,7 @@ def get_quantum_counting_results(
     # Aggregate results on counting register (trace out search qubits)
     counting_register_results: dict[str, int] = {}
     if measurement_counts:
-        for key in measurement_counts.keys():
+        for key in measurement_counts:
             counting_bits = key[:n_counting]
             counting_register_results[counting_bits] = (
                 counting_register_results.get(counting_bits, 0) + measurement_counts[key]

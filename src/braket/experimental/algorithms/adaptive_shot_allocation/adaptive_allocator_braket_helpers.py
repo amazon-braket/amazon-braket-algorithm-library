@@ -66,9 +66,9 @@ def run_fixed_allocation(
     while tasks:
         task_to_process = None
 
-        for c_idx in tasks:
+        for c_idx, task in tasks.items():
             # Check task status
-            state = tasks[c_idx].state()
+            state = task.state()
             assert state in ["CREATED", "QUEUED", "RUNNING", "COMPLETED"], (
                 f"Encountered quantum task failure (status: {state})."
             )
