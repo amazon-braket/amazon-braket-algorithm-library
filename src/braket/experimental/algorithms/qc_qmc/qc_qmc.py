@@ -213,7 +213,7 @@ def imag_time_propogator_qaee(
     return e_loc, numerator, denominator, new_walker, new_weight
 
 
-def local_energy_quantum(  # noqa: C901
+def local_energy_quantum(
     walker: np.ndarray,
     ovlp: float,
     one_body: np.ndarray,

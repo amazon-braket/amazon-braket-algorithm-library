@@ -12,6 +12,8 @@
 # language governing permissions and limitations under the License.
 
 
+from collections.abc import Sequence
+
 import numpy as np
 
 from braket.circuits import Circuit, FreeParameter, circuit
@@ -147,7 +149,9 @@ class QCBM:
         return grad
 
 
-def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: list[float] = [0.1, 1]) -> float:
+def _compute_kernel(
+    px: np.ndarray, py: np.ndarray, sigma_list: Sequence[float] = (0.1, 1)
+) -> float:
     r"""Gaussian radial basis function (RBF) kernel.
 
     .. math::
@@ -156,7 +160,7 @@ def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: list[float] = [0
     Args:
         px (ndarray): Probability distribution
         py (ndarray): Target probability distribution
-        sigma_list (List[float]): Standard deviations of distribution. Defaults to [0.1, 1].
+        sigma_list (Sequence[float]): Standard deviations of distribution. Defaults to (0.1, 1).
 
     Returns:
         float: Value of the Gaussian RBF function for kernel(px, py).
@@ -168,7 +172,7 @@ def _compute_kernel(px: np.ndarray, py: np.ndarray, sigma_list: list[float] = [0
     return kernel
 
 
-def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: list[float] = [0.1, 1]) -> float:
+def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: Sequence[float] = (0.1, 1)) -> float:
     r"""Maximum Mean Discrepancy loss (MMD).
 
     MMD determines if two distributions are equal by looking at the difference between
@@ -189,7 +193,7 @@ def mmd_loss(px: np.ndarray, py: np.ndarray, sigma_list: list[float] = [0.1, 1])
     Args:
         px (ndarray): Probability distribution
         py (ndarray): Target probability distribution
-        sigma_list (List[float]):  Standard deviations of distribution. Defaults to [0.1, 1].
+        sigma_list (Sequence[float]):  Standard deviations of distribution. Defaults to (0.1, 1).
 
     Returns:
         float: Value of the MMD loss
