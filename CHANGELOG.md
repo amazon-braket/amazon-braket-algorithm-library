@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7.10 (2026-07-29)
+
+### Bug Fixes and Other Changes
+
+ * linter fixes and setuptools pin removal
+
 ## v1.7.9 (2026-07-14)
 
 ### Bug Fixes and Other Changes
