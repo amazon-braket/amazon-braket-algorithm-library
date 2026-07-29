@@ -250,9 +250,9 @@ def _get_phases(measurement_counts: Counter) -> list[float]:
         return None
 
     # First get bitstrings with corresponding counts for counting qubits only (top half)
-    num_counting_qubits = int(len(list(measurement_counts.keys())[0]) / 2)
+    num_counting_qubits = int(len(next(iter(measurement_counts))) / 2)
 
-    bitstrings_precision_register = [key[:num_counting_qubits] for key in measurement_counts.keys()]
+    bitstrings_precision_register = [key[:num_counting_qubits] for key in measurement_counts]
 
     # Then keep only the unique strings
     bitstrings_precision_register_set = set(bitstrings_precision_register)
@@ -264,7 +264,7 @@ def _get_phases(measurement_counts: Counter) -> list[float]:
     precision_results_dict = {key: 0 for key in bitstrings_precision_register_list}
 
     # Loop over all measurement outcomes
-    for key in measurement_counts.keys():
+    for key in measurement_counts:
         # Save the measurement count for this outcome
         counts = measurement_counts[key]
         # Generate the corresponding shortened key (supported only on the precision_qubits register)
@@ -272,7 +272,7 @@ def _get_phases(measurement_counts: Counter) -> list[float]:
         # Add these measurement counts to the corresponding key in our new dict
         precision_results_dict[count_key] += counts
 
-    phases_decimal = [_binary_to_decimal(item) for item in precision_results_dict.keys()]
+    phases_decimal = [_binary_to_decimal(item) for item in precision_results_dict]
 
     return phases_decimal
 

@@ -151,7 +151,7 @@ def _get_secret_string(measurement_counts: Counter) -> tuple[str, Counter]:
     Returns:
         Tuple[str, Counter]: the secret string and the marginalized output states
     """
-    nb_base_qubits = len(list(measurement_counts.keys())[0]) // 2
+    nb_base_qubits = len(next(iter(measurement_counts))) // 2
 
     traced_results = Counter()
     for bitstring, count in measurement_counts.items():

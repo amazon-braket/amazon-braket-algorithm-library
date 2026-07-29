@@ -226,16 +226,14 @@ def _get_quantum_phase_estimation_phases(
 
     # Aggregate the results (i.e., ignore/trace out the query register qubits):
     # First get bitstrings with corresponding counts for precision qubits only
-    bitstrings_precision_register = [
-        key[: len(precision_qubits)] for key in measurement_counts.keys()
-    ]
+    bitstrings_precision_register = [key[: len(precision_qubits)] for key in measurement_counts]
 
     # Now create a new dict to collect measurement results on the precision_qubits. Keys are given
     # by the measurement count substrings on the register qubits. Initialize the counts to zero.
     precision_results_dict = {key: 0 for key in set(bitstrings_precision_register)}
 
     # Loop over all measurement outcomes
-    for key in measurement_counts.keys():
+    for key in measurement_counts:
         # Save the measurement count for this outcome
         counts = measurement_counts[key]
         # Generate the corresponding shortened key (supported only on the precision_qubits register)

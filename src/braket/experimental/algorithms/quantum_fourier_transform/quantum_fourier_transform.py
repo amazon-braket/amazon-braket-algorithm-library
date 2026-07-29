@@ -123,8 +123,8 @@ def run_quantum_fourier_transform(
     qubits: QubitSetInput,
     n_shots: int,
     device: Device,
-    state_prep_circ: Circuit = Circuit(),
-    analysis_circ: Circuit = Circuit(),
+    state_prep_circ: Circuit | None = None,
+    analysis_circ: Circuit | None = None,
     inverse: bool = False,
 ) -> GateModelQuantumTaskResult:
     """Execute QFT algorithm and returns results.
@@ -133,14 +133,19 @@ def run_quantum_fourier_transform(
         qubits (QubitSetInput): qubit indices
         n_shots (int): number of shots
         device (Device): The requested device (default: LocalSimulator)
-        state_prep_circ (Circuit): circuit to be run before qft
-        analysis_circ (Circuit): circuit to be run after  qft
+        state_prep_circ (Circuit | None): circuit to be run before qft. Defaults to an
+            empty circuit.
+        analysis_circ (Circuit | None): circuit to be run after qft. Defaults to an
+            empty circuit.
         inverse (bool): do the inverse qft
 
     Returns:
         GateModelQuantumTaskResult: circuit execution result
 
     """
+    state_prep_circ = Circuit() if state_prep_circ is None else state_prep_circ
+    analysis_circ = Circuit() if analysis_circ is None else analysis_circ
+
     circuit = Circuit() + state_prep_circ
 
     if inverse:
