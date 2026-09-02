@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7.10.post0 (2026-09-02)
+
+### Documentation Changes
+
+ * add llms.txt generation
+
 ## v1.7.10 (2026-07-29)
 
 ### Bug Fixes and Other Changes
