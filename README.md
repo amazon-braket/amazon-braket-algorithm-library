@@ -27,6 +27,7 @@ Running notebooks locally requires additional dependencies located in [notebooks
 |Rabi Oscillations| [Rabi_Oscillations.ipynb](notebooks/textbook/Rabi_Oscillations.ipynb) | [Rabi1937](https://journals.aps.org/pr/abstract/10.1103/PhysRev.51.652) |
 |Shor's| [Shors_Algorithm.ipynb](notebooks/textbook/Shors_Algorithm.ipynb) | [Shor1998](https://arxiv.org/abs/quant-ph/9508027) |
 | Simon's | [Simons_Algorithm.ipynb](notebooks/textbook/Simons_Algorithm.ipynb) | [Simon1997](https://epubs.siam.org/doi/10.1137/S0097539796298637) |
+| Variational Quantum Eigensolver | [Variational_Quantum_Eigensolver.ipynb](notebooks/textbook/Variational_Quantum_Eigensolver.ipynb) | [Peruzzo2014](https://www.nature.com/articles/ncomms5213), [McClean2016](https://iopscience.iop.org/article/10.1088/1367-2630/18/2/023023) |
 
 
 | Advanced algorithms | Notebook | References |
