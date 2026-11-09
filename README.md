@@ -27,7 +27,6 @@ Running notebooks locally requires additional dependencies located in [notebooks
 |Rabi Oscillations| [Rabi_Oscillations.ipynb](notebooks/textbook/Rabi_Oscillations.ipynb) | [Rabi1937](https://journals.aps.org/pr/abstract/10.1103/PhysRev.51.652) |
 |Shor's| [Shors_Algorithm.ipynb](notebooks/textbook/Shors_Algorithm.ipynb) | [Shor1998](https://arxiv.org/abs/quant-ph/9508027) |
 | Simon's | [Simons_Algorithm.ipynb](notebooks/textbook/Simons_Algorithm.ipynb) | [Simon1997](https://epubs.siam.org/doi/10.1137/S0097539796298637) |
-| Variational Quantum Eigensolver | [Variational_Quantum_Eigensolver.ipynb](notebooks/textbook/Variational_Quantum_Eigensolver.ipynb) | [Peruzzo2014](https://www.nature.com/articles/ncomms5213), [McClean2016](https://iopscience.iop.org/article/10.1088/1367-2630/18/2/023023) |
 
 
 | Advanced algorithms | Notebook | References |
@@ -36,6 +35,7 @@ Running notebooks locally requires additional dependencies located in [notebooks
 | QMC | [Quantum_Computing_Quantum_Monte_Carlo.ipynb](notebooks/advanced_algorithms/Quantum_Computing_Quantum_Monte_Carlo.ipynb) | [Motta2018](https://wires.onlinelibrary.wiley.com/doi/10.1002/wcms.1364), [Peruzzo2014](https://www.nature.com/articles/ncomms5213) |
 | Adaptive Shot Allocation | [2_Adaptive_Shot_Allocation.ipynb](notebooks/advanced_algorithms/adaptive_shot_allocation/2_Adaptive_Shot_Allocation.ipynb) | [Shlosberg2023](https://doi.org/10.22331/q-2023-01-26-906) |
 | HHL Algorithm | [HHL_Algorithm.ipynb](notebooks/advanced_algorithms/HHL_Algorithm.ipynb) | [Harrow2009](https://arxiv.org/abs/0811.3171) |
+| Variational Quantum Eigensolver | [Variational_Quantum_Eigensolver.ipynb](notebooks/advanced_algorithms/Variational_Quantum_Eigensolver.ipynb) | [Peruzzo2014](https://www.nature.com/articles/ncomms5213), [McClean2016](https://iopscience.iop.org/article/10.1088/1367-2630/18/2/023023) |
 
 
 | Auxiliary functions | Notebook |
