@@ -108,6 +108,12 @@ def test_pauli_exponential_ansatz():
     assert np.allclose(bound.to_unitary(), expected)
 
 
+def test_pauli_exponential_ansatz_without_initial_state():
+    circ = pauli_exponential_ansatz([{"XY": 0.5, "YX": -0.5}])
+    assert get_parameter_names(circ) == ["theta_0"]
+    assert all(instr.operator.name != "X" for instr in circ.instructions)
+
+
 @pytest.mark.parametrize(
     "generators, initial_state",
     [([], None), ([{"X": 1.0}, {"XX": 1.0}], None), ([{"XX": 1.0}], [1])],
@@ -291,6 +297,15 @@ def test_get_vqe_results(capsys):
     summary = get_vqe_results(vqe_result, verbose=False)
     assert set(summary) == {"vqe_energy", "n_evaluations"}
     assert capsys.readouterr().out == ""
+
+
+def test_get_vqe_results_verbose_without_exact_energy(capsys):
+    vqe_result = {"optimal_energy": -1.1370, "energy_history": [-1.0, -1.1370]}
+    summary = get_vqe_results(vqe_result)
+    assert set(summary) == {"vqe_energy", "n_evaluations"}
+    output = capsys.readouterr().out
+    assert "VQE energy" in output
+    assert "Exact energy" not in output
 
 
 def test_get_vqe_results_outside_chemical_accuracy():
