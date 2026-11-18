@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.8.0 (2026-11-18)
+
+### Features
+
+ * add Variational Quantum Eigensolver
+
 ## v1.7.10.post0 (2026-09-02)
 
 ### Documentation Changes
