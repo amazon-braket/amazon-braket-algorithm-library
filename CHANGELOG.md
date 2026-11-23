@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.8.0.post0 (2026-11-23)
+
+### Documentation Changes
+
+ * Python 3.14
+
 ## v1.8.0 (2026-11-18)
 
 ### Features
