@@ -395,3 +395,60 @@ def test_decompose_controlled_unitary_empty():
     unitary = np.eye(2, dtype=complex)
     circ = hhl_module._decompose_controlled_unitary(unitary, [0, 1])
     assert len(circ.instructions) == 0
+
+
+@pytest.mark.parametrize(
+    "matrix, b_vector, num_clock, scaling_factor",
+    [
+        (np.diag([1.0, -1.0]), np.ones(2) / np.sqrt(2), 2, 2 * np.pi),
+        (np.diag([-1.0, 2.0]), np.ones(2) / np.sqrt(2), 3, 2 * np.pi),
+        (np.array([[0.0, 1.0], [1.0, 0.0]]), np.array([1.0, 0.0]), 2, 2 * np.pi),
+        (np.diag([1.0, 2.0]), np.ones(2) / np.sqrt(2), 3, 2 * np.pi),
+        (np.diag([0.5, -0.5]), np.ones(2) / np.sqrt(2), 2, 4 * np.pi),
+        (np.array([[0.0, 1j], [-1j, 0.0]]), np.ones(2) / np.sqrt(2), 2, 2 * np.pi),
+    ],
+)
+def test_hhl_preserves_signed_eigenvalues(matrix, b_vector, num_clock, scaling_factor):
+    """Postselected output must preserve relative phases of A^{-1}|b>."""
+    circuit = hhl_module.hhl_circuit(
+        matrix, b_vector, num_clock_qubits=num_clock, scaling_factor=scaling_factor
+    )
+    # Trace over the clock register after postselecting the ancilla.
+    state = np.asarray(circuit.to_unitary())[:, 0]
+    selected = state.reshape(2**num_clock, 2, 2)[:, :, 1]
+    probability = float(np.sum(np.abs(selected) ** 2))
+    assert probability > 0
+
+    solution = np.linalg.solve(matrix, b_vector)
+    solution /= np.linalg.norm(solution)
+    rho = selected.T @ selected.conj() / probability
+    np.testing.assert_allclose(rho, np.outer(solution, solution.conj()), atol=1e-9)
+
+
+@pytest.mark.parametrize("num_clock", [2, 3, 4])
+def test_hhl_automatic_scaling_preserves_negative_eigenphase(num_clock):
+    """Default QPE scaling uses the signed register and preserves a negative phase."""
+    matrix = np.diag([1.0, -1.0])
+    b_vector = np.ones(2) / np.sqrt(2)
+    circuit = hhl_module.hhl_circuit(matrix, b_vector, num_clock_qubits=num_clock)
+    state = np.asarray(circuit.to_unitary())[:, 0]
+    selected = state.reshape(2**num_clock, 2, 2)[:, :, 1]
+    probability = np.sum(np.abs(selected) ** 2)
+    assert probability > 0
+    rho = selected.T @ selected.conj() / probability
+    solution = np.array([1.0, -1.0]) / np.sqrt(2)
+    np.testing.assert_allclose(rho, np.outer(solution, solution), atol=1e-9)
+
+
+def test_hhl_automatic_scaling_uses_precision_register():
+    """Increasing QPE precision improves fidelity for a mixed-sign system."""
+    matrix = np.diag([-1.0, 2.0])
+    b_vector = np.ones(2) / np.sqrt(2)
+    circuit = hhl_module.hhl_circuit(matrix, b_vector, num_clock_qubits=3)
+    state = np.asarray(circuit.to_unitary())[:, 0]
+    selected = state.reshape(8, 2, 2)[:, :, 1]
+    rho = selected.T @ selected.conj() / np.sum(np.abs(selected) ** 2)
+    solution = np.linalg.solve(matrix, b_vector)
+    solution /= np.linalg.norm(solution)
+    fidelity = float(np.real(solution.conj() @ rho @ solution))
+    assert fidelity > 0.9
