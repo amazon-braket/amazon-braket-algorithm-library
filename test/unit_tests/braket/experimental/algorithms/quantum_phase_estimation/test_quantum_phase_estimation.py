@@ -12,9 +12,9 @@
 # language governing permissions and limitations under the License.
 
 import numpy as np
+
 from braket.circuits import Circuit
 from braket.devices import LocalSimulator
-
 from braket.experimental.algorithms.quantum_phase_estimation import quantum_phase_estimation as qpe
 
 
@@ -37,8 +37,8 @@ def test_cnot_qpe_run_2_precision_qubits():
         qpe_circ, precision_qubits, query_qubits, controlled_unitary_apply_cnot_func
     )
 
-    assert len(qpe_circ.instructions) == 8
-    assert qpe_circ.depth == 6
+    assert len(qpe_circ.instructions) == 10
+    assert qpe_circ.depth == 8
     # assert qpe_circ.instructions[3].ascii_symbols == ("C", "X")
 
     # run QPE
@@ -184,3 +184,29 @@ def test_inverse_qft():
     # validate circuit output
     assert len(qft_circ.instructions) == 4
     assert qft_circ.instructions[2].operator.ascii_symbols == ("C", "PHASE(-1.57)")
+
+
+# The qubit label 0 must be a valid precision control, just like every other label.
+def test_qpe_phase_estimation_is_independent_of_qubit_labels():
+    def controlled_z(qpe_circ, control_qubit, query_qubits):
+        qpe_circ.cz(control_qubit, query_qubits[0])
+
+    for precision_qubit, query_qubit in [(0, 1), (1, 0)]:
+        qpe_circ = Circuit().x(query_qubit)
+        qpe_circ.add_circuit(
+            qpe.quantum_phase_estimation([precision_qubit], [query_qubit], controlled_z)
+        )
+        qpe_circ.probability(target=[precision_qubit])
+        probabilities = LocalSimulator().run(qpe_circ, shots=0).result().values[0]
+        np.testing.assert_allclose(probabilities, [0, 1], atol=1e-12)
+
+
+def test_qpe_controlled_unitary_powers_include_qubit_zero():
+    controls = []
+
+    def record_controlled_x(qpe_circ, control_qubit, query_qubits):
+        controls.append(control_qubit)
+        qpe_circ.cnot(control_qubit, query_qubits[0])
+
+    qpe.quantum_phase_estimation([0, 1, 3], [2], record_controlled_x)
+    assert controls == [3] + [1] * 2 + [0] * 4
