@@ -66,7 +66,9 @@ def hhl_circuit(
         b_vector (np.ndarray): A normalized 2-element vector b.
         num_clock_qubits (int): Number of clock qubits for QPE (default: 2).
         scaling_factor (Optional[float]): Scaling factor for Hamiltonian simulation.
-            If None, automatically computed from the eigenvalues.
+            If None, automatically computed from the eigenvalues. To avoid phase
+            aliasing, ``abs(eigenvalue) * scaling_factor / (2 * pi)`` must stay
+            below ``2 ** (num_clock_qubits - 1)`` for signed eigenvalues.
 
     Returns:
         Circuit: The complete HHL circuit.
@@ -87,12 +89,16 @@ def hhl_circuit(
 
     # Determine scaling factor if not provided
     if scaling_factor is None:
-        # Map the full range of eigenvalues into the QPE register
+        # Reserve half of the phase register for negative eigenvalues. The
+        # clock labels represent signed integers modulo 2**num_clock_qubits.
         max_eigenval = max(abs(ev) for ev in eigenvalues)
         num_states = 2**num_clock_qubits
-        # Scale so that eigenvalues map to distinct, well-separated QPE states
-        # using the eigenvalue range to ensure all eigenvalues are representable
-        scaling_factor = 2 * np.pi * (num_states - 1) / (max_eigenval * num_states)
+        max_signed_state = num_states // 2 - 1
+        if max_signed_state > 0:
+            scaling_factor = 2 * np.pi * max_signed_state / max_eigenval
+        else:
+            # A single clock bit cannot distinguish positive and negative phases.
+            scaling_factor = np.pi / max_eigenval
 
     # Define qubit registers
     clock_qubits = list(range(num_clock_qubits))
@@ -420,12 +426,13 @@ def _controlled_rotation(
 
     # For each possible clock register state, apply a controlled rotation
     for clock_state in range(1, num_states):
-        # Reconstruct the eigenvalue from the clock state
-        reconstructed_eigenval = (2 * np.pi * clock_state) / (scaling_factor * num_states)
+        # QPE encodes lambda as lambda * scaling_factor / (2*pi),
+        # modulo num_states. Interpret wrapped labels as negative eigenvalues.
+        signed_state = clock_state if clock_state < num_states // 2 else clock_state - num_states
+        reconstructed_eigenval = (2 * np.pi * signed_state) / scaling_factor
 
-        # Compute rotation angle
-        ratio = c_value / abs(reconstructed_eigenval)
-        ratio = min(ratio, 1.0)
+        # Preserve the sign of 1/lambda in the postselected ancilla amplitude.
+        ratio = np.clip(c_value / reconstructed_eigenval, -1.0, 1.0)
         theta = 2 * np.arcsin(ratio)
 
         if abs(theta) < 1e-12:
