@@ -92,9 +92,8 @@ def quantum_phase_estimation(
 
     # Apply controlled unitaries C-U(2^k). Start with the last precision_qubit, end with the first
     for ii, qubit in enumerate(reversed(precision_qubits)):
-        if qubit:
-            for _ in range(2**ii):
-                unitary_apply_func(quantum_phase_estimation_circ, qubit, query_qubits)
+        for _ in range(2**ii):
+            unitary_apply_func(quantum_phase_estimation_circ, qubit, query_qubits)
 
     quantum_phase_estimation_circ.inverse_qft(precision_qubits)
 
